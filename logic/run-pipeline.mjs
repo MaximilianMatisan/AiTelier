@@ -21,6 +21,16 @@ import { readOrder, refusal } from "./intake.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
+// Every stage is a child process and inherits this env, so .env has to be
+// loaded here. Python does not read it on its own: without this the stylist
+// saw no model credentials and silently ran in mock mode, which looks like a
+// working pipeline and is not one. Real values already in the environment win.
+try {
+  process.loadEnvFile(path.join(ROOT, ".env"));
+} catch {
+  // no .env, or it is unreadable; the stages report what they are missing
+}
+
 // The stylist stage runs with cwd=person3, so a relative interpreter path has
 // to be resolved against the repo root first or it lands in person3/person3.
 const rawPython = process.env.PYTHON ?? "python3";
