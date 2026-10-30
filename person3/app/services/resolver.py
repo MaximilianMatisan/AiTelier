@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..models import Item, OutfitDraft, OutfitSelection, StylistRequest
+from .combinations import clashes
 
 
 LAYER_ORDER = ["base", "mid", "outer", "bottom", "shoes", "accessory", "other"]
@@ -110,6 +111,12 @@ def resolve_selection(
                 raise ValueError(f"missing required layers: {', '.join(missing)}")
             if not chosen:
                 raise ValueError("empty outfit")
+            problems = clashes(
+                ((value["layer"], value["title"]) for value in chosen),
+                request.customer.season,
+            )
+            if problems:
+                raise ValueError(f"pieces that do not belong together: {'; '.join(problems)}")
             item_total = round(sum(value["price"]["amount"] for value in chosen), 2)
             shipping = _shipping_for_outfit(
                 [by_id[value["item_id"]] for value in chosen],

@@ -25,7 +25,56 @@ bottom + shoes. A single top layer can be correct.
 
 The customer may give up to five style directions. Blend them into one coherent look rather
 than making one outfit per direction. Resolve conflicts with the brief's fit, climate, and
-budget. Keep the palette coherent.
+budget.
+
+## Colour
+
+Colour decides whether a look reads as one outfit. Judge it from the product images, not
+only the title: "sable", "écru", "Verde" or "Stone" are colours too.
+
+- Build each outfit on at most three colours: one neutral base, one supporting colour, and at
+  most one accent. Neutrals are white, cream, écru, beige, sand, camel, grey, charcoal, navy,
+  brown, olive, and black.
+- Keep one temperature. Warm neutrals (cream, sand, camel, brown, olive, rust) go together;
+  cool ones (white, grey, navy, charcoal, black) go together. Join the two only through white,
+  grey, or denim.
+- Default to a lighter top over a darker bottom. A tonal look is fine when the textures differ.
+  Black top with a light warm bottom (sand, beige, cream) is high contrast; use it only when
+  the shoes repeat one of the two colours.
+- Shoes carry the outfit's darkest or most neutral colour. Brown and tan leather go with navy,
+  grey, olive, cream, and camel; black leather goes with black, charcoal, and grey. A coloured
+  sneaker counts as the accent, so everything else stays neutral.
+- At most one patterned, printed, or graphic piece per outfit, and it should repeat a colour
+  already in the outfit. Camo counts as a pattern.
+- Respect the customer's style: old money stays muted and natural, with no logos, neon, or
+  camo; casual stays relaxed and neutral; streetwear may carry one statement colour.
+- Never use a colour the brief says to avoid.
+- Name the outfit after what it actually looks like: call it monochrome only when it is one
+  colour family.
+
+## Pieces that belong together
+
+An outfit fails when one piece belongs to a different occasion than the others. Never combine:
+
+- a polo shirt of any kind (short or long sleeve, knit, jersey, terry, "polo sweat") with
+  shorts. With shorts, use a t-shirt or a short-sleeve shirt.
+- long sleeves, knitwear, sweatshirts, or any mid layer with shorts.
+- loafers, derbies, oxfords, Chelsea boots, or other leather dress shoes with shorts or with
+  sports bottoms.
+- a blazer, coat, or tailored jacket with shorts, joggers, or sweatpants.
+- running, trail, or technical shoes with tailored trousers, chinos, or a blazer.
+- athletic pieces (track tops, joggers, running shorts) with smart or tailored pieces.
+- shorts outside summer, or a heavy or warm fabric (terry, fleece, wool, sweat) in summer.
+
+Keep every piece within one step of formality: athletic, casual, smart casual, tailored.
+
+Balance the silhouette as well: pair a relaxed or boxy top with a straighter bottom, or a slim
+top with a relaxed bottom. Oversized on oversized is a streetwear choice; use it only when the
+brief asks for streetwear or an oversized fit.
+
+Before answering, check every outfit against the colour rules and this list. Replace any piece
+that breaks a rule. If the catalogue leaves no valid combination for a look, return fewer
+outfits rather than a combination from this list.
 
 ## Image use
 
@@ -64,4 +113,6 @@ Rules:
 - `layer` must match the item's slot.
 - `size` must be offered for that item, or omitted only if the item has one size.
 - `confidence` is between 0 and 1.
+- `rationale` names the palette (for example "Palette: navy, cream, tan") and says why the
+  pieces belong together.
 - No extra keys. No markdown fences. No prices or URLs.

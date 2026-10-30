@@ -16,6 +16,7 @@ from ..models import (
     SelectedItem,
     StylistRequest,
 )
+from .combinations import clashes
 from .images import image_data_urls
 
 
@@ -121,6 +122,7 @@ def _catalog_text(request: StylistRequest, items: list[Item]) -> str:
 
 
 def _mock_selection(request: StylistRequest) -> OutfitSelection:
+    by_id = {item.item_id: item for item in request.items}
     grouped: dict[str, list[Item]] = {}
     for item in request.items:
         grouped.setdefault(item.slot, []).append(item)
@@ -146,7 +148,15 @@ def _mock_selection(request: StylistRequest) -> OutfitSelection:
             if candidates:
                 offset = (index + layer_index) % len(candidates)
                 candidates = candidates[offset:] + candidates[:offset]
-            candidate = candidates[0] if candidates else None
+            worn = [(selected.layer, by_id[selected.item_id].title) for selected in chosen]
+            candidate = next(
+                (
+                    item
+                    for item in candidates
+                    if not clashes([*worn, (layer, item.title)], request.customer.season)
+                ),
+                None,
+            )
             if candidate is None:
                 continue
             size = _pick_size(candidate, request, layer)

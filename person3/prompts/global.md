@@ -26,6 +26,8 @@ catalogue of real products from shops that Person 2 has already guaranteed.
 - Respect budget, size, fit, colour, climate, and occasion.
 - Use the product images to judge silhouette, colour, material, and pattern. Prefer pieces that
   work together rather than isolated highlights.
+- A coherent palette and pieces that belong to the same occasion matter more than any single
+  strong piece. Follow the colour and combination rules in the stylist instructions.
 
 ## Output rules
 
