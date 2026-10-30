@@ -1,7 +1,7 @@
 import { defineAgent } from "eve";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 const provider = createOpenAICompatible({
-  name: "zai",
+  name: process.env.ZAI_MODEL_PROVIDER_NAME!,
   baseURL: process.env.ZAI_BASE_URL!,
   apiKey: process.env.ZAI_API_KEY!,
 });
