@@ -34,6 +34,11 @@ node logic/data/to_person3.js --in shortlist.json
 Politeness: one request at a time per shop, 500 ms between pages, 10 s timeout,
 `User-Agent: OutfitAgent-Hackathon/0.1 (TUM Blockchain Hackathon)`.
 
+`npm test` covers this layer from `catalog-data.test.mjs`: the catalogue invariants (every
+seeded shop present, unique ids, no zero prices, a variant id exactly for each in-stock size),
+the normalisation heuristics, and conformance to the Person 3 contract. Each test was checked
+against a deliberately reintroduced bug, so it fails when the thing it guards breaks.
+
 ## The item schema
 
 One entry of `cache/products.json`. Field names are the Frame 16 agreement — **do not rename
