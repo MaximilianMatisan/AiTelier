@@ -172,6 +172,19 @@ export function genderOf(product, title = "", vendor = "") {
   return null;
 }
 
+/**
+ * The brand to show. `??` only catches null, and silbon publishes the literal
+ * string "false" as its vendor on 184 products, which reached the result page
+ * as a brand called "false". Anything that is not a real name falls back to
+ * the shop.
+ */
+const NOT_A_BRAND = new Set(["false", "true", "null", "undefined", "none", "n/a", "-"]);
+
+export function brandOf(vendor, shop) {
+  const name = String(vendor ?? "").trim();
+  return !name || NOT_A_BRAND.has(name.toLowerCase()) ? shop.name : name;
+}
+
 /** Every label that means the same size as `label`, the label itself first. */
 export function equivalentSizes(label) {
   const size = normalizeSize(label);
@@ -306,7 +319,7 @@ export function normalizeProduct(product, shop, fetchedAt = new Date().toISOStri
     id: `${shop.id}-${product.id}`,
     shop_id: shop.id,
     name: String(product.title ?? "").trim(),
-    vendor: product.vendor ?? shop.name,
+    vendor: brandOf(product.vendor, shop),
     description: plainText(product.body_html),
     category,
     gender: genderOf(product, product.title ?? "", product.vendor ?? ""),

@@ -404,3 +404,17 @@ test("a REFUND page says nothing was charged and offers no cart", async () => {
   assert.match(html, /Nothing was charged/);
   assert.ok(!html.includes("/cart/"), "a refused run must not invite a purchase");
 });
+
+test("a junk vendor falls back to the shop, not to the word false", async () => {
+  // silbon publishes the literal string "false" as its vendor on 184 products,
+  // and `??` only catches null, so the result page showed a brand called
+  // "false".
+  const { brandOf } = await import("./logic/data/normalize.js");
+  const shop = { name: "Silbon" };
+  for (const junk of ["false", "FALSE", "null", "undefined", "", "  ", null, undefined]) {
+    assert.equal(brandOf(junk, shop), "Silbon", `${JSON.stringify(junk)} is not a brand`);
+  }
+  assert.equal(brandOf("Norse Projects", shop), "Norse Projects");
+  const named = items.filter((i) => ["false", "true", "null", ""].includes(String(i.vendor).toLowerCase()));
+  assert.deepEqual(named.map((i) => i.id), [], "no catalogue item may carry a junk brand");
+});
