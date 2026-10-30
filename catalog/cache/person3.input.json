@@ -564,6 +564,7 @@
      "10": 53804008243466,
      "11": 53804008276234
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -652,6 +653,7 @@
      "26": 54723567944005,
      "27": 54723567550789
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -730,6 +732,7 @@
     "variants": {
      "XS": 54857659580802
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -812,6 +815,7 @@
     "variants": {
      "44": 51076434067723
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -886,6 +890,7 @@
      "39": 55176237777270,
      "41": 55176237908342
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -936,6 +941,7 @@
     "variants": {
      "ONE": 52056507810124
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1007,6 +1013,7 @@
      "L": 53773594984773,
      "XL": 53773595017541
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1075,6 +1082,7 @@
      "XL": 55025658888536,
      "XXL": 55025658921304
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1170,6 +1178,7 @@
      "38": 57587950879064,
      "47": 57587951206744
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1268,6 +1277,7 @@
      "40": 55156517667202,
      "43": 55156517765506
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1363,6 +1373,7 @@
      "45": 53629705388361,
      "46": 53629705421129
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1422,6 +1433,7 @@
      "L-XL": 56688041197894,
      "S-M": 56688041263430
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1496,6 +1508,7 @@
     "variants": {
      "XL": 54377690366287
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -1556,6 +1569,7 @@
     "variants": {
      "L": 55026989400442
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1626,6 +1640,7 @@
     "variants": {
      "34": 55290440909184
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1698,6 +1713,7 @@
      "M": 54913231257949,
      "L": 54913231290717
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1752,6 +1768,7 @@
     "variants": {
      "LONG": 53337773113730
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1822,6 +1839,7 @@
      "XS": 45311181520943,
      "XL": 44435011960879
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1896,6 +1914,7 @@
      "XL": 54689168195908,
      "EXTRA EXTRA LARGE": 54689168228676
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -1989,6 +2008,7 @@
      "42": 54953949102463,
      "43": 54953949299071
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2062,6 +2082,7 @@
      "XL": 56535144497483,
      "XXL": 56535144530251
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2152,6 +2173,7 @@
     "variants": {
      "26": 61677060915530
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2241,6 +2263,7 @@
      "XXL": 53377815085388,
      "XXXL": 53377815118156
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2330,6 +2353,7 @@
      "38.5": 55526926090620,
      "40.5": 55526926188924
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2404,6 +2428,7 @@
      "XL": 54797705969987,
      "XXL": 54797706002755
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2479,6 +2504,7 @@
      "XL": 50305181221104,
      "XXL": 50305180041456
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2552,6 +2578,7 @@
      "M": 51538890096906,
      "L": 51538890129674
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2642,6 +2669,7 @@
     "variants": {
      "39": 54997480440183
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2713,6 +2741,7 @@
      "XS": 51588780228935,
      "S": 51588780261703
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2793,6 +2822,7 @@
      "48": 56649215607161,
      "50": 56649215639929
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2880,6 +2910,7 @@
      "12": 53804098879754,
      "13": 53804098912522
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -2965,6 +2996,7 @@
      "36": 54723575939397,
      "38": 54723576201541
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3043,6 +3075,7 @@
     "variants": {
      "XS": 54857659548034
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3177,6 +3210,7 @@
     "variants": {
      "37.5": 51151288566027
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3247,6 +3281,7 @@
      "39": 55176248164726,
      "40": 55176248230262
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3297,6 +3332,7 @@
     "variants": {
      "ONE": 52200665710924
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3366,6 +3402,7 @@
      "L": 53773599768901,
      "XL": 53773599801669
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3434,6 +3471,7 @@
      "XL": 55025659052376,
      "XXL": 55025659085144
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3533,6 +3571,7 @@
      "40": 57587925746008,
      "41": 57587925778776
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3632,6 +3671,7 @@
      "42": 55156522385794,
      "43": 55156522418562
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3727,6 +3767,7 @@
      "45": 53629707387209,
      "46": 53629707419977
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3797,6 +3838,7 @@
      "XL": 56688157589830,
      "XS": 56688157622598
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -3871,6 +3913,7 @@
     "variants": {
      "M": 55861635285327
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -3931,6 +3974,7 @@
     "variants": {
      "3": 55027373670778
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4000,6 +4044,7 @@
      "36": 55290458276224,
      "44": 55290458407296
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4073,6 +4118,7 @@
      "L": 54913236566365,
      "XL": 54913236599133
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4128,6 +4174,7 @@
      "LONG": 53343866454402,
      "REGULAR": 53343866487170
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -4195,6 +4242,7 @@
      "XL": 43294364074031,
      "M": 43294364827695
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4268,6 +4316,7 @@
      "M": 54697488810308,
      "L": 54697488843076
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4360,6 +4409,7 @@
      "42": 54953950478719,
      "45": 54953950675327
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4433,6 +4483,7 @@
      "XL": 56535144857931,
      "XXL": 56535144890699
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4525,6 +4576,7 @@
      "30": 61764882497866,
      "36": 61751785062730
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4610,6 +4662,7 @@
      "XXL": 53377825309004,
      "XXXL": 53377825341772
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4706,6 +4759,7 @@
      "46": 56010508206460,
      "47": 57575160185212
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4781,6 +4835,7 @@
      "XL": 54797715767619,
      "XXL": 54797715800387
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4856,6 +4911,7 @@
      "XL": 50305183482096,
      "XXL": 50305182302448
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -4927,6 +4983,7 @@
      "XS": 51538890424586,
      "S": 51538890457354
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5017,6 +5074,7 @@
     "variants": {
      "36": 54997491384695
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5087,6 +5145,7 @@
     "variants": {
      "XS": 51588780425543
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5162,6 +5221,7 @@
      "XL": 57366844211577,
      "XXL": 57366844277113
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -5250,6 +5310,7 @@
      "9": 53804101730570,
      "10": 53804101763338
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5329,6 +5390,7 @@
      "29": 54723577479493,
      "31": 54723577577797
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5410,6 +5472,7 @@
      "S": 54857716957570,
      "XL": 54857717055874
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5508,6 +5571,7 @@
     "variants": {
      "37": 51171481616651
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5579,6 +5643,7 @@
      "36": 55176251343222,
      "37": 55176251408758
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5629,6 +5694,7 @@
     "variants": {
      "ONE": 52200665612620
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5697,6 +5763,7 @@
      "L": 53773619036485,
      "XL": 53773619069253
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5760,6 +5827,7 @@
      "L": 55025660854616,
      "XL": 55025660887384
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5864,6 +5932,7 @@
      "45": 57587925418328,
      "46": 57587925451096
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -5965,6 +6034,7 @@
      "45": 55156522910082,
      "46": 55156522942850
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -6058,6 +6128,7 @@
      "45": 53629704208713,
      "46": 53629704241481
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6128,6 +6199,7 @@
      "XL": 56688782934342,
      "XXL": 56688782967110
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6203,6 +6275,7 @@
      "S": 56557838008655,
      "L": 56557838074191
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -6267,6 +6340,7 @@
     "variants": {
      "5": 55027375604090
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6341,6 +6415,7 @@
      "40": 55290461880704,
      "42": 55290461913472
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6414,6 +6489,7 @@
      "L": 56046299545949,
      "XL": 56046299578717
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6469,6 +6545,7 @@
      "LONG": 53395845874050,
      "REGULAR": 53395845906818
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6539,6 +6616,7 @@
      "M": 44435013795887,
      "L": 44435013664815
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6618,6 +6696,7 @@
      "40": 55287792992580,
      "41": 55287793025348
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6722,6 +6801,7 @@
      "46": 54953951887743,
      "47": 54953951920511
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6795,6 +6875,7 @@
      "XL": 56535147086155,
      "XXL": 56535147118923
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6890,6 +6971,7 @@
      "32": 61751785161034,
      "33": 61764882792778
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -6979,6 +7061,7 @@
      "XXL": 53377830060364,
      "XXXL": 53377830093132
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7109,6 +7192,7 @@
      "44.5": 56131170402684,
      "46.5": 56131170500988
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7183,6 +7267,7 @@
      "XL": 54797747388739,
      "XXL": 54797747421507
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7253,6 +7338,7 @@
      "L": 50305576304880,
      "XL": 50305576403184
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "autumn",
@@ -7317,6 +7403,7 @@
     "variants": {
      "XS": 51538893078794
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7376,6 +7463,7 @@
      "M": 55839069929847,
      "L": 55839069962615
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7451,6 +7539,7 @@
      "45": 51685347819847,
      "41.5": 51685347688775
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7526,6 +7615,7 @@
      "42": 57375243567481,
      "44": 57375243600249
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7613,6 +7703,7 @@
      "12": 53804108972298,
      "13": 53804109005066
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7695,6 +7786,7 @@
      "36": 54723582394693,
      "38": 54723582132549
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7775,6 +7867,7 @@
      "S": 54857717219714,
      "XXL": 54857717350786
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7848,6 +7941,7 @@
      "S": 51257555222795,
      "XS": 51257555255563
     },
+    "gender": "unisex",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7908,6 +8002,7 @@
     "variants": {
      "41": 55323389231478
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -7958,6 +8053,7 @@
     "variants": {
      "ONE": 52200665907532
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -8026,6 +8122,7 @@
      "L": 53773621625157,
      "XL": 53773621657925
     },
+    "gender": "women",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -8093,6 +8190,7 @@
      "L": 55025662591320,
      "XXL": 55025662656856
     },
+    "gender": "men",
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -8194,6 +8292,7 @@
      "42": 57587924926808,
      "43": 57587924959576
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "spring",
@@ -8291,6 +8390,7 @@
      "44": 55156523270530,
      "45": 55156523303298
     },
+    "gender": null,
     "stock_kind": "boolean",
     "seasons": [
      "autumn",

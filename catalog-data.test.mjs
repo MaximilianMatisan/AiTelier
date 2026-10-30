@@ -294,3 +294,49 @@ test("the size swap follows the cheapest garment, not the biggest pile", async (
   assert.equal(swapped.sizes.bottom, "M");
   assert.equal(swapped.swaps.length, 1);
 });
+
+// --- who the garment is for ----------------------------------------------
+test("the shop's own gender marking is read, tags first", async () => {
+  const { genderOf } = await import("./logic/data/normalize.js");
+  assert.equal(genderOf({ tags: ["gender:Men", "Category:Hosen"] }), "men");
+  assert.equal(genderOf({ tags: ["Women", "Female"] }), "women");
+  assert.equal(genderOf({ tags: ["Unisex"] }), "unisex");
+  assert.equal(genderOf({ tags: ["Men", "Women"] }), "unisex", "both marked means both");
+  assert.equal(genderOf({ tags: [] }, "", "KnowledgeCotton Apparel - WMN"), "women");
+  assert.equal(genderOf({ tags: [] }, "Brooke Pleated Skirt"), "women", "a skirt answers itself");
+  assert.equal(genderOf({ tags: [] }, "Nike Wmns Air Force 1"), "women");
+  assert.equal(genderOf({ tags: [] }, "Oxford Shirt"), null, "silence stays silence");
+  // "men" must not be found inside "women", nor "male" inside "female".
+  assert.equal(genderOf({ tags: ["Women"] }), "women");
+  assert.equal(genderOf({ tags: ["Female"] }), "women");
+});
+
+test("only the explicit opposite gender is dropped", async () => {
+  // A men's brief came back with a pleated skirt. But 40% of the catalogue
+  // says nothing about gender, and requiring a positive match would throw it
+  // all away, so unlabelled and unisex items stay.
+  const { dropWrongGender } = await import("./logic/run-pipeline.mjs");
+  const envelope = {
+    items: [
+      { item_id: "a", raw: { gender: "men" } },
+      { item_id: "b", raw: { gender: "women" } },
+      { item_id: "c", raw: { gender: "unisex" } },
+      { item_id: "d", raw: {} },
+    ],
+  };
+  const forMen = dropWrongGender(envelope, "men");
+  assert.deepEqual(forMen.envelope.items.map((i) => i.item_id), ["a", "c", "d"]);
+  assert.equal(forMen.dropped, 1);
+
+  const forWomen = dropWrongGender(envelope, "women");
+  assert.deepEqual(forWomen.envelope.items.map((i) => i.item_id), ["b", "c", "d"]);
+
+  // No gender in the brief means no filtering.
+  assert.equal(dropWrongGender(envelope, undefined).dropped, 0);
+});
+
+test("every catalogue item carries a gender field", () => {
+  const allowed = new Set(["men", "women", "unisex", null]);
+  const bad = items.filter((i) => !allowed.has(i.gender));
+  assert.deepEqual(bad.map((i) => i.id), []);
+});

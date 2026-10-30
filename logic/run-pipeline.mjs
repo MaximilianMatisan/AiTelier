@@ -194,6 +194,22 @@ export function fitSizesToCatalogue(sizes, envelope) {
   return { sizes: adjusted, swaps };
 }
 
+/**
+ * Drop what the shop says is for another gender. A men's brief came back with
+ * a pleated skirt and women's sneakers, which is the first thing anyone
+ * notices on the result page.
+ *
+ * Only an explicit opposite is dropped: `unisex` and the unlabelled majority
+ * stay, because about 40% of the catalogue says nothing and most of that is
+ * unisex basics. Requiring a positive match would throw the catalogue away.
+ */
+export function dropWrongGender(envelope, gender) {
+  if (gender !== "men" && gender !== "women") return { envelope, dropped: 0 };
+  const opposite = gender === "men" ? "women" : "men";
+  const items = envelope.items.filter((i) => (i.raw?.gender ?? null) !== opposite);
+  return { envelope: { ...envelope, items }, dropped: envelope.items.length - items.length };
+}
+
 const stages = [];
 async function stage(name, hint, fn) {
   const started = Date.now();
@@ -282,7 +298,12 @@ async function main() {
     )) &&
     (await stage("3/4 customer envelope (Person 1)", "", async () => {
       const brief = orderToCustomer(order);
-      const shortlisted = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
+      const loaded = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
+      const { envelope: shortlisted, dropped } = dropWrongGender(loaded, order.gender);
+      if (dropped) {
+        console.log(`gender: dropped ${dropped} items marked for another gender`);
+        await writeFile(path.resolve(ROOT, envelope), JSON.stringify(shortlisted, null, 2) + "\n");
+      }
       const { sizes, swaps } = fitSizesToCatalogue(brief.customer.sizes, shortlisted);
       brief.customer.sizes = sizes;
       for (const swap of swaps) console.log(`size: ${swap}`);

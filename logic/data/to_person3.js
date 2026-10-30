@@ -82,6 +82,7 @@ export function toPerson3Item(item, withDescription = true) {
     // permalink https://{domain}/cart/{variant_id}:{qty} gets built.
     raw: {
       variants: item.variants,
+      gender: item.gender,
       stock_kind: item.stock_kind,
       seasons: item.seasons,
       delivery_days: item.delivery_days,

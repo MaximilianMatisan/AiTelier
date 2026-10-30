@@ -137,6 +137,41 @@ export const WAIST_TO_LETTER = {
   34: "L", 35: "L", 36: "XL", 37: "XL", 38: "XXL", 40: "XXL",
 };
 
+const WOMEN = /\b(wmns?|women|womens|damen|ladies|femme|mujer|female|donna|dames)\b/i;
+const MEN = /\b(mens?|herren|homme|hombre|male|uomo|heren)\b/i;
+const UNISEX = /\bunisex\b/i;
+// A skirt or a dress carries its own answer whatever the shop tagged.
+const WOMENS_GARMENT = /\b(skirt|dress|rock|jupe|falda|kleid)\b/i;
+
+/**
+ * Who the shop says the garment is for: "men", "women", "unisex", or null when
+ * nothing says. Tags answer first and most often - 765 products carry "Men",
+ * 663 "Unisex" - then the vendor ("KnowledgeCotton Apparel - WMN"), then the
+ * title.
+ *
+ * Only about a tenth of the catalogue says anything, so this is for *excluding*
+ * the clearly wrong, never for requiring a match: filtering down to "men only"
+ * would throw away the 90% that is simply unlabelled, most of it unisex basics.
+ */
+export function genderOf(product, title = "", vendor = "") {
+  const tags = Array.isArray(product?.tags)
+    ? product.tags
+    : String(product?.tags ?? "").split(",");
+  const tagText = tags.join(" ");
+  const women = WOMEN.test(tagText);
+  const men = MEN.test(tagText);
+  if (UNISEX.test(tagText) || (women && men)) return "unisex";
+  if (women) return "women";
+  if (men) return "men";
+
+  if (WOMEN.test(vendor)) return "women";
+  if (MEN.test(vendor)) return "men";
+  if (WOMENS_GARMENT.test(title)) return "women";
+  if (WOMEN.test(title)) return "women";
+  if (MEN.test(title)) return "men";
+  return null;
+}
+
 /** Every label that means the same size as `label`, the label itself first. */
 export function equivalentSizes(label) {
   const size = normalizeSize(label);
@@ -274,6 +309,7 @@ export function normalizeProduct(product, shop, fetchedAt = new Date().toISOStri
     vendor: product.vendor ?? shop.name,
     description: plainText(product.body_html),
     category,
+    gender: genderOf(product, product.title ?? "", product.vendor ?? ""),
     themes: themesOf(style),
     seasons: seasonsOf(style),
     price_eur: Math.min(...available),
