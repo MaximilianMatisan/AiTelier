@@ -68,6 +68,41 @@ test("a variant id exists exactly for the sizes that are in stock", () => {
 });
 
 // --- normalisation ------------------------------------------------------
+test("size options are recognised by the words shops actually use", async () => {
+  // Exact matching filed 272 pairs of jeans under "ONE" because armedangels
+  // calls the option "Waist", and missed "Damen Bekleidung Größe" and
+  // "Tamanhos". "Title" is Shopify's name for no options at all.
+  const { isSizeOption } = await import("./logic/data/normalize.js");
+  for (const name of ["Size", "Größe", "Damen Bekleidung Größe", "Tamanhos", "Waist", "Shoe Size", "Boxer Briefs (Size)"]) {
+    assert.ok(isSizeOption(name), `${name} should be a size option`);
+  }
+  for (const name of ["Title", "Color", "Farbe", "Length", "variant_id", "Amount"]) {
+    assert.ok(!isSizeOption(name), `${name} should not be a size option`);
+  }
+});
+
+test("a combined label covers both of its sizes", async () => {
+  // A garment sold as "M/L" fits a customer asking for M. A numeric "32/34"
+  // is a waist and a leg length, not two sizes.
+  const { sizeLabels } = await import("./logic/data/normalize.js");
+  assert.deepEqual(sizeLabels("M/L"), ["M", "L"]);
+  assert.deepEqual(sizeLabels("XXS/XS"), ["XXS", "XS"]);
+  assert.deepEqual(sizeLabels("32/34"), ["32"]);
+  assert.deepEqual(sizeLabels("M"), ["M"]);
+  assert.deepEqual(sizeLabels(""), ["ONE"]);
+  const combined = items.filter((i) => Object.keys(i.stock).some((k) => k.includes("/")));
+  assert.deepEqual(combined.map((i) => i.id), [], "no catalogue label should still hold a slash");
+});
+
+test("a sleeve belongs to a top, whatever its length", () => {
+  // "short" is a whole word in "Short sleeve shirt", which filed 113 t-shirts
+  // as trousers.
+  const sleeved = items.filter(
+    (i) => i.category === "bottom" && /\b(short|long)[- ]?sleeve/i.test(i.name),
+  );
+  assert.deepEqual(sleeved.map((i) => i.name), []);
+});
+
 test("sizes are normalised, unknown values survive", () => {
   assert.deepEqual(
     ["Medium", "EU 43 1/3", "W32", "xxl", "One Size", ""].map(normalizeSize),

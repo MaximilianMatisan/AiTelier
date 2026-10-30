@@ -3,7 +3,7 @@
 Real products from real EU shops, normalised to the agreed schema (Frame 16).
 Everything is fetched from the shops' public Shopify product feed — nothing is scraped.
 
-**8725 items across 36 shops.** Tops 4405, bottoms 1844, shoes 1285, outerwear 1191.
+**8725 items across 36 shops.** Tops 4496, bottoms 1755, shoes 1285, outerwear 1189.
 Themes: casual 6007, old\_money 1513, streetwear 1281. Prices 5.50–1995 EUR.
 Every item carries an image and is in stock in at least one size; 8305 carry a description.
 
@@ -137,12 +137,21 @@ returned nothing usable, so the collector stays Shopify-only.
      read `"steel gray"` as a tee. `CATEGORY_PHRASES` handles the rest: "boot cut" is a trouser
      cut, not footwear.
 6. **Sizes are normalised** (`Medium`→`M`, `EU 43 1/3`→`43`, `W32`→`32`). Fractional shoe sizes
-   lose the fraction. Products with no size option are stored under `"ONE"`.
-7. **One colour per size.** When a product has both Colour and Size options, `variants[size]`
+   lose the fraction. Products with no size option are stored under `"ONE"`. A label like
+   `"M/L"` is registered under both `M` and `L`, pointing at the same variant, because the
+   garment fits a customer asking for either. A numeric `"32/34"` is a waist and a leg length,
+   not two sizes, so it stays `32` — the variant we link to has one specific leg length.
+7. **The size option is found by word, not by exact name.** Shops call it `Size`, `Größe`,
+   `Damen Bekleidung Größe`, `Tamanhos` or `Waist`. `Title` is Shopify's name for a product with
+   no options and never counts.
+8. **Bottoms use two size systems.** 894 are waist-sized, 713 letter-sized. A customer giving a
+   waist measurement can only match the first group, so a `waist 32` brief reaches 293 of 1755
+   trousers. Mapping waist to letter sizes is a fit judgement and has not been made here.
+9. **One colour per size.** When a product has both Colour and Size options, `variants[size]`
    points at the *cheapest available* variant for that size, so two sizes of one product can be
    different colours.
-8. **Duplicates are real.** Shops list each colourway as its own product, so similar names repeat.
-9. **`delivery_days` is an estimate** from `shops.seed.json`; the feed does not carry it.
+10. **Duplicates are real.** Shops list each colourway as its own product, so similar names repeat.
+11. **`delivery_days` is an estimate** from `shops.seed.json`; the feed does not carry it.
 
 ## Person 3 adapter
 

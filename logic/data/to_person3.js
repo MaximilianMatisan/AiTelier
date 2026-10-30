@@ -68,7 +68,9 @@ export function toPerson3Item(item, withDescription = true) {
     category: SLOT[item.category] ?? "other",
     description: withDescription ? capped(item.description) : null,
     style: { style_tags: item.themes.map((t) => STYLE_TAG[t] ?? t) },
-    size_system: "EU",
+    // Only shoes carry a system we can name with confidence. Clothing labels
+    // are whatever the shop used, so claiming "EU" there would be invented.
+    size_system: item.category === "shoes" ? "EU" : null,
     sizes,
     price: { amount: item.price_eur, currency: "EUR" },
     availability: sizes.some((s) => s.in_stock) ? "in_stock" : "sold_out",

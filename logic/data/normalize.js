@@ -1,7 +1,34 @@
 // Maps a Shopify /products.json product onto the agreed item schema (Frame 16).
 // Person 2 and 3: the tables below are the tuning surface. Change keywords here, not the mapper.
 
-export const SIZE_OPTION_NAMES = ["size", "größe", "groesse", "grosse", "taille", "talla", "shoe size", "eu size"];
+/**
+ * Words that make an option a size option. Matched as whole words inside the
+ * option name, not by equality: shops label the same thing "Size",
+ * "Damen Bekleidung Größe", "Tamanhos" or "Classic Boxer Briefs (Size)".
+ * Exact matching filed 272 pairs of jeans under "ONE" because armedangels
+ * calls the option "Waist".
+ */
+export const SIZE_OPTION_WORDS = [
+  "size", "sizes", "größe", "grösse", "groesse", "grosse", "waist",
+  "taille", "talla", "tallas", "tamanho", "tamanhos", "taglia", "maat",
+  "storlek", "størrelse", "koko",
+];
+
+/** Kept for callers that still import the old name. */
+export const SIZE_OPTION_NAMES = SIZE_OPTION_WORDS;
+
+// "Title" is Shopify's option name for a product with no real options, and
+// "Length" is the second half of a waist/length pair, never the size itself.
+const NOT_A_SIZE_OPTION = new Set(["title", "length", "inseam", "leg", "color", "colour", "farbe"]);
+
+const sizeWord = new RegExp(`(?:^|[^a-zà-ÿ])(?:${SIZE_OPTION_WORDS.join("|")})(?:[^a-zà-ÿ]|$)`, "i");
+
+/** Does this Shopify option name denote a size? */
+export function isSizeOption(name) {
+  const text = String(name ?? "").trim().toLowerCase();
+  if (!text || NOT_A_SIZE_OPTION.has(text)) return false;
+  return sizeWord.test(text);
+}
 
 // Checked first: these never become clothing, even when they contain a category keyword
 // ("Shoe Care Kit" would otherwise land in `shoes`).
@@ -33,6 +60,9 @@ const WHOLE_WORD_ONLY = new Set(["short", "top", "boot", "rock", "tee", "cap"]);
 /** Phrases that decide the category outright, ahead of the keyword groups. */
 const CATEGORY_PHRASES = [
   [/boot[- ]?cut|bootleg/, "bottom"], // a trouser cut, not footwear
+  // "short" is a whole word in "Short sleeve shirt", which filed 113 t-shirts
+  // as trousers. A sleeve belongs to a top whatever its length.
+  [/\b(?:short|long|half|three[- ]quarter)[- ]?sleeve/, "top"],
 ];
 
 const matchers = new Map();
@@ -74,6 +104,21 @@ export function normalizeSize(raw) {
   const num = lower.match(/\d+(?:[.,]\d+)?/);
   if (num) return num[0].replace(",", ".").replace(/\.0$/, "");
   return s.toUpperCase();
+}
+
+/**
+ * The labels a customer can ask for to get this variant. Usually one, but
+ * shops sell a single garment as "S/M" or "M/L", and a customer asking for M
+ * can wear either. 254 items carry such a label; without this they match no
+ * size at all. A numeric "32/34" is a waist and a leg length, not two sizes,
+ * so only letter pairs expand.
+ */
+export function sizeLabels(raw) {
+  const text = String(raw ?? "").trim();
+  const pair = text.match(/^([A-Za-z]{1,4})\s*\/\s*([A-Za-z]{1,4})$/);
+  if (!pair) return [normalizeSize(text)];
+  const [a, b] = [normalizeSize(pair[1]), normalizeSize(pair[2])];
+  return a === b ? [a] : [a, b];
 }
 
 /**
@@ -135,7 +180,7 @@ export function seasonsOf(text) {
  */
 export function sizeIndexOf(options) {
   return (options ?? []).findIndex((o) =>
-    SIZE_OPTION_NAMES.includes(String(typeof o === "string" ? o : o?.name ?? "").trim().toLowerCase())
+    isSizeOption(typeof o === "string" ? o : o?.name)
   );
 }
 
@@ -175,18 +220,20 @@ export function normalizeProduct(product, shop, fetchedAt = new Date().toISOStri
   const prices = {}; // size -> cheapest available price, so `variants` and `price_eur` agree
 
   for (const v of product.variants ?? []) {
-    const size = idx === -1 ? "ONE" : normalizeSize(v[`option${idx + 1}`]);
+    const labels = idx === -1 ? ["ONE"] : sizeLabels(v[`option${idx + 1}`]);
     const price = Number(v.price);
     // A 0.00 variant is a free gift or a placeholder, not something to budget for.
     if (!Number.isFinite(price) || price <= 0) continue;
 
-    if (!(size in stock)) stock[size] = 0;
-    if (!v.available) continue;
+    for (const size of labels) {
+      if (!(size in stock)) stock[size] = 0;
+      if (!v.available) continue;
 
-    stock[size] = 1;
-    if (prices[size] === undefined || price < prices[size]) {
-      prices[size] = price;
-      variants[size] = v.id;
+      stock[size] = 1;
+      if (prices[size] === undefined || price < prices[size]) {
+        prices[size] = price;
+        variants[size] = v.id;
+      }
     }
   }
 
