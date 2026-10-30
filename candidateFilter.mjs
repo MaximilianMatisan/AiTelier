@@ -41,14 +41,14 @@ Answer with these fields:
 - themesByCategory: style overrides for single categories, e.g. {"shoes": ["streetwear"]}. Use only catalogue categories as keys and only catalogue themes as values. A category listed here uses its own themes and ignores the overall themes. Leave it empty when the brief gives no category-specific style.
 - seasons: the customer's season or the climate they describe. If the brief names one season, select only that one.
 - stock: every size label the customer needs, exactly as listed in the catalogue. This array is never empty — always list at least one label. Clothing and shoe sizes both appear here, one entry per slot the brief names — e.g. ["M", "32", "43"] for "top M, waist 32, shoes 43". Numbers are fine; reconcile normalises them to the catalogue's string labels. When the brief names a size, use it; when it gives measurements but no label, use the size chart; when it gives no size information at all, list a broad range covering the plausible catalogue labels, mixing numeric and letter sizes (e.g. ["XS", "S", "M", "L", "XL", "36", "38", "40", "42"]).
-- maxPriceEur: the maximum price for one item, in EUR, or null when the brief names no budget.
+- budgetEur: the customer's total budget for the whole order, in EUR, or null when the brief names no budget. This is the total, never a per-item price.
 - confidence: a number from 0 to 1.
 - rationale: one short sentence per decision, in English.
 
 How to size categoryCounts:
 - Read how many outfits or variations the customer asks for. One outfit is one of each slot it needs; "two outfits", "a week of looks", or a capsule wardrobe needs several.
 - Count per slot so the outfits can be mixed: three tops and two bottoms give six combinations, so do not ask for more of one slot than the alternatives can pair with.
-- Respect maxPriceEur: it is the ceiling for a single item.
+- Do not divide budgetEur by the item count. Slots have very different price floors - a pair of shoes costs several times what a t-shirt costs - so a per-item ceiling removes whole slots and leaves outfits that cannot be assembled. The stylist does the budget arithmetic across a complete outfit.
 - When the brief is one plain outfit and says nothing more, count one of each slot it names.
 - Arrays are answered as arrays even when they hold one value. Never invent a category, theme, season, or size.
 
@@ -171,11 +171,11 @@ export function selectionSchema(facets) {
       .array(z.union([z.string(), z.number()]))
       .nullable()
       .describe(describeValues("Required size labels", facets.sizes)),
-    maxPriceEur: z
+    budgetEur: z
       .number()
       .min(0)
       .nullable()
-      .describe("Ceiling in EUR for a single item. null means no budget."),
+      .describe("Total budget in EUR for the whole order. null means no budget."),
     confidence: z.number().min(0).max(1).nullable(),
     rationale: z.string().nullable(),
   });
@@ -209,7 +209,7 @@ export function buildSelectionPrompt(facets, userInfo) {
     String(userInfo ?? "").trim(),
     "</untrusted_brief>",
     "",
-    'Answer as JSON: {"categoryCounts": {}, "themes": [], "themesByCategory": {}, "seasons": [], "stock": [], "maxPriceEur": null, "confidence": 0, "rationale": ""}',
+    'Answer as JSON: {"categoryCounts": {}, "themes": [], "themesByCategory": {}, "seasons": [], "stock": [], "budgetEur": null, "confidence": 0, "rationale": ""}',
   ];
   return blocks.join("\n").slice(0, MAX_PROMPT_CHARS);
 }
@@ -339,8 +339,8 @@ export function reconcile(object, facets) {
     themesByCategory: themes.themesByCategory,
     seasons: values(field("seasons", "season"), facets.seasons),
     stock: values(field("stock", "sizes", "size"), facets.sizes),
-    maxPriceEur: priceNumber(
-      field("maxPriceEur", "max_price", "price_max", "budget"),
+    budgetEur: priceNumber(
+      field("budgetEur", "budget_eur", "maxPriceEur", "max_price", "price_max", "budget"),
     ),
     confidence,
     rationale: String(field("rationale") ?? "")
@@ -445,51 +445,132 @@ function matches(candidate, selection, sizeOfSlot) {
     );
     if (!sizes.length) return false;
   }
+  // The budget is a sanity bound here, not a per-item ceiling: no single
+  // garment may cost more than the whole order. Dividing the budget by the
+  // item count used to empty the shoe slot, because shoes start near 100 EUR
+  // where tops start at 12. The stylist budgets a complete outfit, and the
+  // final check enforces guarantee 1.
   if (
-    selection.maxPriceEur !== null &&
-    !(candidate.price_eur <= selection.maxPriceEur)
+    selection.budgetEur !== null &&
+    !(candidate.price_eur <= selection.budgetEur)
   )
     return false;
   return true;
 }
 
+/** Smallest share any wanted slot gets, however few items it was asked for. */
+const MIN_PER_SLOT = 4;
+
+const slotOf = (candidate) => candidate.category ?? "other";
+
 /**
- * Keep every candidate that matches the selection. The model's per-category
- * counts are reported back (`wanted`) but do not limit the result; the stylist
- * in Person 3 chooses how many items to use.
+ * Give every wanted slot its own share of the item cap instead of letting one
+ * slot crowd the others out. Person 3 needs at least one candidate per
+ * required layer; a shortlist of 98 tops and no shoes cannot become an outfit,
+ * so it is worth spending cap on coverage rather than on more of the same slot.
+ *
+ * @param {object[]} ranked cheapest first
+ * @param {Record<string, number>} counts the model's categoryCounts
+ * @param {number} maxItems
+ */
+function allocate(ranked, counts, maxItems) {
+  const slots = Object.keys(counts);
+  if (!slots.length) return ranked.slice(0, maxItems);
+
+  const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+  const picked = [];
+  for (const slot of slots) {
+    const quota = Math.max(
+      MIN_PER_SLOT,
+      Math.floor((maxItems * counts[slot]) / total),
+    );
+    picked.push(...ranked.filter((item) => slotOf(item) === slot).slice(0, quota));
+  }
+  // Slots the catalogue could not fill leave room for the others.
+  const spare = ranked.filter((item) => !picked.includes(item));
+  return [...picked, ...spare].slice(0, maxItems);
+}
+
+/**
+ * Person 3 rejects a request with more than `maxShops` shops. Prefer the shops
+ * that carry the most candidates, and never let the cap empty a slot.
+ *
+ * @param {object[]} items
+ * @param {number} maxShops
+ */
+function capShops(items, maxShops) {
+  const counts = new Map();
+  for (const item of items)
+    counts.set(item.shop_id ?? "unknown", (counts.get(item.shop_id ?? "unknown") ?? 0) + 1);
+  if (counts.size <= maxShops) return items;
+
+  const allowed = new Set(
+    [...counts]
+      .sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])))
+      .slice(0, maxShops)
+      .map(([shop]) => shop),
+  );
+  const kept = items.filter((item) => allowed.has(item.shop_id ?? "unknown"));
+  const covered = new Set(kept.map(slotOf));
+  // A slot the cap wiped out is worse than one shop too many: keep the
+  // cheapest candidate of that slot and report the overshoot.
+  for (const item of items) {
+    if (!covered.has(slotOf(item))) {
+      kept.push(item);
+      covered.add(slotOf(item));
+    }
+  }
+  return kept;
+}
+
+/**
+ * Keep the candidates that match the selection, then narrow them to what
+ * Person 3 accepts: at most `MAX_ITEMS` items from at most `MAX_SHOPS` shops,
+ * with every category the model asked for still represented.
  *
  * @param {object[]} candidates
  * @param {ReturnType<typeof catalogueFacets>} facets
  * @param {ReturnType<typeof reconcile>} selection
+ * @param {{ maxItems?: number, maxShops?: number }} [caps]
  */
-export function applySelection(candidates, facets, selection) {
+export function applySelection(candidates, facets, selection, caps = {}) {
+  const maxItems = caps.maxItems ?? MAX_ITEMS;
+  const maxShops = caps.maxShops ?? MAX_SHOPS;
   const sizeOfSlot = (candidate) =>
-    facets.sizesByCategory[candidate.category ?? "other"] ?? [];
+    facets.sizesByCategory[slotOf(candidate)] ?? [];
   const matched = candidates.filter((candidate) =>
     matches(candidate, selection, sizeOfSlot),
   );
 
-  // Keep every candidate that matches, cheapest first so the output is stable.
-  const kept = [...matched].sort(
+  // Cheapest first, so each slot's share is the affordable end of that slot.
+  const ranked = [...matched].sort(
     (a, b) =>
       (a.price_eur ?? Infinity) - (b.price_eur ?? Infinity) ||
       String(a.id).localeCompare(String(b.id)),
   );
 
-  const shops = new Set(
-    kept.map((candidate) => candidate.shop_id ?? "unknown"),
+  const kept = capShops(
+    allocate(ranked, selection.categoryCounts, maxItems),
+    maxShops,
   );
 
   const slots = {};
-  for (const item of kept)
-    slots[item.category ?? "other"] =
-      (slots[item.category ?? "other"] ?? 0) + 1;
+  for (const item of kept) slots[slotOf(item)] = (slots[slotOf(item)] ?? 0) + 1;
+
+  const shops = new Set(kept.map((candidate) => candidate.shop_id ?? "unknown"));
+  // A wanted slot with no candidates cannot produce an outfit. Say so here
+  // rather than letting it surface two steps later as a refund.
+  const missing = Object.keys(selection.categoryCounts).filter(
+    (slot) => !slots[slot],
+  );
 
   return {
     items: kept,
     matched: matched.length,
     shops: shops.size,
     slots,
+    missing,
+    truncated: kept.length < matched.length,
     // The counts the model asked for next to what the catalogue offers.
     wanted: selection.categoryCounts,
   };
@@ -500,16 +581,17 @@ export function applySelection(candidates, facets, selection) {
  *
  * @param {object[]} candidates
  * @param {string} userInfo
- * @param {{ model?: unknown, timeoutMs?: number, maxRetries?: number }} [options]
+ * @param {{ model?: unknown, timeoutMs?: number, maxRetries?: number, maxItems?: number, maxShops?: number }} [options]
  */
 export async function filterCandidates(candidates, userInfo, options = {}) {
   if (!Array.isArray(candidates))
     throw new Error("candidates must be an array");
   const facets = catalogueFacets(candidates);
   const selection = await selectFilters(facets, userInfo, options);
-  console.log(facets);
-  console.log(selection);
-  const result = applySelection(candidates, facets, selection);
+  const result = applySelection(candidates, facets, selection, {
+    maxItems: options.maxItems,
+    maxShops: options.maxShops,
+  });
   return { selection, facets, ...result };
 }
 
@@ -526,7 +608,10 @@ if (
     const inPath = resolve(flag("--in") ?? "catalog/cache/products.json");
     const outPath = resolve(flag("--out") ?? "catalog/cache/shortlist.json");
     const candidates = JSON.parse(readFileSync(inPath, "utf8"));
-    const result = await filterCandidates(candidates, userInfo);
+    const result = await filterCandidates(candidates, userInfo, {
+      maxItems: Number(flag("--max-items")) || undefined,
+      maxShops: Number(flag("--max-shops")) || undefined,
+    });
     writeFileSync(outPath, JSON.stringify(result.items, null, 1));
     const slots = Object.entries(result.slots)
       .sort()
@@ -535,11 +620,19 @@ if (
     console.log(
       [
         `${result.items.length} items from ${result.shops} shops -> ${outPath}`,
-        `matched ${result.matched} of ${candidates.length} candidates`,
+        `matched ${result.matched} of ${candidates.length} candidates` +
+          (result.truncated ? " (narrowed to the Person 3 caps)" : ""),
         `slots: ${slots}`,
         `selection: ${JSON.stringify(result.selection)}`,
       ].join("\n"),
     );
+    if (result.missing.length) {
+      console.error(
+        `No candidates for ${result.missing.join(", ")}. ` +
+          `Person 3 cannot complete an outfit without every required layer.`,
+      );
+      process.exitCode = 1;
+    }
   } catch (error) {
     console.error(`Candidate filter failed: ${error.message}`);
     process.exitCode = 1;
