@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { readOrder, refusal, TEMPLATE } from "./logic/intake.mjs";
+import { readOrder, refusal, reviewOrder, TEMPLATE } from "./logic/intake.mjs";
 import { briefToCustomer, sizesFromLabels } from "./logic/run-pipeline.mjs";
 
 const today = new Date("2026-10-30T12:00:00Z");
@@ -97,4 +97,42 @@ test("sizes the customer wrote out win over a broad filter reading", () => {
 test("sizes are only assigned when the labels are unambiguous", () => {
   assert.deepEqual(sizesFromLabels(["40"]), { top: undefined, waist: undefined, shoe_eu: "40" });
   assert.deepEqual(sizesFromLabels(["XS", "S", "M", "L", "36", "38", "40", "42"]), { top: undefined, waist: undefined, shoe_eu: undefined });
+});
+
+// The order is read before the escrow is requested, so an order AiTelier
+// cannot fill costs the customer nothing. Before this, a description of
+// "shopping" reached APPROVED on a guessed budget and a guessed size.
+test("a description that names no garment or style is refused", () => {
+  const review = reviewOrder("shopping", { today });
+  assert.equal(review.action, "refuse");
+  assert.match(review.message, /Nothing was charged/);
+  assert.match(review.message, /does not describe clothing/);
+});
+
+test("groceries are not an outfit order", () => {
+  assert.equal(reviewOrder("Buy groceries and household items", { today }).action, "refuse");
+});
+
+test("a clothing order with no size is asked about, never guessed", () => {
+  // A guessed size is a return, not an outfit, so this must not reach payment.
+  const review = reviewOrder("Organize black clothing collection", { today });
+  assert.equal(review.action, "ask");
+  assert.match(review.message, /top size/);
+  assert.match(review.message, /waist/);
+  assert.match(review.message, /shoe size/);
+  assert.match(review.message, /Nothing was charged/);
+});
+
+test("a brief that states its sizes runs straight through", () => {
+  assert.equal(reviewOrder("male, 150cm, Small; Slim; Old Money", { today }).action, "proceed");
+  assert.equal(
+    reviewOrder("Two autumn outfits, old money, top M, waist 32, shoes EU 43", { today }).action,
+    "proceed",
+  );
+});
+
+test("a malformed JSON order is refused, not answered at the customer's expense", () => {
+  const review = reviewOrder(JSON.stringify({ ...TEMPLATE, sizes: undefined }), { today });
+  assert.equal(review.action, "refuse");
+  assert.match(review.message, /sizes is required/);
 });

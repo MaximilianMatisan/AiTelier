@@ -206,6 +206,79 @@ export function readOrder(description, { today = new Date() } = {}) {
   return errors.length ? { ok: false, errors, warnings } : { ok: true, order, warnings };
 }
 
+// A free-text brief is accepted as an order, but the pipeline still has to know
+// what to buy and in which size. Without a size Person 2's filter invents one
+// and the customer pays for clothes that do not fit; with no garment or style
+// named at all ("shopping") it is not a clothing order in the first place.
+// Both are decided here so the answer arrives before the escrow is requested.
+const LETTER_SIZE =
+  /\b(?:xxs|xs|s|m|l|xl|xxl|xxxl|small|medium|large|extra\s?large)\b/i;
+const NUMERIC_SIZE =
+  /\b(?:waist|taille|bundweite|w|shoes?|schuhe?|schuhgr[oö]ss?e|eu|feet|foot|size|gr[oö]ss?e|talla)\s*(?:size\s*|eu\s*)?\d{2}(?:[.,]5)?\b/i;
+const GARMENT_OR_STYLE =
+  /\b(?:outfits?|looks?|wardrobe|garderobe|clothes|clothing|kleidung|shirts?|t-?shirts?|tops?|trousers|pants|jeans|chinos|shorts|skirts?|dress(?:es)?|jackets?|coats?|blazers?|knitwear|sweaters?|jumpers?|hoodies?|shoes|sneakers|boots|loafers|suits?|styl(?:e|ing)|aesthetic|streetwear|old\s?money|preppy|casual|minimal|smart|formal|business)\b/i;
+
+/** Does the brief name a size we can shop with? */
+export function namesSize(brief) {
+  return LETTER_SIZE.test(brief) || NUMERIC_SIZE.test(brief);
+}
+
+/** Does the brief name a garment, a style or anything we could dress someone in? */
+export function namesGarment(brief) {
+  return GARMENT_OR_STYLE.test(brief);
+}
+
+/**
+ * The decision taken before any money is requested:
+ *   proceed · the order can be filled
+ *   ask     · it is a clothing order but something we must not guess is missing
+ *   refuse  · it cannot be filled at all
+ * `message` is what the customer reads in either case. Nothing is charged for
+ * an `ask` or a `refuse`, because the escrow has not been requested yet.
+ */
+export function reviewOrder(description, options = {}) {
+  const intake = readOrder(description, options);
+  if (!intake.ok)
+    return { action: "refuse", message: refusal(intake), reasons: intake.errors, intake };
+  const brief = intake.order.brief;
+  if (!brief) return { action: "proceed", intake };
+  if (!namesGarment(brief))
+    return {
+      action: "refuse",
+      reasons: ["The description names no garment, style or outfit."],
+      message: [
+        "AiTelier could not start this order. Nothing was charged.",
+        "",
+        `This task asks for "${brief.slice(0, 80)}", which does not describe clothing.`,
+        "AiTelier builds outfits from real garments in real shops, so it needs to know",
+        "what to dress you in.",
+        "",
+        'Try: "Two autumn outfits, old money style, budget 400 EUR, top M, waist 32, shoes EU 43."',
+      ].join("\n"),
+      intake,
+    };
+  if (!namesSize(brief))
+    return {
+      action: "ask",
+      reasons: ["The description names no size."],
+      message: [
+        "AiTelier needs your sizes before it can request payment. Nothing was charged.",
+        "",
+        "Guessing a size is the one thing it will not do: the shops sell single",
+        "garments, and a wrong size is a return, not an outfit.",
+        "",
+        "Please add:",
+        "- top size, for example S, M or L",
+        "- waist in inches, for example 32",
+        "- shoe size in EU, for example 43",
+        "",
+        "Start the order again with those included and it will run straight through.",
+      ].join("\n"),
+      intake,
+    };
+  return { action: "proceed", intake };
+}
+
 /** What the customer reads in Sokosumi when the order is refused. */
 export function refusal({ errors, warnings = [] }) {
   return [
