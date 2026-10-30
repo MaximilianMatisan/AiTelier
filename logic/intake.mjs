@@ -105,10 +105,14 @@ function strings(value, field, errors, { max = 20, length = 80 } = {}) {
  */
 export function readOrder(description, { today = new Date() } = {}) {
   const raw = extractJson(description);
-  if (!raw) {
+  // {"brief": "..."} is a free-text order the Lead-Agent saved for the pipeline.
+  const saved = raw && Object.keys(raw).length === 1 && typeof raw.brief === "string" ? raw.brief : null;
+  if (!raw || saved !== null) {
     // Free text is a normal order: Person 2's filter reads it directly and picks
     // budget, style, season and sizes out of it. Only an empty brief is refused.
-    const brief = typeof description === "string" ? description.trim() : "";
+    const text = saved ?? (typeof description === "string" ? description : "");
+    // Sokosumi descriptions sometimes arrive wrapped in a ``` fence.
+    const brief = text.replace(/^\s*```[a-z]*\s*|\s*```\s*$/gi, "").trim();
     if (!brief)
       return { ok: false, errors: ["The task description is empty. Describe the outfits you would like."], warnings: [] };
     if (brief.length > 4000)

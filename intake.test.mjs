@@ -48,6 +48,13 @@ test("every problem is reported at once, not one per retry", () => {
     assert.ok(result.errors.some((e) => e.includes(field)), `missing error for ${field}`);
 });
 
+test("a free-text order survives the file the Lead-Agent hands the pipeline", () => {
+  // lead-agent.mjs writes intake.order to order.json; run-pipeline.mjs reads it back.
+  const first = read("```\nmale, 150cm, Small; Slim; Old Money\n```");
+  assert.deepEqual(first.order, { brief: "male, 150cm, Small; Slim; Old Money" }, "the fence is dropped");
+  assert.deepEqual(read(JSON.stringify(first.order, null, 2)), first);
+});
+
 test("free text is an order: it goes to the filter as written", () => {
   const brief = "180cm, feet 40; winter; old money";
   assert.deepEqual(read(brief), { ok: true, order: { brief }, warnings: [] });
