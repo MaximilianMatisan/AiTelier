@@ -6,13 +6,25 @@ from typing import Any, TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from .config import Settings
-from .models import ContractError, StylistRequest
+from .models import (
+    ContractError,
+    OutfitDraft,
+    OutfitSelection,
+    SelectedItem,
+    StylistRequest,
+)
 from .normalize import normalize_request
 from .services.a2ui import build_a2ui
 from .services.checks import check_outfit, live_check, overall_guarantees
 from .services.llm import select_outfits
 from .services.mannequin import compose_board, compose_lookbook
-from .services.resolver import resolve_selection
+from .services.resolver import LAYER_ORDER, resolve_selection
+
+
+class EditRejected(ContractError):
+    def __init__(self, message: str, guarantees: dict[str, Any]):
+        super().__init__(message)
+        self.guarantees = guarantees
 
 
 class StylistState(TypedDict, total=False):
@@ -50,13 +62,18 @@ def _resolve(state: StylistState) -> StylistState:
     return {"outfits": outfits, "feedback": errors}
 
 
+def _live_checks(request: StylistRequest, settings: Settings) -> dict[str, dict[str, Any]]:
+    shops = {shop.shop_id: shop for shop in request.shops}
+    return {
+        item.item_id: live_check(item, settings, shops.get(item.shop_id))
+        for item in request.items
+    }
+
+
 def _final_check(state: StylistState) -> StylistState:
     request = state["request"]
     settings = state["settings"]
-    live: dict[str, dict[str, Any]] = {}
-    shops = {shop.shop_id: shop for shop in request.shops}
-    for item in request.items:
-        live[item.item_id] = live_check(item, settings, shops.get(item.shop_id))
+    live = _live_checks(request, settings)
     approved: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     feedback: list[str] = []
@@ -93,10 +110,11 @@ def _route_after_guarantees(state: StylistState) -> str:
     return "refund"
 
 
-def _compose(state: StylistState) -> StylistState:
-    request = state["request"]
-    settings = state["settings"]
-    approved = state.get("approved", [])
+def build_result(
+    request: StylistRequest,
+    approved: list[dict[str, Any]],
+    settings: Settings,
+) -> dict[str, Any]:
     task_dir = settings.artifact_dir / request.task_id
     task_dir.mkdir(parents=True, exist_ok=True)
     board_files: list[str] = []
@@ -134,7 +152,195 @@ def _compose(state: StylistState) -> StylistState:
         settings.artifact_base_url,
         f"aitelier-gallery-{request.task_id}",
     )
-    return {"result": result}
+    return result
+
+
+def _compose(state: StylistState) -> StylistState:
+    return {
+        "result": build_result(
+            state["request"],
+            state.get("approved", []),
+            state["settings"],
+        )
+    }
+
+
+def _image_ref(item) -> str:
+    for image in item.images:
+        if image.role == "front":
+            return image.url
+    return item.images[0].url if item.images else ""
+
+
+def _size_available(item, request: StylistRequest, layer: str) -> bool:
+    preferred = request.customer.sizes.get(layer) or request.customer.sizes.get(item.slot)
+    if not preferred or not item.sizes:
+        return True
+    return any(
+        size.label.lower() == preferred.lower() and size.in_stock is not False
+        for size in item.sizes
+    )
+
+
+def candidates_for_layer(
+    request: StylistRequest,
+    layer: str,
+    limit: int = 30,
+) -> list[dict[str, Any]]:
+    if layer not in LAYER_ORDER:
+        raise ContractError(f"unknown layer {layer}")
+    candidates: list[dict[str, Any]] = []
+    for item in request.items:
+        if item.slot != layer or item.availability == "sold_out":
+            continue
+        if not _size_available(item, request, layer):
+            continue
+        sizes = [size.label for size in item.sizes if size.in_stock is not False]
+        candidates.append(
+            {
+                "item_id": item.item_id,
+                "title": item.title,
+                "brand": item.brand,
+                "layer": layer,
+                "price": {
+                    "amount": item.price.amount,
+                    "currency": item.price.currency,
+                },
+                "image_url": _image_ref(item),
+                "sizes": sizes,
+                "availability": item.availability,
+                "product_url": item.product_url,
+                "colors": item.colors,
+            }
+        )
+    candidates.sort(key=lambda value: (value["price"]["amount"], value["title"]))
+    return candidates[:limit]
+
+
+def catalogue_items(request: StylistRequest) -> list[dict[str, Any]]:
+    shops = {shop.shop_id: shop for shop in request.shops}
+    items: list[dict[str, Any]] = []
+    for item in request.items:
+        shop = shops.get(item.shop_id)
+        items.append(
+            {
+                "item_id": item.item_id,
+                "title": item.title,
+                "brand": item.brand,
+                "layer": item.slot,
+                "category": item.category,
+                "shop": shop.name if shop else item.shop_id,
+                "price": {
+                    "amount": item.price.amount,
+                    "currency": item.price.currency,
+                },
+                "image_url": _image_ref(item),
+                "sizes": [size.label for size in item.sizes if size.in_stock is not False],
+                "availability": item.availability,
+                "product_url": item.product_url,
+            }
+        )
+    items.sort(
+        key=lambda value: (
+            LAYER_ORDER.index(value["layer"]) if value["layer"] in LAYER_ORDER else 99,
+            value["price"]["amount"],
+            value["title"],
+        )
+    )
+    return items
+
+
+def edit_outfit(
+    request: StylistRequest,
+    result: dict[str, Any],
+    settings: Settings,
+    outfit_id: str,
+    replacements: list[dict[str, Any]],
+) -> dict[str, Any]:
+    outfits = result.get("outfits", [])
+    current = next(
+        (outfit for outfit in outfits if outfit.get("outfit_id") == outfit_id),
+        None,
+    )
+    if current is None:
+        raise ContractError(f"outfit {outfit_id} not found")
+    item_by_id = {item.item_id: item for item in request.items}
+    edited_parts = {
+        value["layer"]: {
+            "item_id": value["item_id"],
+            "size": value.get("size"),
+            "layer": value["layer"],
+        }
+        for value in current.get("items", [])
+    }
+    if not replacements:
+        raise ContractError("no replacements supplied")
+    for replacement in replacements:
+        layer = str(replacement.get("layer", "")).strip()
+        if layer not in edited_parts:
+            raise ContractError(f"outfit has no {layer!r} layer")
+        item_id = replacement.get("item_id") or edited_parts[layer]["item_id"]
+        item = item_by_id.get(item_id)
+        if item is None:
+            raise ContractError(f"unknown item_id {item_id}")
+        if item.slot != layer:
+            raise ContractError(
+                f"{item_id} belongs to {item.slot}, not {layer}"
+            )
+        edited_parts[layer] = {
+            "item_id": item_id,
+            "size": replacement.get("size") or edited_parts[layer]["size"],
+            "layer": layer,
+        }
+    draft = OutfitDraft(
+        name=current.get("name", "AiTelier look"),
+        items=[
+            SelectedItem(**value)
+            for value in sorted(
+                edited_parts.values(),
+                key=lambda value: LAYER_ORDER.index(value["layer"]),
+            )
+        ],
+        rationale=current.get("rationale", ""),
+        fit_notes=current.get("fit_notes", ""),
+        confidence=current.get("confidence"),
+    )
+    resolve_request = request
+    explicit_layers = {
+        str(value.get("layer"))
+        for value in replacements
+        if value.get("size")
+    }
+    if explicit_layers:
+        resolve_request = request.model_copy(deep=True)
+        for layer in explicit_layers:
+            resolve_request.customer.sizes.pop(layer, None)
+    resolved, errors = resolve_selection(
+        OutfitSelection(outfits=[draft]),
+        resolve_request,
+    )
+    if errors or not resolved:
+        raise ContractError("; ".join(errors) or "could not resolve the edited outfit")
+    edited = resolved[0]
+    edited["outfit_id"] = outfit_id
+    guarantee = check_outfit(
+        edited,
+        resolve_request,
+        _live_checks(resolve_request, settings),
+    )
+    edited["guarantees"] = guarantee
+    if not guarantee["ok"]:
+        failed = [
+            f"{name}: {value['detail']}"
+            for name, value in guarantee["checks"].items()
+            if not value["ok"]
+        ]
+        raise EditRejected("; ".join(failed), guarantee)
+    approved = [
+        edited if outfit.get("outfit_id") == outfit_id else outfit
+        for outfit in outfits
+    ]
+    return build_result(request, approved, settings)
 
 
 def _refund(state: StylistState) -> StylistState:

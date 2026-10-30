@@ -14,10 +14,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY requirements.txt pytest.ini ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml ./
+RUN pip install --no-cache-dir ".[test]"
 
 COPY app ./app
+COPY web ./web
 COPY prompts ./prompts
 COPY fixtures ./fixtures
 COPY schemas ./schemas

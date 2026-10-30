@@ -33,9 +33,12 @@ class Settings:
     artifact_base_url: str
     static_dir: Path
     fixture_image_dir: Path
+    web_dir: Path = BASE_DIR / "web"
+    demo_catalog_path: Path = BASE_DIR.parent / "catalog" / "cache" / "person3.input.json"
     required_layers: tuple[str, ...] = ("base", "mid", "outer", "bottom", "shoes")
     max_items: int = 100
-    max_images: int = 12
+    max_images: int = 20
+    image_max_side: int = 384
     image_max_bytes: int = 8 * 1024 * 1024
     allow_local_images: bool = True
     request_timeout_seconds: float = 90.0
@@ -52,6 +55,13 @@ class Settings:
         static_dir = Path(_env("STATIC_DIR", str(BASE_DIR / "fixtures")))
         fixture_image_dir = Path(
             _env("FIXTURE_IMAGE_DIR", str(static_dir / "images"))
+        )
+        web_dir = Path(_env("WEB_DIR", str(BASE_DIR / "web")))
+        demo_catalog_path = Path(
+            _env(
+                "DEMO_CATALOG_PATH",
+                str(BASE_DIR.parent / "catalog" / "cache" / "person3.input.json"),
+            )
         )
         return cls(
             gemini_api_key=api_key,
@@ -71,8 +81,11 @@ class Settings:
             ).rstrip("/"),
             static_dir=static_dir,
             fixture_image_dir=fixture_image_dir,
+            web_dir=web_dir,
+            demo_catalog_path=demo_catalog_path,
             max_items=int(_env("MAX_ITEMS", "100")),
-            max_images=int(_env("MAX_IMAGES", "12")),
+            max_images=int(_env("MAX_IMAGES", "20")),
+            image_max_side=int(_env("IMAGE_MAX_SIDE", "384")),
             image_max_bytes=int(_env("IMAGE_MAX_BYTES", str(8 * 1024 * 1024))),
             allow_local_images=_env_bool("ALLOW_LOCAL_IMAGES", True),
             request_timeout_seconds=float(_env("REQUEST_TIMEOUT_SECONDS", "90")),

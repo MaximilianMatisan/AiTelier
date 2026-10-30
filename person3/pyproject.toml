@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aitelier-person3"
+version = "0.1.0"
+description = "AiTelier Person 3 stylist and final-check service"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi==0.115.0",
+  "uvicorn[standard]==0.30.6",
+  "httpx==0.27.2",
+  "pillow==11.0.0",
+  "langgraph==0.2.60",
+  "pydantic==2.9.2",
+  "jsonschema==4.23.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.3.3"]
+
+[tool.setuptools]
+packages = []
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "live: calls the real Gemini API; enable with RUN_LIVE_TESTS=1",
+]

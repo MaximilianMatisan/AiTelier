@@ -234,7 +234,8 @@ Plain-language combinations such as `"straight fit, slim waist"` are valid. The 
 ### 4.2.1 Style blend and layer count
 
 `customer.style` may contain up to five style directions. They are blended into one coherent
-look, not expanded into five separate outfits.
+look, not expanded into five separate outfits. `customer.outfit_count` is clamped to 1-5;
+one request can therefore produce up to five looks.
 
 The number of garment layers depends on the season and climate:
 

@@ -25,20 +25,40 @@ $podman = "C:\Program Files\RedHat\Podman\podman.exe"
 & $podman run --rm --name aitelier-person3 `
   -p 127.0.0.1:21951:8000 `
   --env-file .env `
+  -e DEMO_CATALOG_PATH=/catalog/person3.input.json `
+  -v "${PWD}/catalog/cache:/catalog:ro" `
   -v person3-artifacts:/data/artifacts `
   aitelier-person3:local
 ```
 
+Open `http://127.0.0.1:21951/` for the interactive studio. It can load the synthetic demo,
+the real Person 1 catalogue, or an uploaded JSON file. Every look exposes each layer with
+alternative images and sizes; swapping one part reruns resolution, final checks, board
+composition, and the A2UI build.
+
 `ARTIFACT_BASE_URL` defaults to `http://127.0.0.1:21951`. If the A2UI renderer is remote,
 set it to a URL it can reach.
+
+## Dependencies
+
+Runtime and test dependencies are declared in `pyproject.toml`; there is no
+`requirements.txt`.
 
 ## API
 
 ```text
+GET  /                         interactive studio
+GET  /gallery/{task_id}        every input image for a generated task
 GET  /healthz
+GET  /v1/demo/input            synthetic demo (?kind=real for mounted catalogue)
+GET  /v1/demo/customer         demo customer brief
 POST /v1/style                 canonical input JSON -> full result
 GET  /v1/style/{task_id}       stored result
 GET  /v1/style/{task_id}/a2ui  A2UI messages as a JSON array
+GET  /v1/style/{task_id}/catalogue   all normalized items with image links
+GET  /v1/style/{task_id}/candidates?layer=base
+POST /v1/style/{task_id}/outfits/{outfit_id}/parts
+                               swap one layer and recompose
 GET  /artifacts/...            generated boards and lookbook
 GET  /static/...               fixture images
 ```
@@ -53,7 +73,9 @@ GET  /static/...               fixture images
 - `PERSON1_REFRESH_URL` for live re-checks
 - `ARTIFACT_DIR`, `ARTIFACT_BASE_URL`
 - `STATIC_DIR`, `FIXTURE_IMAGE_DIR`
-- `MAX_ITEMS`, `MAX_IMAGES`, `REQUEST_TIMEOUT_SECONDS`
+- `DEMO_CATALOG_PATH`, `WEB_DIR`
+- `MAX_ITEMS`, `MAX_IMAGES` (default 20), `IMAGE_MAX_SIDE` (default 384 px)
+- `REQUEST_TIMEOUT_SECONDS`
 
 ## Tests
 

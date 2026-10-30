@@ -52,6 +52,32 @@ def test_e2e_summer_uses_only_three_layers(tmp_path, raw_input):
     assert all(len(tab["tabs"]) == 3 for tab in _tabs(result))
 
 
+def test_e2e_mild_uses_four_layers(tmp_path, raw_input):
+    raw = deepcopy(raw_input)
+    raw["customer"]["season"] = "spring"
+    raw["customer"]["climate"] = "mild and rainy"
+    settings = make_settings(tmp_path)
+    result = run_style(raw, settings)
+    assert result["status"] == "APPROVED"
+    assert result["outfits"]
+    assert all(
+        [layer["layer"] for layer in outfit["layers"]]
+        == ["base", "mid", "bottom", "shoes"]
+        for outfit in result["outfits"]
+    )
+    assert all(len(tab["tabs"]) == 4 for tab in _tabs(result))
+
+
+def test_e2e_supports_five_looks(tmp_path, raw_input):
+    raw = deepcopy(raw_input)
+    raw["customer"]["outfit_count"] = 5
+    settings = make_settings(tmp_path)
+    result = run_style(raw, settings)
+    assert result["status"] == "APPROVED"
+    assert len(result["outfits"]) == 5
+    assert all(len(outfit["layers"]) == 5 for outfit in result["outfits"])
+
+
 def test_e2e_refund_when_no_outfit_passes(tmp_path, raw_input):
     raw = deepcopy(raw_input)
     raw["options"]["strict_guarantees"] = True

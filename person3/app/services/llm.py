@@ -86,6 +86,7 @@ def _catalog_text(request: StylistRequest, items: list[Item]) -> str:
     shops = {shop.shop_id: shop for shop in request.shops}
     lines = [
         f"Customer budget: {request.customer.budget.amount:.2f} {request.customer.budget.currency}",
+        f"Desired number of looks (1-5): {request.customer.outfit_count}",
         f"Style directions (max 5): {', '.join(request.customer.style)}",
         f"Fit: {', '.join(request.customer.fit) or 'not specified'}",
         f"Fit description: {request.customer.fit_description or 'not provided'}",
@@ -133,7 +134,7 @@ def _mock_selection(request: StylistRequest) -> OutfitSelection:
         )
     outfits: list[OutfitDraft] = []
     style_names = request.customer.style or ["minimal"]
-    for index in range(min(request.customer.outfit_count, 3)):
+    for index in range(min(request.customer.outfit_count, 5)):
         chosen: list[SelectedItem] = []
         used: set[str] = set()
         for layer_index, layer in enumerate(request.required_layers):
@@ -220,6 +221,27 @@ def select_outfits(
         return _mock_selection(request)
 
 
+def _image_sample(items: list[Item], request: StylistRequest, limit: int) -> list[Item]:
+    """Spread the image budget across layers instead of taking catalogue order."""
+    grouped: dict[str, list[Item]] = {}
+    for item in items:
+        grouped.setdefault(item.slot, []).append(item)
+    order = [layer for layer in request.required_layers if layer in grouped]
+    order.extend(layer for layer in grouped if layer not in order)
+    selected: list[Item] = []
+    while len(selected) < limit:
+        added = False
+        for layer in order:
+            if grouped[layer]:
+                selected.append(grouped[layer].pop(0))
+                added = True
+                if len(selected) >= limit:
+                    break
+        if not added:
+            break
+    return selected
+
+
 def _live_selection(
     request: StylistRequest,
     feedback: list[str],
@@ -228,7 +250,13 @@ def _live_selection(
     items = [item for item in request.items if item.availability != "sold_out"]
     if not items:
         items = list(request.items)
-    images = image_data_urls(items, settings, limit=settings.max_images)
+    image_items = _image_sample(list(items), request, settings.max_images)
+    images = image_data_urls(
+        image_items,
+        settings,
+        limit=settings.max_images,
+        max_side=settings.image_max_side,
+    )
     system_prompt = "\n\n".join(
         part
         for part in (

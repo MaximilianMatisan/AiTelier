@@ -105,7 +105,12 @@ def image_to_data_url(data: bytes, max_side: int = 512) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(buffer.getvalue()).decode("ascii")
 
 
-def image_data_urls(items: list, settings: Settings, limit: int = 12) -> list[dict[str, str]]:
+def image_data_urls(
+    items: list,
+    settings: Settings,
+    limit: int = 20,
+    max_side: int = 384,
+) -> list[dict[str, str]]:
     result: list[dict[str, str]] = []
     for item in items:
         if len(result) >= limit:
@@ -117,7 +122,7 @@ def image_data_urls(items: list, settings: Settings, limit: int = 12) -> list[di
                     {
                         "item_id": item.item_id,
                         "url": image.url,
-                        "data_url": image_to_data_url(data),
+                        "data_url": image_to_data_url(data, max_side=max_side),
                     }
                 )
                 break
