@@ -24,10 +24,10 @@ const SHOP_CONCURRENCY = 4; // across shops; still one request at a time per sho
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /** GET with a timeout and our User-Agent. Returns parsed JSON, or throws. */
-export async function fetchJson(url) {
+export async function fetchJson(url, timeoutMs = TIMEOUT_MS) {
   const res = await fetch(url, {
     headers: { "User-Agent": UA, Accept: "application/json" },
-    signal: AbortSignal.timeout(TIMEOUT_MS),
+    signal: AbortSignal.timeout(timeoutMs),
     redirect: "follow",
   });
   if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);

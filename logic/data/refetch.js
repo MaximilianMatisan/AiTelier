@@ -12,6 +12,15 @@ import { fetchJson } from "./collect.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 
+/**
+ * Total time the live attempts may take before we fall back to the cache.
+ * A shop that accepts the connection and then stalls costs a full timeout per
+ * attempt, and refetch makes up to three. Unbudgeted that is ~30 s for one
+ * item, and Person 3's contract allows 90 s for the whole request.
+ * A dead network is not the problem - DNS fails in milliseconds.
+ */
+const LIVE_BUDGET_MS = 8000;
+
 let shopsById = null;
 async function shopFor(shopId) {
   shopsById ??= Object.fromEntries(
@@ -42,14 +51,14 @@ function readVariants(options, variants, toEur) {
 const fromCents = (p) => Number(p) / 100;
 const fromDecimal = (p) => Number(p);
 
-async function fromStorefront(item, shop) {
-  const p = await fetchJson(`https://${shop.domain}/products/${item.source.handle}.js`);
+async function fromStorefront(item, shop, timeoutMs) {
+  const p = await fetchJson(`https://${shop.domain}/products/${item.source.handle}.js`, timeoutMs);
   return { ...readVariants(p.options, p.variants, fromCents), url_ok: true };
 }
 
-async function fromProductsJson(item, shop) {
+async function fromProductsJson(item, shop, timeoutMs) {
   for (let page = 1; page <= 2; page++) {
-    const body = await fetchJson(`https://${shop.domain}/products.json?limit=250&page=${page}`);
+    const body = await fetchJson(`https://${shop.domain}/products.json?limit=250&page=${page}`, timeoutMs);
     const list = body.products ?? [];
     const p = list.find((x) => x.handle === item.source.handle);
     if (p) return { ...readVariants(p.options, p.variants, fromDecimal), url_ok: true };
@@ -74,9 +83,12 @@ export async function refetch(item) {
   const base = { id: item.id, fetched_at: new Date().toISOString() };
 
   if (process.env.OFFLINE !== "1") {
+    const deadline = Date.now() + LIVE_BUDGET_MS;
     for (const attempt of [fromStorefront, fromProductsJson]) {
+      const left = deadline - Date.now();
+      if (left < 500) break; // out of budget, the cache is better than stalling
       try {
-        return { ...base, ...(await attempt(item, shop)), source: "live" };
+        return { ...base, ...(await attempt(item, shop, left)), source: "live" };
       } catch { /* fall through to the next strategy */ }
     }
   }

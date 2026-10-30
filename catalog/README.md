@@ -105,6 +105,11 @@ returned nothing usable, so the collector stays Shopify-only.
    "N in warehouse".
 3. **`/products.json` is CDN-cached and can be minutes stale.** `refetch()` hits
    `/products/{handle}.js` first, which is fresher. Always refetch before asserting a guarantee.
+   Its live attempts share an **8 s budget**, after which it falls back to the cache. A shop that
+   accepts the connection and then stalls would otherwise cost a 10 s timeout on each of up to
+   three attempts — ~30 s for one item, against the 90 s the contract allows for the whole
+   request. Measured: 8.02 s against a stalled shop, 63 ms when the network is simply down
+   (DNS fails immediately), 0.5 s on the happy path.
 4. **Items with no buyable size are dropped at collect time**, so guarantee 2 can only fail on
    the *customer's* size.
 5. **Category, theme and season are keyword heuristics** (tables at the top of
