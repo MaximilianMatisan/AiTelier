@@ -15,6 +15,7 @@
     "eve": "0.71.0",
     "ai": "7.0.127",
     "zod": "4.6.5",
+    "@types/node": "^26.6.6",
     "@ai-sdk/openai-compatible": "3.0.62"
   }
 }
