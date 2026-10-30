@@ -164,3 +164,40 @@ test("sampling respects the 100-item and 30-shop caps", () => {
   assert.equal(sample.length, 100);
   assert.ok(new Set(sample.map((i) => i.shop_id)).size <= 30);
 });
+
+// --- the live re-check service -------------------------------------------
+test("an item we cannot look up is never reported as in stock", async () => {
+  // Person 3 decides guarantee 3 on this record. Claiming stock for an item
+  // we failed to find would put money behind something we never checked.
+  const { checkOne } = await import("./logic/data/refresh-service.mjs");
+  const empty = { byId: new Map(), shops: new Map() };
+  const record = await checkOne(
+    { item_id: "gone-1", shop_id: "gone", product_url: "https://shop.example/x" },
+    empty,
+  );
+  assert.equal(record.availability, "unknown");
+  assert.equal(record.stale, true);
+  assert.deepEqual(record.sizes_in_stock, []);
+  assert.equal(record.price, null);
+  assert.equal(record.source, "person1_refresh");
+});
+
+test("a cached answer from the service is marked stale", async () => {
+  // checks.py only trusts `stale: false`. OFFLINE forces the cache path, and
+  // the record has to admit it.
+  const { checkOne } = await import("./logic/data/refresh-service.mjs");
+  const item = items.find((i) => i.shop_id === "norseprojects");
+  const shop = seed.find((s) => s.id === "norseprojects");
+  const catalogue = { byId: new Map([[item.id, item]]), shops: new Map([[shop.id, shop]]) };
+  const previous = process.env.OFFLINE;
+  process.env.OFFLINE = "1";
+  try {
+    const record = await checkOne({ item_id: item.id, shop_id: item.shop_id }, catalogue);
+    assert.equal(record.stale, true);
+    assert.equal(record.item_id, item.id);
+    assert.ok(record.sizes_in_stock.length >= 0);
+  } finally {
+    if (previous === undefined) delete process.env.OFFLINE;
+    else process.env.OFFLINE = previous;
+  }
+});

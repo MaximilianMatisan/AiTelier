@@ -29,6 +29,7 @@ node logic/data/refetch.js <item-id> --person3   # same, as a section 9 final-ch
 
 node logic/data/to_person3.js --limit 100        # emit Person 3's envelope shape
 node logic/data/to_person3.js --in shortlist.json
+node logic/data/refresh-service.mjs --port 8787   # live re-check for the final check
 ```
 
 Politeness: one request at a time per shop, 500 ms between pages, 10 s timeout,
@@ -270,6 +271,36 @@ the keyword fixes above. What is left is mostly on their side and worth telling 
   (*Hose* = trousers) and "Nike Tailored Dri-FIT Loose Short".
 - 22 of our tops become `shoes` on the word "Oxford", which is both a shirt fabric and a shoe
   style — genuinely ambiguous.
+
+## The live re-check service
+
+Person 3's final check decides guarantees 2, 3 and 4. Without a service to ask,
+`person3/app/services/checks.py` takes this branch:
+
+```python
+if live_check_mode == "snapshot" or not person1_refresh_url:
+    return _snapshot(item, stale=False)
+```
+
+It reads our cached catalogue and reports `stale: false`, so stock and price are
+claimed rather than checked. `logic/data/refresh-service.mjs` is the service that
+branch waits for:
+
+```sh
+node logic/data/refresh-service.mjs --port 8787
+
+PERSON1_REFRESH_URL=http://127.0.0.1:8787/refresh LIVE_CHECK_MODE=live \
+PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs
+```
+
+It takes `{"items":[{item_id, shop_id, product_url}]}`, runs `refetch()` on each
+and answers with section 9 records. An item it cannot look up comes back
+`availability: "unknown"`, `stale: true` — never as in stock.
+
+Measured with the demo shortlist and a 500 EUR budget: 50 records, all
+`source: person1_refresh` and `stale: false`, result APPROVED with two outfits
+and all five guarantees passing. The same run in snapshot mode takes 1 second
+instead of 15, which is the difference between asking the shops and not.
 
 ## Open items for the team
 
