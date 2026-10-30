@@ -13,3 +13,4 @@ person3/artifacts/
 person3/**/__pycache__/
 person3/.pytest_cache/
 testsperson3/
+trustCache/
