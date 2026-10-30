@@ -8,10 +8,13 @@ import { taskTarget, isTaskForTarget } from "./task-target.mjs";
 import { pipelineAnswer } from "./logic/lead-agent.mjs";
 import { logger } from "./log.mjs";
 const log = logger("worker");
+import { loadSokosumiRuntime } from "./sokosumi-runtime.mjs";
+const { readRuntimeCredential, createCoworkerHttpClient, fetchTasks } = await loadSokosumiRuntime();
 // Tasks run through the team pipeline; AITELIER_PIPELINE=false restores the plain LLM.
 const respond = process.env.AITELIER_PIPELINE === "false" ? answer : pipelineAnswer;
 const target = taskTarget();
 const id = target.coworkerId;
+const runtime = createCoworkerHttpClient({ apiKey: readRuntimeCredential(id) });
 const releaseLock = acquireWorkerLock();
 process.once("exit", releaseLock);
 for (const signal of ["SIGINT", "SIGTERM"])
@@ -65,13 +68,21 @@ const once = (taskId, level, message, data) => {
 };
 while (true) {
   try {
-    const tasks = cli([
-      "tasks",
-      "list",
-      "--coworker-id",
-      id,
-      ...target.taskArgs,
-    ]).tasks;
+    // Listed with the Coworker's own key: `sokosumi tasks list` uses the
+    // operator's login and only returns the operator's own Tasks, so Tasks a
+    // teammate assigned to AiTelier stayed READY forever.
+    // The API returns at most 20 per call, so open Tasks are asked for by
+    // status and merged with the newest 20 (finished Tasks awaiting payout).
+    const pages = await Promise.all(
+      [{ status: ["READY"] }, { status: ["RUNNING"] }, {}].map((filter) =>
+        fetchTasks(runtime, { coworkerId: id, ...filter }),
+      ),
+    );
+    const tasks = [
+      ...new Map(
+        pages.flatMap((page) => page.tasks ?? page.data ?? page).map((task) => [task.id, task]),
+      ).values(),
+    ];
     const mine = tasks.filter((t) => isTaskForTarget(t, target));
     const counts = Object.entries(
       mine.reduce((c, t) => ({ ...c, [t.status]: (c[t.status] ?? 0) + 1 }), {}),
