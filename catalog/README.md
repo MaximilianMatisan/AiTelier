@@ -103,8 +103,11 @@ returned nothing usable, so the collector stays Shopify-only.
 1. **Cart permalinks cannot be verified by the agent.** The format is documented and the
    `variant_id`s are real, but every shop returns **403 on the `/cart/` path** to a non-browser
    client. Product pages answer 200.
-   → **Derive guarantee 4 from `refetch()` (`url_ok` + the size being available), never from an
-   HTTP check on the cart link.** Have a human click one cart link in a browser before the demo.
+   → **Derive guarantee 4 from `refetch()` — `url_ok` *and* the size available *and*
+   `source === "live"`** — never from an HTTP check on the cart link. The `source` part matters:
+   a cache read returns `url_ok: true` because it found the product record, but it cannot prove
+   the page still answers. `toPerson3Check` already folds this into `stale`. Have a human click
+   one cart link in a browser before the demo.
 2. **Stock is boolean, not a count.** The feed has `available: true/false` and no quantity, so
    `stock` values are only ever `1` or `0`. Guarantee 2 means "buyable in that size", not
    "N in warehouse".

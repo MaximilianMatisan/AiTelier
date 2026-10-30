@@ -37,6 +37,17 @@ test("every item is priced above zero", () => {
   assert.deepEqual(free.map((i) => i.id), []);
 });
 
+test("fetched_at tells the truth about when the data was collected", () => {
+  // An offline rebuild used to stamp "now" on cached data, so week-old items
+  // would have looked seconds fresh. This becomes Person 3's `collected_at`.
+  const shops = [...new Set(items.map((i) => i.shop_id))];
+  for (const id of shops) {
+    const raw = JSON.parse(readFileSync(`catalog/cache/raw/${id}.json`, "utf8"));
+    const stamped = new Set(items.filter((i) => i.shop_id === id).map((i) => i.source.fetched_at));
+    assert.deepEqual([...stamped], [raw.fetched_at], `${id} fetched_at drifted from its raw file`);
+  }
+});
+
 test("every item matches the agreed schema", () => {
   const cats = new Set(["top", "bottom", "shoes", "outer"]);
   for (const i of items) {

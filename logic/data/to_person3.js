@@ -59,6 +59,7 @@ export function toPerson3Shop(shop) {
     base_url: `https://${shop.domain}/`,
     // No `guarantee`: that is Person 2's trust check (catalog/trust.json), not ours.
     // Absent means GUARANTEE_ASSUMED in their contract - see catalog/README.md.
+
     // Hand-entered estimates (`shipping.estimated` in the seed), because the
     // product feed carries no shipping at all and /cart/shipping_rates.json
     // needs a real cart. Both are deliberately conservative: the amount is set

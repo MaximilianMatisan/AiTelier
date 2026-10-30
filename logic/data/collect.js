@@ -68,15 +68,16 @@ async function saveRaw(shop, products, fetchedAt) {
 }
 
 async function collectShop(shop, offline) {
-  const fetchedAt = new Date().toISOString();
-  let products, source;
+  let products, fetchedAt;
   if (offline) {
-    ({ products } = await loadRaw(shop));
-    source = "cache";
+    // Keep the raw file's own timestamp. Stamping "now" on a rebuild would make
+    // week-old data look seconds fresh, and this becomes Person 3's `collected_at`.
+    ({ products, fetchedAt } = await loadRaw(shop));
+    fetchedAt ??= new Date().toISOString();
   } else {
+    fetchedAt = new Date().toISOString();
     products = await fetchShop(shop);
     await saveRaw(shop, products, fetchedAt);
-    source = "live";
   }
 
   // A product can land on two pages when the shop's ordering shifts between the
@@ -92,7 +93,7 @@ async function collectShop(shop, offline) {
   const byCategory = {};
   for (const i of items) byCategory[i.category] = (byCategory[i.category] ?? 0) + 1;
 
-  return { shop, source, seen: products.length, kept: items.length, byCategory, items };
+  return { shop, seen: products.length, kept: items.length, byCategory, items };
 }
 
 async function main() {
@@ -123,7 +124,14 @@ async function main() {
         try {
           results.push(await collectShop(shop, offline));
         } catch (err) {
-          results.push({ shop, error: err.message, seen: 0, kept: 0, byCategory: {}, items: [] });
+          // A transient failure (429, a timeout) must not drop this shop from the
+          // catalogue, because the reduced set then overwrites the good one. The
+          // raw cache exists for exactly this.
+          try {
+            results.push({ ...(await collectShop(shop, true)), error: `${err.message} — used raw cache` });
+          } catch {
+            results.push({ shop, error: err.message, seen: 0, kept: 0, byCategory: {}, items: [] });
+          }
         }
       }
     })
@@ -138,8 +146,9 @@ async function main() {
   console.log(`mode: ${offline ? "OFFLINE (raw cache)" : "live"}   max pages/shop: ${MAX_PAGES}\n`);
   for (const r of results) {
     const cats = Object.entries(r.byCategory).sort().map(([c, n]) => `${c}:${n}`).join(" ");
+    const status = !r.error ? "ok  " : r.kept ? "warn" : "FAIL";
     console.log(
-      `${(r.error ? "FAIL" : "ok  ").padEnd(5)}${r.shop.id.padEnd(18)}` +
+      `${status.padEnd(5)}${r.shop.id.padEnd(18)}` +
         `seen ${String(r.seen).padStart(4)}  kept ${String(r.kept).padStart(3)}  ` +
         `skipped ${String(r.seen - r.kept).padStart(4)}  ${r.error ?? cats}`
     );

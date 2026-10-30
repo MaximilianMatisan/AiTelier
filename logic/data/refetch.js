@@ -51,14 +51,19 @@ function readVariants(options, variants, toEur) {
 const fromCents = (p) => Number(p) / 100;
 const fromDecimal = (p) => Number(p);
 
-async function fromStorefront(item, shop, timeoutMs) {
-  const p = await fetchJson(`https://${shop.domain}/products/${item.source.handle}.js`, timeoutMs);
+// Both take the deadline, not a duration: fromProductsJson makes up to two
+// requests, and a per-request timeout would let them overrun the budget together.
+async function fromStorefront(item, shop, deadline) {
+  const url = `https://${shop.domain}/products/${item.source.handle}.js`;
+  const p = await fetchJson(url, deadline - Date.now());
   return { ...readVariants(p.options, p.variants, fromCents), url_ok: true };
 }
 
-async function fromProductsJson(item, shop, timeoutMs) {
+async function fromProductsJson(item, shop, deadline) {
   for (let page = 1; page <= 2; page++) {
-    const body = await fetchJson(`https://${shop.domain}/products.json?limit=250&page=${page}`, timeoutMs);
+    const left = deadline - Date.now();
+    if (left < 500) break;
+    const body = await fetchJson(`https://${shop.domain}/products.json?limit=250&page=${page}`, left);
     const list = body.products ?? [];
     const p = list.find((x) => x.handle === item.source.handle);
     if (p) return { ...readVariants(p.options, p.variants, fromDecimal), url_ok: true };
@@ -67,6 +72,8 @@ async function fromProductsJson(item, shop, timeoutMs) {
   throw new Error(`handle ${item.source.handle} not found in /products.json`);
 }
 
+// `url_ok` here only means the product record was found. A cached read cannot
+// prove the page still answers, so guarantee 4 needs `source === "live"` too.
 async function fromCache(item) {
   const raw = JSON.parse(await readFile(path.join(ROOT, `catalog/cache/raw/${item.shop_id}.json`), "utf8"));
   const p = (raw.products ?? []).find((x) => x.handle === item.source.handle);
@@ -85,10 +92,9 @@ export async function refetch(item) {
   if (process.env.OFFLINE !== "1") {
     const deadline = Date.now() + LIVE_BUDGET_MS;
     for (const attempt of [fromStorefront, fromProductsJson]) {
-      const left = deadline - Date.now();
-      if (left < 500) break; // out of budget, the cache is better than stalling
+      if (deadline - Date.now() < 500) break; // out of budget, the cache beats stalling
       try {
-        return { ...base, ...(await attempt(item, shop, left)), source: "live" };
+        return { ...base, ...(await attempt(item, shop, deadline)), source: "live" };
       } catch { /* fall through to the next strategy */ }
     }
   }
