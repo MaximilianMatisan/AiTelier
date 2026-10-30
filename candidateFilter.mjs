@@ -8,12 +8,12 @@
 // catalog/cache/shortlist.json. The brief comes from --user-info or stdin.
 //
 // Same pattern as trustcheck.mjs: generateObject with a Zod schema. Two
-// differences that the provider forces:
+// provider quirks shape the schema:
 // - Every field is nullable, because this OpenAI-compatible endpoint ignores
 //   the JSON schema and freely renames or drops fields. `reconcile` turns that
 //   into a usable, in-catalogue selection instead of throwing.
-// - The enum lists are descriptions and prompt hints, not Zod enums, for the
-//   same reason. `reconcile` is what keeps a hallucinated value out.
+// - The enum lists are prompt hints, not Zod enums, for the same reason.
+//   `reconcile` is what keeps a hallucinated value out.
 // The filtering itself is a deterministic string match: the model selects,
 // the code applies.
 import { pathToFileURL } from "node:url";
@@ -24,7 +24,7 @@ import { z } from "zod";
 import { repairJson, trustModel } from "./trustcheck.mjs";
 
 // PERSON3_INPUT_CONTRACT.md section 11: a Person 3 request holds at most 100
-// items and 30 shops. The shortlist has to fit both.
+// items and 30 shops.
 export const MAX_ITEMS = 100;
 export const MAX_SHOPS = 30;
 
@@ -37,26 +37,35 @@ const SYSTEM_PROMPT = `You are the candidate filter of an outfit-shopping agent.
 
 Answer with these fields:
 - categoryCounts: an object mapping each needed category to how many items the customer needs in it, e.g. {"top": 2, "bottom": 1, "shoes": 1} for two outfit variations. Use only the category keys listed in the catalogue. Leave it empty when no category is needed.
-- themes: the style direction, e.g. "old_money" means timeless, classic, quiet luxury, tailored or preppy.
+- themes: the overall style direction for the whole outfit, e.g. "old_money" means timeless, classic, quiet luxury, tailored or preppy. It applies to every category that has no entry in themesByCategory. Leave it empty when the brief names no overall style.
+- themesByCategory: style overrides for single categories, e.g. {"shoes": ["streetwear"]}. Use only catalogue categories as keys and only catalogue themes as values. A category listed here uses its own themes and ignores the overall themes. Leave it empty when the brief gives no category-specific style.
 - seasons: the customer's season or the climate they describe. If the brief names one season, select only that one.
-- stock: the size labels the customer needs, exactly as listed in the catalogue. Clothing and shoe sizes both appear here. try to guess the size from the user input. do not just leave it empty
-- priceEur: {"minAmount": number or null, "maxAmount": number or null}. maxAmount is the price for one item
+- stock: every size label the customer needs, exactly as listed in the catalogue. This array is never empty — always list at least one label. Clothing and shoe sizes both appear here, one entry per slot the brief names — e.g. ["M", "32", "43"] for "top M, waist 32, shoes 43". Numbers are fine; reconcile normalises them to the catalogue's string labels. When the brief names a size, use it; when it gives measurements but no label, use the size chart; when it gives no size information at all, list a broad range covering the plausible catalogue labels, mixing numeric and letter sizes (e.g. ["XS", "S", "M", "L", "XL", "36", "38", "40", "42"]).
+- maxPriceEur: the maximum price for one item, in EUR, or null when the brief names no budget.
 - confidence: a number from 0 to 1.
 - rationale: one short sentence per decision, in English.
 
 How to size categoryCounts:
 - Read how many outfits or variations the customer asks for. One outfit is one of each slot it needs; "two outfits", "a week of looks", or a capsule wardrobe needs several.
 - Count per slot so the outfits can be mixed: three tops and two bottoms give six combinations, so do not ask for more of one slot than the alternatives can pair with.
-- Respect the budget: maxAmount per item.
+- Respect maxPriceEur: it is the ceiling for a single item.
 - When the brief is one plain outfit and says nothing more, count one of each slot it names.
 - Arrays are answered as arrays even when they hold one value. Never invent a category, theme, season, or size.
 
+How to read style requests:
+- "old money overall" or just "old money style" sets themes, not themesByCategory: every category follows it.
+- "old money, but streetwear sneakers" sets themes to ["old_money"] and themesByCategory to {"shoes": ["streetwear"]}: shoes follow streetwear only, the other categories follow old_money.
+- "old money tops, casual bottoms" sets themes to [] and themesByCategory to {"top": ["old_money"], "bottom": ["casual"]}: categories with no entry have no style constraint.
+- A category-specific style replaces the overall style for that category; it does not add to it. To allow both, list both themes for that category.
+
 Rules:
 - Use only values from the supplied lists.
-- Honour an "Avoid" in the brief: if a theme or category is explicitly ruled out, do not select it.
-- Leave an array empty when the brief says nothing about that dimension. Empty means "no constraint", which is better than guessing.
-- When the brief gives measurements but no size label, use the size chart to pick labels that fit. Otherwise choose the labels the brief names.
-- Set confidence low rather than guessing.`;
+- Honour an "Avoid" in the brief: if a theme or category is explicitly ruled out, do not select it. An overall avoid applies everywhere; a category-specific avoid removes that theme only from that category.
+- Leave themes, themesByCategory and seasons empty when the brief says nothing about that dimension — empty means "no constraint". The stock array is the exception: it must never be empty.
+- When the brief gives measurements but no size label, use the size chart to pick labels that fit. Otherwise choose the labels the brief names. Always include at least one stock size label; if any size information at all is given, expand to a larger array covering every number / size label in the range.
+- If the brief gives no size information whatsoever, still populate stock with a broad range of plausible catalogue labels, combining numeric sizes and letter sizes (e.g. ["XS", "S", "M", "L", "XL", "36", "38", "40", "42"]).
+- if any stock size label is used, everything else will be filtered out, so allays add the possible stocksizes, that the user could use
+- Set confidence low rather than guessing.`
 
 /** Size labels that carry no fit information. */
 const MEANINGLESS_SIZES = new Set([
@@ -71,16 +80,14 @@ const MEANINGLESS_SIZES = new Set([
 ]);
 
 /**
- * Dedupe, drop blanks, and truncate for prompt display.
+ * Dedupe, drop blanks, and sort for prompt display.
  *
  * @param {Iterable<string>} values
  */
 function distinctStrings(values) {
   return [
     ...new Set(
-      [...values]
-        .map((value) => String(value ?? "").trim())
-        .filter(Boolean),
+      [...values].map((value) => String(value ?? "").trim()).filter(Boolean),
     ),
   ].sort((a, b) => a.localeCompare(b));
 }
@@ -88,7 +95,7 @@ function distinctStrings(values) {
 /**
  * Every value the model may choose from, read straight off the candidates.
  *
- * @param {{ category?: string, themes?: string[], seasons?: string[], stock?: Record<string, unknown>, price_eur?: number }[]} candidates
+ * @param {{ category?: string, themes?: string[], seasons?: string[], stock?: Record<string, unknown> }[]} candidates
  */
 export function catalogueFacets(candidates) {
   const categories = new Set();
@@ -96,7 +103,6 @@ export function catalogueFacets(candidates) {
   const seasons = new Set();
   const sizes = new Set();
   const bySlot = new Map();
-  const prices = [];
   for (const candidate of candidates) {
     if (candidate.category) categories.add(candidate.category);
     if (candidate.themes) candidate.themes.forEach((t) => themes.add(t));
@@ -109,7 +115,6 @@ export function catalogueFacets(candidates) {
       if (!bySlot.has(slot)) bySlot.set(slot, new Set());
       bySlot.get(slot).add(size);
     }
-    if (Number.isFinite(candidate.price_eur)) prices.push(candidate.price_eur);
   }
   return {
     categories: distinctStrings(categories),
@@ -119,8 +124,6 @@ export function catalogueFacets(candidates) {
     sizesByCategory: Object.fromEntries(
       [...bySlot].map(([slot, set]) => [slot, distinctStrings(set)]),
     ),
-    minPriceEur: prices.length ? Math.round(Math.min(...prices) * 100) / 100 : null,
-    maxPriceEur: prices.length ? Math.round(Math.max(...prices) * 100) / 100 : null,
   };
 }
 
@@ -145,10 +148,7 @@ function describeValues(label, values) {
 export function selectionSchema(facets) {
   return z.object({
     categoryCounts: z
-      .record(
-        z.string(),
-        z.number().int().min(1).max(MAX_ITEMS),
-      )
+      .record(z.string(), z.number().int().min(1).max(MAX_ITEMS))
       .nullable()
       .describe(
         `Items the customer needs per category, as {"category": count}. Categories, one of: ${facets.categories.slice(0, MAX_ENUM_VALUES).join(", ") || "(none)"}. {} means no category constraint.`,
@@ -156,22 +156,26 @@ export function selectionSchema(facets) {
     themes: z
       .array(z.string())
       .nullable()
-      .describe(describeValues("Style themes to keep", facets.themes)),
+      .describe(describeValues("Overall style themes to keep", facets.themes)),
+    themesByCategory: z
+      .record(z.string(), z.array(z.string()))
+      .nullable()
+      .describe(
+        `Per-category style overrides as {"category": ["theme"]}. Categories, one of: ${facets.categories.slice(0, MAX_ENUM_VALUES).join(", ") || "(none)"}. Themes, one of: ${facets.themes.slice(0, MAX_ENUM_VALUES).join(", ") || "(none)"}. {} means every category follows the overall themes.`,
+      ),
     seasons: z
       .array(z.string())
       .nullable()
       .describe(describeValues("Seasons to keep", facets.seasons)),
     stock: z
-      .array(z.string())
+      .array(z.union([z.string(), z.number()]))
       .nullable()
       .describe(describeValues("Required size labels", facets.sizes)),
-    priceEur: z
-      .object({
-        minAmount: z.number().min(0).nullable(),
-        maxAmount: z.number().min(0).nullable(),
-      })
+    maxPriceEur: z
+      .number()
+      .min(0)
       .nullable()
-      .describe("Budget in EUR for everything requested. null means no bound."),
+      .describe("Ceiling in EUR for a single item. null means no budget."),
     confidence: z.number().min(0).max(1).nullable(),
     rationale: z.string().nullable(),
   });
@@ -196,9 +200,6 @@ export function buildSelectionPrompt(facets, userInfo) {
     `- themes: ${facets.themes.join(", ")}`,
     `- seasons: ${facets.seasons.join(", ")}`,
     `- stock (every size label in the catalogue): ${facets.sizes.slice(0, MAX_ENUM_VALUES).join(", ")}`,
-    facets.minPriceEur === null
-      ? ""
-      : `- price range: ${facets.minPriceEur} to ${facets.maxPriceEur} EUR`,
     "",
     "Size labels per category. Use these to map a size name or a body measurement to a label:",
     ...sizeChart,
@@ -208,7 +209,7 @@ export function buildSelectionPrompt(facets, userInfo) {
     String(userInfo ?? "").trim(),
     "</untrusted_brief>",
     "",
-    'Answer as JSON: {"categoryCounts": {}, "themes": [], "seasons": [], "stock": [], "priceEur": {"minAmount": null, "maxAmount": null}, "confidence": 0, "rationale": ""}',
+    'Answer as JSON: {"categoryCounts": {}, "themes": [], "themesByCategory": {}, "seasons": [], "stock": [], "maxPriceEur": null, "confidence": 0, "rationale": ""}',
   ];
   return blocks.join("\n").slice(0, MAX_PROMPT_CHARS);
 }
@@ -224,6 +225,79 @@ export function buildSelectionPrompt(facets, userInfo) {
  * @param {unknown} object
  * @param {ReturnType<typeof catalogueFacets>} facets
  */
+/**
+ * Keep only the allowed catalogue values, accepting a scalar or an array.
+ *
+ * @param {unknown} input
+ * @param {string[]} allowed
+ */
+function allowedValues(input, allowed) {
+  return distinctStrings(
+    input === undefined || input === null
+      ? []
+      : Array.isArray(input)
+        ? input
+        : [input],
+  ).filter((value) => allowed.includes(value));
+}
+
+/**
+ * Keep the model's per-category style overrides inside the catalogue.
+ *
+ * Accepts the object shape `{category: ["theme"]}` as well as a list of
+ * `{category, themes}` objects, because the provider renames and flattens
+ * fields. An explicit `overall` / `all` key is folded into the overall themes.
+ *
+ * @param {unknown} input
+ * @param {ReturnType<typeof catalogueFacets>} facets
+ * @param {string[]} overallThemes
+ */
+function normaliseThemesByCategory(input, facets, overallThemes) {
+  const overall = new Set(overallThemes);
+  const byCategory = new Map();
+  const overallKeys = new Set(["overall", "all", "everything", "*"]);
+  const add = (category, style) => {
+    const raw = String(category ?? "").trim();
+    if (!raw) return;
+    const picked = allowedValues(style, facets.themes);
+    if (!picked.length) return;
+    if (overallKeys.has(raw.toLowerCase())) {
+      picked.forEach((theme) => overall.add(theme));
+      return;
+    }
+    const slot = facets.categories.find(
+      (candidate) => candidate.toLowerCase() === raw.toLowerCase(),
+    );
+    if (!slot) return;
+    const merged = new Set([...(byCategory.get(slot) ?? []), ...picked]);
+    byCategory.set(
+      slot,
+      [...merged].sort((a, b) => a.localeCompare(b)),
+    );
+  };
+  if (Array.isArray(input)) {
+    for (const entry of input) {
+      if (!entry || typeof entry !== "object") continue;
+      add(
+        entry.category ?? entry.slot ?? entry.type,
+        entry.themes ??
+          entry.theme ??
+          entry.styles ??
+          entry.style ??
+          entry.values,
+      );
+    }
+  } else if (input && typeof input === "object") {
+    for (const [category, style] of Object.entries(input)) add(category, style);
+  }
+  return {
+    themes: [...overall].sort((a, b) => a.localeCompare(b)),
+    themesByCategory: Object.fromEntries(
+      [...byCategory].sort(([a], [b]) => a.localeCompare(b)),
+    ),
+  };
+}
+
 export function reconcile(object, facets) {
   const selection = object ?? {};
   const field = (...names) => {
@@ -233,44 +307,45 @@ export function reconcile(object, facets) {
     }
     return undefined;
   };
-  const values = (input, allowed) =>
-    distinctStrings(
-      input === undefined || input === null
-        ? []
-        : Array.isArray(input)
-          ? input
-          : [input],
-    ).filter((value) => allowed.includes(value));
+  const values = allowedValues;
   const priceNumber = (value) =>
     typeof value === "number" && Number.isFinite(value) && value >= 0
       ? Math.round(value * 100) / 100
       : null;
-  const price = field("priceEur", "price") ?? {};
-  const minAmount = priceNumber(price.minAmount ?? price.min ?? null);
-  const maxAmount = priceNumber(
-    price.maxAmount ?? price.max ?? field("price_max", "budget") ?? null,
-  );
   const rawConfidence = field("confidence");
   const confidence = Number.isFinite(rawConfidence)
     ? Math.round(Math.min(1, Math.max(0, rawConfidence)) * 100) / 100
     : 0.5;
+  const themes = normaliseThemesByCategory(
+    field(
+      "themesByCategory",
+      "themes_by_category",
+      "categoryThemes",
+      "themesPerCategory",
+      "styleByCategory",
+    ),
+    facets,
+    values(
+      field("themes", "theme", "overallThemes", "overall_theme"),
+      facets.themes,
+    ),
+  );
   return {
     categoryCounts: normaliseCategoryCounts(
       field("categoryCounts", "categories", "category"),
       facets,
     ),
-    themes: values(field("themes", "theme"), facets.themes),
+    themes: themes.themes,
+    themesByCategory: themes.themesByCategory,
     seasons: values(field("seasons", "season"), facets.seasons),
     stock: values(field("stock", "sizes", "size"), facets.sizes),
-    priceEur: {
-      minAmount,
-      maxAmount:
-        minAmount !== null && maxAmount !== null && maxAmount < minAmount
-          ? minAmount
-          : maxAmount,
-    },
+    maxPriceEur: priceNumber(
+      field("maxPriceEur", "max_price", "price_max", "budget"),
+    ),
     confidence,
-    rationale: String(field("rationale") ?? "").trim().slice(0, 900),
+    rationale: String(field("rationale") ?? "")
+      .trim()
+      .slice(0, 900),
   };
 }
 
@@ -294,7 +369,8 @@ function normaliseCategoryCounts(input, facets) {
   };
   if (Array.isArray(input)) {
     for (const entry of input) {
-      if (entry && typeof entry === "object") add(entry.category ?? entry.slot, entry.count ?? entry.amount);
+      if (entry && typeof entry === "object")
+        add(entry.category ?? entry.slot, entry.count ?? entry.amount);
       else add(entry, 1);
     }
   } else if (input && typeof input === "object") {
@@ -303,9 +379,7 @@ function normaliseCategoryCounts(input, facets) {
     // A bare category name ("top") counts as needs-one.
     add(input, 1);
   }
-  return Object.fromEntries(
-    [...raw].sort(([a], [b]) => a.localeCompare(b)),
-  );
+  return Object.fromEntries([...raw].sort(([a], [b]) => a.localeCompare(b)));
 }
 
 /**
@@ -333,42 +407,56 @@ export async function selectFilters(facets, userInfo, options = {}) {
   return reconcile(object, facets);
 }
 
+/**
+ * The themes that apply to one category: its own override when it has one,
+ * otherwise the overall themes. An empty list means no theme constraint.
+ *
+ * @param {ReturnType<typeof reconcile>} selection
+ * @param {string} category
+ */
+function themesForCategory(selection, category) {
+  const specific = selection.themesByCategory?.[category] ?? [];
+  return specific.length ? specific : selection.themes;
+}
+
 function matches(candidate, selection, sizeOfSlot) {
-//   if (
-//     Object.keys(selection.categoryCounts).length &&
-//     !(candidate.category in selection.categoryCounts)
-//   )
-//     return false;
   // With several themes selected, matching any one is the useful reading: a
   // brief asking for "old_money or casual" should not return nothing.
-  if (selection.themes.length) {
+  const wantedThemes = themesForCategory(
+    selection,
+    candidate.category ?? "other",
+  );
+  if (wantedThemes.length) {
     const themes = Array.isArray(candidate.themes) ? candidate.themes : [];
-    if (!themes.some((theme) => selection.themes.includes(theme))) return false;
+    if (!themes.some((theme) => wantedThemes.includes(theme))) return false;
   }
   if (selection.seasons.length) {
     const seasons = Array.isArray(candidate.seasons) ? candidate.seasons : [];
-    if (!seasons.some((season) => selection.seasons.includes(season))) return false;
+    if (!seasons.some((season) => selection.seasons.includes(season)))
+      return false;
   }
   if (selection.stock.length) {
     // A size only counts when it is a size of this item's slot: shoe size 43
     // must not match a waist-43 trouser. The slot's size list comes from the
     // catalogue, not from this item, so a sold-out size still counts as a match.
     const sizes = selection.stock.filter(
-      (size) => sizeOfSlot(candidate).includes(size) && size in (candidate.stock ?? {}),
+      (size) =>
+        sizeOfSlot(candidate).includes(size) && size in (candidate.stock ?? {}),
     );
     if (!sizes.length) return false;
   }
-  const { minAmount, maxAmount } = selection.priceEur;
-  if (minAmount !== null && !(candidate.price_eur >= minAmount)) return false;
-  if (maxAmount !== null && !(candidate.price_eur <= maxAmount)) return false;
+  if (
+    selection.maxPriceEur !== null &&
+    !(candidate.price_eur <= selection.maxPriceEur)
+  )
+    return false;
   return true;
 }
 
 /**
  * Keep every candidate that matches the selection. The model's per-category
  * counts are reported back (`wanted`) but do not limit the result; the stylist
- * in Person 3 chooses how many items to use. No item or shop cap is applied
- * here — truncating would drop items the stylist could still use.
+ * in Person 3 chooses how many items to use.
  *
  * @param {object[]} candidates
  * @param {ReturnType<typeof catalogueFacets>} facets
@@ -388,11 +476,14 @@ export function applySelection(candidates, facets, selection) {
       String(a.id).localeCompare(String(b.id)),
   );
 
-  const shops = new Set(kept.map((candidate) => candidate.shop_id ?? "unknown"));
+  const shops = new Set(
+    kept.map((candidate) => candidate.shop_id ?? "unknown"),
+  );
 
   const slots = {};
   for (const item of kept)
-    slots[item.category ?? "other"] = (slots[item.category ?? "other"] ?? 0) + 1;
+    slots[item.category ?? "other"] =
+      (slots[item.category ?? "other"] ?? 0) + 1;
 
   return {
     items: kept,
@@ -401,23 +492,6 @@ export function applySelection(candidates, facets, selection) {
     slots,
     // The counts the model asked for next to what the catalogue offers.
     wanted: selection.categoryCounts,
-    truncated: false,
-  };
-}
-
-/**
- * Options for `applySelection` / `filterCandidates`. Both functions take an
- * options bag that also holds model settings, so the caps are read by name:
- * `filterCandidates(candidates, brief, { maxItems: 50 })` stays 50.
- *
- * @param {{ maxItems?: number, maxShops?: number }} options
- */
-function capsOf(options) {
-  const positive = (value, fallback) =>
-    Number.isFinite(value) && value > 0 ? Math.floor(value) : fallback;
-  return {
-    maxItems: positive(options.maxItems, MAX_ITEMS),
-    maxShops: positive(options.maxShops, MAX_SHOPS),
   };
 }
 
@@ -426,13 +500,16 @@ function capsOf(options) {
  *
  * @param {object[]} candidates
  * @param {string} userInfo
- * @param {{ model?: unknown, timeoutMs?: number, maxRetries?: number, maxItems?: number, maxShops?: number }} [options]
+ * @param {{ model?: unknown, timeoutMs?: number, maxRetries?: number }} [options]
  */
 export async function filterCandidates(candidates, userInfo, options = {}) {
-  if (!Array.isArray(candidates)) throw new Error("candidates must be an array");
+  if (!Array.isArray(candidates))
+    throw new Error("candidates must be an array");
   const facets = catalogueFacets(candidates);
   const selection = await selectFilters(facets, userInfo, options);
-  const result = applySelection(candidates, facets, selection, capsOf(options));
+  console.log(facets);
+  console.log(selection);
+  const result = applySelection(candidates, facets, selection);
   return { selection, facets, ...result };
 }
 
@@ -449,10 +526,7 @@ if (
     const inPath = resolve(flag("--in") ?? "catalog/cache/products.json");
     const outPath = resolve(flag("--out") ?? "catalog/cache/shortlist.json");
     const candidates = JSON.parse(readFileSync(inPath, "utf8"));
-    const result = await filterCandidates(candidates, userInfo, {
-      maxItems: Number(flag("--max-items") ?? MAX_ITEMS),
-      maxShops: Number(flag("--max-shops") ?? MAX_SHOPS),
-    });
+    const result = await filterCandidates(candidates, userInfo);
     writeFileSync(outPath, JSON.stringify(result.items, null, 1));
     const slots = Object.entries(result.slots)
       .sort()
@@ -461,7 +535,7 @@ if (
     console.log(
       [
         `${result.items.length} items from ${result.shops} shops -> ${outPath}`,
-        `matched ${result.matched} of ${candidates.length} candidates${result.truncated ? " (truncated to the Person 3 caps)" : ""}`,
+        `matched ${result.matched} of ${candidates.length} candidates`,
         `slots: ${slots}`,
         `selection: ${JSON.stringify(result.selection)}`,
       ].join("\n"),
