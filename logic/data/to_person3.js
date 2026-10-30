@@ -58,12 +58,13 @@ export function toPerson3Shop(shop) {
     base_url: `https://${shop.domain}/`,
     // No `guarantee`: that is Person 2's trust check (catalog/trust.json), not ours.
     // Absent means GUARANTEE_ASSUMED in their contract - see catalog/README.md.
+    // No `default_amount` and no `regions`: the Shopify product feed carries
+    // neither. `regions` must list where the shop SHIPS TO, so filling it with
+    // the shop's own country would fail G5 for every customer outside it.
     shipping: {
-      regions: [shop.country],
       currency: shop.currency,
       min_days: shop.default_delivery_days,
       max_days: shop.default_delivery_days,
-      // No `default_amount`: the Shopify product feed carries no shipping cost.
     },
   };
 }
@@ -98,6 +99,32 @@ export function toPerson3Item(item, description = null) {
       seasons: item.seasons,
       delivery_days: item.delivery_days,
     },
+  };
+}
+
+/**
+ * refetch() output -> the final-check record of contract section 9.
+ *
+ * `stale` is true whenever the answer did not come from the live shop. Their
+ * section 9 fails strict guarantees on stale records, which is the honest
+ * outcome: an offline demo cannot prove live stock. See catalog/README.md.
+ */
+export function toPerson3Check(item, fresh, shop) {
+  const sizesInStock = Object.entries(fresh.stock ?? {})
+    .filter(([, inStock]) => inStock === 1)
+    .map(([label]) => label);
+
+  return {
+    item_id: item.id,
+    checked_at: fresh.fetched_at,
+    price: fresh.price_eur === null ? null : { amount: fresh.price_eur, currency: "EUR" },
+    availability: !fresh.url_ok ? "unknown" : sizesInStock.length ? "in_stock" : "sold_out",
+    sizes_in_stock: sizesInStock,
+    // No `amount` and no `regions`, for the same reason as toPerson3Shop.
+    shipping: { currency: shop.currency, days: shop.default_delivery_days },
+    product_url: item.url,
+    stale: fresh.source !== "live" || !fresh.url_ok,
+    source: "person1_refresh",
   };
 }
 

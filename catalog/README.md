@@ -20,6 +20,7 @@ node logic/data/collect.js --shop afew     # one shop
 OFFLINE=1 node logic/data/collect.js       # rebuild products.json from raw only
 node logic/data/refetch.js <item-id>       # fresh stock/price for one item
 node logic/data/to_person3.js --limit 100  # emit Person 3's envelope shape
+node logic/data/refetch.js <item-id> --person3   # final-check record, contract section 9
 MAX_PAGES=4 node logic/data/collect.js     # widen (default 2 pages = 500 products/shop)
 ```
 
@@ -94,14 +95,34 @@ text, so `products.json` keeps its agreed shape.
 The adapter emits **our half** of the envelope — `contract_version`, `currency`, `shops`, `items`.
 Person 3 adds `task_id`, `customer` and `options`.
 
+Contract **section 9** ("Final-check input from Person 1") is a second surface, and `refetch()`
+does not match it either. `toPerson3Check(item, fresh, shop)` converts, and
+`node logic/data/refetch.js <item-id> --person3` prints it:
+
+| `refetch()` | Section 9 |
+| --- | --- |
+| `id` | `item_id` |
+| `fetched_at` | `checked_at` |
+| `price_eur` | `price: {amount, currency}` |
+| `stock: {M: 1, L: 0}` | `sizes_in_stock: ["M"]` + `availability` |
+| `url_ok: false` | `availability: "unknown"` |
+| `source: "cache"` | `stale: true` |
+
+**`stale` matters for the offline demo.** Section 9 says a stale record fails strict guarantees.
+An `OFFLINE=1` run therefore returns `stale: true` and, with `strict_guarantees: true`, every
+outfit is refused. That is the honest result — a cached answer cannot prove live stock — but it
+means **the offline fallback and strict mode cannot both be on during the demo.** Decide which.
+
 ### What the adapter cannot fix
 
 1. **The contract caps a request at 100 items** (section 11) and we hold 3346. `--limit` samples
    round-robin across shops for smoke tests; the real shortlist is Person 2's filter step
    (`--in <shortlist.json>`).
-2. **`shipping.default_amount` is unknown.** The Shopify feed carries no shipping cost, so all 12
-   shops raise `SHIPPING_UNKNOWN`. Their G1 (budget) and G5 (delivery) need a value at the final
-   check. Either hand-enter shipping per shop in the seed, or relax G5 to `delivery_days`.
+2. **`shipping.default_amount` and `shipping.regions` are unknown.** The Shopify feed carries
+   neither, so all 12 shops raise `SHIPPING_UNKNOWN`. Their G1 (budget) and G5 (delivery) need a
+   value at the final check. Note `regions` means where a shop **ships to**, not where it is
+   based — filling it with the shop's own country would fail G5 for every customer abroad, so it
+   is left out. Either hand-enter shipping per shop in the seed, or relax G5 to `delivery_days`.
 3. **`options.fit_mode` must be `size_only`.** The canonical envelope uses `measurements`, which
    needs per-size `measurements_cm`. The feed has no garment measurements at all.
 4. **No `guarantee` on any shop** — that is Person 2's `catalog/trust.json`. Careful: their

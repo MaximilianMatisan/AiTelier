@@ -3,6 +3,7 @@
 //
 //   node logic/data/refetch.js <item-id>
 //   OFFLINE=1 node logic/data/refetch.js <item-id>
+//   node logic/data/refetch.js <item-id> --person3   contract section 9 shape
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -92,5 +93,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const items = JSON.parse(await readFile(path.join(ROOT, "catalog/cache/products.json"), "utf8"));
   const item = items.find((i) => i.id === id);
   if (!item) throw new Error(`no item ${id} in catalog/cache/products.json`);
-  console.log(JSON.stringify(await refetch(item), null, 2));
+  const fresh = await refetch(item);
+  if (process.argv.includes("--person3")) {
+    const { toPerson3Check } = await import("./to_person3.js");
+    console.log(JSON.stringify(toPerson3Check(item, fresh, await shopFor(item.shop_id)), null, 2));
+  } else {
+    console.log(JSON.stringify(fresh, null, 2));
+  }
 }

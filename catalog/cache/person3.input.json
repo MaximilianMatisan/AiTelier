@@ -8,9 +8,6 @@
    "domain": "en.afew-store.com",
    "base_url": "https://en.afew-store.com/",
    "shipping": {
-    "regions": [
-     "DE"
-    ],
     "currency": "EUR",
     "min_days": 3,
     "max_days": 3
@@ -22,9 +19,6 @@
    "domain": "arte-antwerp.com",
    "base_url": "https://arte-antwerp.com/",
    "shipping": {
-    "regions": [
-     "BE"
-    ],
     "currency": "EUR",
     "min_days": 4,
     "max_days": 4
@@ -36,9 +30,6 @@
    "domain": "www.asphaltgold.com",
    "base_url": "https://www.asphaltgold.com/",
    "shipping": {
-    "regions": [
-     "DE"
-    ],
     "currency": "EUR",
     "min_days": 2,
     "max_days": 2
@@ -50,9 +41,6 @@
    "domain": "colorfulstandard.com",
    "base_url": "https://colorfulstandard.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 3,
     "max_days": 3
@@ -64,9 +52,6 @@
    "domain": "www.eytys.com",
    "base_url": "https://www.eytys.com/",
    "shipping": {
-    "regions": [
-     "SE"
-    ],
     "currency": "EUR",
     "min_days": 5,
     "max_days": 5
@@ -78,9 +63,6 @@
    "domain": "libertine-libertine.com",
    "base_url": "https://libertine-libertine.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 4,
     "max_days": 4
@@ -92,9 +74,6 @@
    "domain": "mfpen.com",
    "base_url": "https://mfpen.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 5,
     "max_days": 5
@@ -106,9 +85,6 @@
    "domain": "www.norseprojects.com",
    "base_url": "https://www.norseprojects.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 4,
     "max_days": 4
@@ -120,9 +96,6 @@
    "domain": "organicbasics.com",
    "base_url": "https://organicbasics.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 3,
     "max_days": 3
@@ -134,9 +107,6 @@
    "domain": "www.overkillshop.com",
    "base_url": "https://www.overkillshop.com/",
    "shipping": {
-    "regions": [
-     "DE"
-    ],
     "currency": "EUR",
     "min_days": 3,
     "max_days": 3
@@ -148,9 +118,6 @@
    "domain": "www.rains.com",
    "base_url": "https://www.rains.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 3,
     "max_days": 3
@@ -162,9 +129,6 @@
    "domain": "soulland.com",
    "base_url": "https://soulland.com/",
    "shipping": {
-    "regions": [
-     "DK"
-    ],
     "currency": "EUR",
     "min_days": 4,
     "max_days": 4
