@@ -595,6 +595,9 @@ if (
       maxShops: Number(flag("--max-shops")) || undefined,
     });
     writeFileSync(outPath, JSON.stringify(result.items, null, 1));
+    // Optional: what the model read out of the brief, for the steps after this one.
+    if (flag("--selection-out"))
+      writeFileSync(resolve(flag("--selection-out")), JSON.stringify(result.selection, null, 1));
     const slots = Object.entries(result.slots)
       .sort()
       .map(([slot, count]) => `${slot}:${count}`)

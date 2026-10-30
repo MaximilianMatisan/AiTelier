@@ -106,11 +106,14 @@ function strings(value, field, errors, { max = 20, length = 80 } = {}) {
 export function readOrder(description, { today = new Date() } = {}) {
   const raw = extractJson(description);
   if (!raw) {
-    return {
-      ok: false,
-      errors: ["The task description must contain the order as a JSON object."],
-      warnings: [],
-    };
+    // Free text is a normal order: Person 2's filter reads it directly and picks
+    // budget, style, season and sizes out of it. Only an empty brief is refused.
+    const brief = typeof description === "string" ? description.trim() : "";
+    if (!brief)
+      return { ok: false, errors: ["The task description is empty. Describe the outfits you would like."], warnings: [] };
+    if (brief.length > 4000)
+      return { ok: false, errors: ["The task description may be at most 4000 characters."], warnings: [] };
+    return { ok: true, order: { brief }, warnings: [] };
   }
   const errors = [];
   const warnings = [];
@@ -207,7 +210,8 @@ export function refusal({ errors, warnings = [] }) {
     ...errors.map((e) => `- ${e}`),
     ...warnings.map((w) => `- Note: ${w}`),
     "",
-    "Send the order as JSON in the task description, for example:",
+    "Describe your order in plain words, for example: \"Two autumn outfits, old money style,",
+    "budget 400 EUR, top M, waist 32, shoes EU 43.\" Or send it as JSON:",
     "",
     "```json",
     JSON.stringify(TEMPLATE, null, 2),

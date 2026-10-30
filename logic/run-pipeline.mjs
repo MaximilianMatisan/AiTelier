@@ -52,6 +52,7 @@ function run(command, args, options = {}) {
 
 /** The free text Person 2's filter reads. It picks the facets out of this itself. */
 export function orderToBrief(order) {
+  if (order.brief) return order.brief;
   const { sizes = {}, avoid = [], owned = [] } = order;
   return [
     `${order.season} outfits, ${String(order.theme).replace(/_/g, " ")} style`,
@@ -72,7 +73,7 @@ export function orderToBrief(order) {
  * fit_mode stays size_only: the Shopify feed carries no garment measurements,
  * so `measurements` would fail every item. See catalog/README.md.
  */
-export function orderToCustomer(order) {
+export function orderToCustomer(order, brief = null) {
   const { sizes = {} } = order;
   return {
     currency: "EUR",
@@ -82,6 +83,7 @@ export function orderToCustomer(order) {
       item_count: order.item_count ?? order.outfits * 3,
       style: [String(order.theme).replace(/_/g, " ")],
       fit: order.fit ? [order.fit] : [],
+      ...(brief ? { fit_description: brief.slice(0, 500) } : {}),
       gender: order.gender ?? null,
       season: order.season,
       climate: order.climate ?? null,
@@ -102,6 +104,66 @@ export function orderToCustomer(order) {
       fit_mode: "size_only",
       country: "DE",
     },
+  };
+}
+
+// Used only when a free-text brief names no budget; Person 3 cannot style without one,
+// and its result shows the budget it used, so the customer sees the assumption.
+const DEFAULT_BUDGET_EUR = Number(process.env.AITELIER_DEFAULT_BUDGET_EUR) || 500;
+const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const WORD_NUMBERS = { one: 1, two: 2, three: 3, four: 4, five: 5, ein: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5 };
+
+/**
+ * Per-slot sizes from the filter's size labels. A size is assigned only when it
+ * is unambiguous: one letter size, and one or two numbers (the smaller is the
+ * waist, the larger the shoe). A broad range means the brief named no size, so
+ * nothing is assigned and the stylist keeps every size open.
+ */
+export function sizesFromLabels(labels = []) {
+  const letters = [...new Set(labels.map((l) => String(l).toUpperCase()).filter((l) => LETTER_SIZES.includes(l)))];
+  const numbers = [...new Set(labels.map(Number).filter((n) => Number.isFinite(n) && n >= 24 && n <= 50))].sort((a, b) => a - b);
+  const top = letters.length === 1 ? letters[0] : undefined;
+  let waist, shoe;
+  if (numbers.length === 2) [waist, shoe] = numbers;
+  else if (numbers.length === 1) numbers[0] >= 35 ? (shoe = numbers[0]) : (waist = numbers[0]);
+  return { top, waist: waist && String(waist), shoe_eu: shoe && String(shoe) };
+}
+
+/** The customer half of Person 3's envelope for a free-text brief. */
+export function briefToCustomer(brief, selection = null) {
+  const text = brief.toLowerCase();
+  const budgetMatch =
+    text.match(/(\d[\d.,]*)\s*(?:€|eur|euro)/) ?? text.match(/(?:budget|max(?:imum)?)\D{0,12}(\d[\d.,]*)/);
+  const budget = Number(selection?.budgetEur) || (budgetMatch && Number(budgetMatch[1].replace(/[.,](?=\d{3}\b)/g, "").replace(",", ".")));
+  const countMatch = text.match(/(\d+|one|two|three|four|five|ein|zwei|drei|vier|fünf)\s*(?:outfits?|looks?)/);
+  const outfits = countMatch ? Number(countMatch[1]) || WORD_NUMBERS[countMatch[1]] : 2;
+  const themes = selection?.themes?.length ? selection.themes : [];
+  const seasons = selection?.seasons ?? [];
+  const gender = /\b(women|woman|damen|female)\b/.test(text) ? "women" : /\b(men|man|herren|male)\b/.test(text) ? "men" : null;
+  // A size the customer wrote out ("feet 40", "waist 32", "top M") beats the
+  // filter's reading, which falls back to a broad range when unsure.
+  const said = (re) => text.match(re)?.[1];
+  const sizes = {
+    ...sizesFromLabels(selection?.stock),
+    ...Object.fromEntries(
+      Object.entries({
+        top: said(/\b(?:top|tops|shirt|oberteil|size|größe)\s*(?:size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl)\b/)?.toUpperCase(),
+        waist: said(/\b(?:waist|taille|bundweite|w)\s*(\d{2})\b/),
+        shoe_eu: said(/\b(?:feet|foot|shoes?|schuhe?|schuhgröße|eu)\s*(?:size\s*|eu\s*)?(\d{2}(?:[.,]5)?)\b/)?.replace(",", "."),
+      }).filter(([, v]) => v),
+    ),
+  };
+  return {
+    budgetAssumed: !budget,
+    envelope: orderToCustomer({
+      budget_eur: budget || DEFAULT_BUDGET_EUR,
+      outfits: Math.min(Math.max(outfits, 1), 10),
+      theme: themes[0] ?? "minimal",
+      season: seasons.length === 1 ? seasons[0] : null,
+      gender,
+      sizes,
+      fit: null,
+    }, brief),
   };
 }
 
@@ -241,6 +303,7 @@ async function main() {
   const shortlist = prepared ?? path.join(outDir, "shortlist.json");
   const envelope = path.join(outDir, "person3.input.json");
   const customer = path.join(outDir, "customer.json");
+  const selectionFile = path.join(outDir, "selection.json");
   const resultDir = path.join(outDir, "person3");
 
   console.log(`order:  ${orderPath}`);
@@ -275,6 +338,7 @@ async function main() {
           "--user-info", orderToBrief(order),
           "--in", "catalog/cache/products.json",
           "--out", shortlist,
+          "--selection-out", selectionFile,
         ]);
       }
     )) &&
@@ -297,9 +361,19 @@ async function main() {
       }
     )) &&
     (await stage("3/4 customer envelope (Person 1)", "", async () => {
-      const brief = orderToCustomer(order);
+      let brief = orderToCustomer(order);
+      if (order.brief) {
+        // A free-text brief: budget, style, season and sizes come from what
+        // Person 2's filter read out of it.
+        const selection = await readFile(path.resolve(ROOT, selectionFile), "utf8").then(JSON.parse, () => null);
+        const fromBrief = briefToCustomer(order.brief, selection);
+        brief = fromBrief.envelope;
+        if (fromBrief.budgetAssumed)
+          console.log(`warning: the brief names no budget; using ${brief.customer.budget.amount} EUR`);
+        console.log(`from brief: ${JSON.stringify(brief.customer.sizes)} · ${brief.customer.style} · ${brief.customer.season}`);
+      }
       const loaded = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
-      const { envelope: shortlisted, dropped } = dropWrongGender(loaded, order.gender);
+      const { envelope: shortlisted, dropped } = dropWrongGender(loaded, brief.customer.gender);
       if (dropped) {
         console.log(`gender: dropped ${dropped} items marked for another gender`);
         await writeFile(path.resolve(ROOT, envelope), JSON.stringify(shortlisted, null, 2) + "\n");
