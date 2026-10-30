@@ -7,7 +7,7 @@ Everything here is fetched from the shops' public Shopify product feed.
 
 | File | What |
 | --- | --- |
-| `shops.seed.json` | The 12 shops. Person 2 keys `trust.json` off these `id`s. |
+| `shops.seed.json` | The 37 shops. Person 2 keys `trust.json` off these `id`s. |
 | `cache/products.json` | **The handover artifact.** Normalised items, one array. |
 | `cache/raw/<shop_id>.json` | Untouched feed responses, so the demo runs with no network. |
 | `cache/person3.input.json` | 100-item sample in Person 3's envelope shape, for smoke tests. |
@@ -29,13 +29,27 @@ Politeness: one request at a time per shop, 500 ms between pages, 10 s timeout,
 
 ## Shops
 
-All 12 answer `/products.json` and price in EUR (verified via `/cart.js`).
-Candidates that were checked and rejected: Asket, A Day's March, NN07, Samsøe, Wood Wood,
-Nudie, Filippa K, Morjas, Holzweiler, Stutterheim, Sandqvist, Kaufmann (feed closed — 403/404/410);
-Velasca (USD), Won Hundred (DKK).
+All 37 answer `/products.json` and price in EUR (verified via `/cart.js`). 84 candidates were
+probed in total; 47 were rejected because the feed is closed (403/404/410/429) or the shop prices
+in another currency (Velasca USD, Won Hundred DKK, Les Deux unconfirmed).
 
-Shoes in EU sizing come mainly from **asphaltgold, afew, overkill, eytys**.
-Numeric waist sizing (e.g. `32`) comes mainly from **overkill, norseprojects, mfpen**.
+Shoes in EU sizing: **asphaltgold, afew, overkill, eytys** (premium) and **saye, naevegan, ecoalf,
+ethletic, womsh, zeta, flamingoslife, ideight** (affordable).
+Numeric waist sizing (e.g. `32`): **overkill, norseprojects, mfpen, knowledgecotton**.
+
+### Why a public feed and not scraping
+
+Every candidate is reached through `/products.json`, never by parsing product pages:
+
+- The feed carries `variant_id`, which is the only way to build the cart permalink that
+  guarantee 4 depends on. Product HTML usually does not expose it.
+- One shop costs one seed entry, not a bespoke parser that breaks when the site is restyled.
+- `available` is an explicit field; HTML would have to be guessed at.
+- Shops that closed their feed (Asket, NN07, Samsøe, Nudie, Wood Wood and others) said no.
+  We do not route around that.
+
+A WooCommerce Store API probe (`/wp-json/wc/store/v1/products`) was run across the same
+candidates and returned nothing usable, so the collector stays Shopify-only.
 
 ## Known limits — read these before trusting a guarantee
 
@@ -115,27 +129,53 @@ means **the offline fallback and strict mode cannot both be on during the demo.*
 
 ### What the adapter cannot fix
 
-1. **The contract caps a request at 100 items** (section 11) and we hold 3346. `--limit` samples
-   round-robin across shops for smoke tests; the real shortlist is Person 2's filter step
-   (`--in <shortlist.json>`).
-2. **`shipping.default_amount` and `shipping.regions` are unknown.** The Shopify feed carries
-   neither, so all 12 shops raise `SHIPPING_UNKNOWN`. Their G1 (budget) and G5 (delivery) need a
-   value at the final check. Note `regions` means where a shop **ships to**, not where it is
-   based — filling it with the shop's own country would fail G5 for every customer abroad, so it
-   is left out. Either hand-enter shipping per shop in the seed, or relax G5 to `delivery_days`.
-3. **`options.fit_mode` must be `size_only`.** The canonical envelope uses `measurements`, which
+1. **The contract caps a request at 100 items and 30 shops** (section 11) and we hold 8652 items
+   across 37 shops. `--limit` samples round-robin within the 30-shop cap for smoke tests; the real
+   shortlist is Person 2's filter step (`--in <shortlist.json>`), **which must also stay within
+   30 shops**.
+2. **`options.fit_mode` must be `size_only`.** The canonical envelope uses `measurements`, which
    needs per-size `measurements_cm`. The feed has no garment measurements at all.
-4. **No `guarantee` on any shop** — that is Person 2's `catalog/trust.json`. Careful: their
+3. **No `guarantee` on any shop** — that is Person 2's `catalog/trust.json`. Careful: their
    section 5 treats an **absent guarantee as guaranteed** with only a `GUARANTEE_ASSUMED`
    warning. Until Person 2 wires trust in, shop trust silently passes.
 
-## Budget finding (matters for the demo)
+## Shipping is estimated, deliberately high
 
-With the demo order (`old_money`, `autumn`, top `M` / waist `32` / shoe `43`, avoid neon+polyester)
-there are **314 matching items**, but the cheapest possible pair of two fully independent outfits is
-**686 EUR** — the stated **300 EUR budget cannot be met**. Cheapest matching pieces: top ~47, bottom
-~135, shoes ~129. Two outfits sharing the bottom and shoes land at ~362 EUR.
+The product feed carries no shipping at all, and `/cart/shipping_rates.json` answers `200` with an
+empty list because Shopify only computes rates for a session that already holds a cart. Building a
+cart on 37 shops to read their rates is a write to someone else's store, so it was not done.
 
-If the order stays at 300 EUR, guarantee 1 fails, the escrow refunds, and we never demo a
-*completed paid job* — which is the hackathon's hard requirement. Either raise the demo budget to
-**~450–500 EUR**, or let the stylist build around `owned` items.
+`shops.seed.json` therefore carries a hand-entered estimate per shop, flagged `estimated: true`
+and carried through to Person 3:
+
+```json
+"shipping": { "amount_eur": 8.0, "ships_to": ["DE"], "estimated": true }
+```
+
+Both fields are **conservative on purpose**:
+
+- The **amount is set high** (5 EUR domestic, up to 20 EUR from the UK). Guarantee 1 is "total
+  within budget", so an estimate above the real cost can never break it; an estimate below it
+  would let us promise a total the customer then exceeds.
+- **`ships_to` is narrowed to `["DE"]`**, the demo's destination. Guarantee 5 then fails closed
+  for any other destination instead of passing on an assumption.
+
+Replace these with measured values before trusting G1 or G5 outside the demo.
+
+## Budget finding — resolved
+
+The first 12-shop seed was all premium EU labels, and the demo order (`old_money`, `autumn`,
+top `M` / waist `32` / shoe `43`, budget 300 EUR, avoid neon+polyester) could not be met: two
+independent outfits cost **686 EUR** at the cheapest.
+
+Adding 25 affordable shops fixed it. The same order now matches **910 items across 32 shops**:
+
+| Scenario | Total | |
+| --- | --- | --- |
+| Two outfits, nothing shared | 401.18 EUR | over |
+| Two outfits sharing bottom and shoes, two tops | 206.78 EUR | **within budget** |
+| The same plus one outer layer | 287.68 EUR | **within budget** |
+
+Cheapest matching pieces are now top 12 EUR (thokkthokk), bottom 59.98 (knowledgecotton),
+shoes 99.90 (ecoalf), outer 80.90 (armedangels). **The 300 EUR demo order stands**, as long as the
+stylist shares pieces across outfits, which is what a capsule wardrobe does anyway.

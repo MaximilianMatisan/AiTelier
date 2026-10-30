@@ -15,6 +15,7 @@ import path from "node:path";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
 const CONTRACT_VERSION = "1.0";
 const MAX_ITEMS = 100; // contract section 11
+const MAX_SHOPS = 30; // contract section 11
 const MAX_DESCRIPTION = 2000; // contract section 6.2
 
 // Our category -> their slot (section 6.1). `outer` is NOT one of their slots:
@@ -58,13 +59,18 @@ export function toPerson3Shop(shop) {
     base_url: `https://${shop.domain}/`,
     // No `guarantee`: that is Person 2's trust check (catalog/trust.json), not ours.
     // Absent means GUARANTEE_ASSUMED in their contract - see catalog/README.md.
-    // No `default_amount` and no `regions`: the Shopify product feed carries
-    // neither. `regions` must list where the shop SHIPS TO, so filling it with
-    // the shop's own country would fail G5 for every customer outside it.
+    // Hand-entered estimates (`shipping.estimated` in the seed), because the
+    // product feed carries no shipping at all and /cart/shipping_rates.json
+    // needs a real cart. Both are deliberately conservative: the amount is set
+    // high so G1 cannot break on an underestimate, and `regions` is narrowed to
+    // the demo's destination so G5 fails closed rather than passing wrongly.
     shipping: {
+      default_amount: shop.shipping.amount_eur,
       currency: shop.currency,
+      regions: shop.shipping.ships_to,
       min_days: shop.default_delivery_days,
       max_days: shop.default_delivery_days,
+      estimated: shop.shipping.estimated,
     },
   };
 }
@@ -120,8 +126,14 @@ export function toPerson3Check(item, fresh, shop) {
     price: fresh.price_eur === null ? null : { amount: fresh.price_eur, currency: "EUR" },
     availability: !fresh.url_ok ? "unknown" : sizesInStock.length ? "in_stock" : "sold_out",
     sizes_in_stock: sizesInStock,
-    // No `amount` and no `regions`, for the same reason as toPerson3Shop.
-    shipping: { currency: shop.currency, days: shop.default_delivery_days },
+    // Conservative estimates, as in toPerson3Shop.
+    shipping: {
+      amount: shop.shipping.amount_eur,
+      currency: shop.currency,
+      regions: shop.shipping.ships_to,
+      days: shop.default_delivery_days,
+      estimated: shop.shipping.estimated,
+    },
     product_url: item.url,
     stale: fresh.source !== "live" || !fresh.url_ok,
     source: "person1_refresh",
@@ -153,13 +165,14 @@ export async function toPerson3(items, seed, { withDescriptions = true } = {}) {
  * only, which is useless as a smoke-test sample. This is sampling for the
  * contract's 100-item cap, not candidate filtering - that is Person 2's step.
  */
-export function sampleAcrossShops(items, n) {
+export function sampleAcrossShops(items, n, maxShops = MAX_SHOPS) {
   const byShop = new Map();
   for (const i of items) {
     if (!byShop.has(i.shop_id)) byShop.set(i.shop_id, []);
     byShop.get(i.shop_id).push(i);
   }
-  const lists = [...byShop.values()];
+  // Section 11 caps shops per request too, not just items.
+  const lists = [...byShop.values()].slice(0, maxShops);
   const out = [];
   for (let round = 0; out.length < n; round++) {
     let added = false;
@@ -202,6 +215,12 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   console.log(`slots:        ${Object.entries(slots).sort().map(([s, n]) => `${s}:${n}`).join("  ")}`);
   console.log(`description:  ${withDesc}/${envelope.items.length}`);
   console.log(`image:        ${withImg}/${envelope.items.length}`);
+  if (envelope.shops.length > MAX_SHOPS) {
+    console.log(
+      `\nWARNING: ${envelope.shops.length} shops, the contract caps a request at ${MAX_SHOPS} (section 11).` +
+        `\n  Person 2's shortlist has to stay within ${MAX_SHOPS} shops.`
+    );
+  }
   if (envelope.items.length > MAX_ITEMS) {
     console.log(
       `\nWARNING: the contract caps a request at ${MAX_ITEMS} items (section 11).` +

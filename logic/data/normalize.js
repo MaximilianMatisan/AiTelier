@@ -124,7 +124,8 @@ export function normalizeProduct(product, shop, fetchedAt = new Date().toISOStri
   for (const v of product.variants ?? []) {
     const size = idx === -1 ? "ONE" : normalizeSize(v[`option${idx + 1}`]);
     const price = Number(v.price);
-    if (!Number.isFinite(price)) continue;
+    // A 0.00 variant is a free gift or a placeholder, not something to budget for.
+    if (!Number.isFinite(price) || price <= 0) continue;
 
     if (!(size in stock)) stock[size] = 0;
     if (!v.available) continue;

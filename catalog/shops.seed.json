@@ -7,7 +7,14 @@
     "currency": "EUR",
     "default_delivery_days": 4,
     "products_json_ok": true,
-    "notes": "lambswool knitwear, oxford shirts, chinos, coats - core old_money source"
+    "notes": "lambswool knitwear, oxford shirts, chinos, coats - core old_money source",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "colorfulstandard",
@@ -17,7 +24,14 @@
     "currency": "EUR",
     "default_delivery_days": 3,
     "products_json_ok": true,
-    "notes": "merino knitwear, overshirts, organic basics - affordable old_money layers"
+    "notes": "merino knitwear, overshirts, organic basics - affordable old_money layers",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "mfpen",
@@ -27,7 +41,14 @@
     "currency": "EUR",
     "default_delivery_days": 5,
     "products_json_ok": true,
-    "notes": "tailored trousers, oxford shirts, wool - old_money, higher price band"
+    "notes": "tailored trousers, oxford shirts, wool - old_money, higher price band",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "libertine",
@@ -37,7 +58,14 @@
     "currency": "EUR",
     "default_delivery_days": 4,
     "products_json_ok": true,
-    "notes": "shirts, trousers, knitwear - mixed old_money and casual"
+    "notes": "shirts, trousers, knitwear - mixed old_money and casual",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "soulland",
@@ -47,7 +75,14 @@
     "currency": "EUR",
     "default_delivery_days": 4,
     "products_json_ok": true,
-    "notes": "knitwear, trousers, outerwear - casual and streetwear"
+    "notes": "knitwear, trousers, outerwear - casual and streetwear",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "organicbasics",
@@ -57,7 +92,14 @@
     "currency": "EUR",
     "default_delivery_days": 3,
     "products_json_ok": true,
-    "notes": "tees, knit basics - cheap filler layers, many non-apparel items to skip"
+    "notes": "tees, knit basics - cheap filler layers, many non-apparel items to skip",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "arteantwerp",
@@ -67,7 +109,14 @@
     "currency": "EUR",
     "default_delivery_days": 4,
     "products_json_ok": true,
-    "notes": "knitwear, trousers, jackets - casual and streetwear"
+    "notes": "knitwear, trousers, jackets - casual and streetwear",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "overkill",
@@ -77,7 +126,14 @@
     "currency": "EUR",
     "default_delivery_days": 3,
     "products_json_ok": true,
-    "notes": "multi-brand streetwear, sneakers in EU sizes"
+    "notes": "multi-brand streetwear, sneakers in EU sizes",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "asphaltgold",
@@ -87,7 +143,14 @@
     "currency": "EUR",
     "default_delivery_days": 2,
     "products_json_ok": true,
-    "notes": "sneaker specialist, EU sizes incl. 43 - main shoe source"
+    "notes": "sneaker specialist, EU sizes incl. 43 - main shoe source",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "afew",
@@ -97,7 +160,14 @@
     "currency": "EUR",
     "default_delivery_days": 3,
     "products_json_ok": true,
-    "notes": "sneakers and apparel, EU sizes"
+    "notes": "sneakers and apparel, EU sizes",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "eytys",
@@ -107,7 +177,14 @@
     "currency": "EUR",
     "default_delivery_days": 5,
     "products_json_ok": true,
-    "notes": "boots, loafers, denim - shoes in EU sizes"
+    "notes": "boots, loafers, denim - shoes in EU sizes",
+    "shipping": {
+      "amount_eur": 10,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   },
   {
     "id": "rains",
@@ -117,6 +194,438 @@
     "currency": "EUR",
     "default_delivery_days": 3,
     "products_json_ok": true,
-    "notes": "rain coats and jackets - outer layer, many non-apparel items to skip"
+    "notes": "rain coats and jackets - outer layer, many non-apparel items to skip",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "armedangels",
+    "name": "ARMEDANGELS",
+    "domain": "www.armedangels.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "organic basics, knitwear, denim - affordable",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "recolution",
+    "name": "Recolution",
+    "domain": "www.recolution.de",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "knitwear, tees, trousers - affordable",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "ethletic",
+    "name": "Ethletic",
+    "domain": "www.ethletic.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "fair-trade sneakers in EU sizes - cheap shoes",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "thokkthokk",
+    "name": "ThokkThokk",
+    "domain": "thokkthokk.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "tees, basics - cheap",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "melawear",
+    "name": "Melawear",
+    "domain": "melawear.de",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "knitwear, sneakers",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "lanius",
+    "name": "Lanius",
+    "domain": "lanius.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "wool and knit, womenswear - mid to high",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "stanray",
+    "name": "Stan Ray",
+    "domain": "stanray.eu",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "painter pants, fatigues, tees - workwear casual",
+    "shipping": {
+      "amount_eur": 5,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "knowledgecotton",
+    "name": "Knowledge Cotton Apparel",
+    "domain": "www.knowledgecottonapparel.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "knitwear, oxford shirts, chinos - affordable old_money",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "madsnorgaard",
+    "name": "Mads Noergaard",
+    "domain": "madsnorgaard.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "knitwear, trousers, casual",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "bellerose",
+    "name": "Bellerose",
+    "domain": "www.bellerose.be",
+    "country": "BE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "shirts, knitwear, chinos - mid old_money",
+    "shipping": {
+      "amount_eur": 8,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "saye",
+    "name": "SAYE",
+    "domain": "sayebrand.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "sneakers in EU sizes - cheapest shoe source",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "flamingoslife",
+    "name": "Flamingos Life",
+    "domain": "flamingoslife.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "sneakers in EU sizes",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "bravafabrics",
+    "name": "Brava Fabrics",
+    "domain": "bravafabrics.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "shirts, knitwear - cheapest shop in the seed",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "thinkingmu",
+    "name": "Thinking MU",
+    "domain": "thinkingmu.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "shirts, knitwear, trousers",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "silbon",
+    "name": "Silbon",
+    "domain": "silbonshop.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "oxford shirts, chinos, blazers - old_money",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "scalpers",
+    "name": "Scalpers",
+    "domain": "scalperscompany.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "blazers, shirts, knitwear - old_money",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "ecoalf",
+    "name": "Ecoalf",
+    "domain": "ecoalf.com",
+    "country": "ES",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "outerwear, knitwear",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "naevegan",
+    "name": "NAE Vegan Shoes",
+    "domain": "nae-vegan.com",
+    "country": "PT",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "loafers and sneakers in EU sizes - cheap shoes",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "portugueseflannel",
+    "name": "Portuguese Flannel",
+    "domain": "portugueseflannel.com",
+    "country": "PT",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "flannel and oxford shirts - old_money",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "olow",
+    "name": "Olow",
+    "domain": "www.olow.fr",
+    "country": "FR",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "tees, overshirts, trousers - casual",
+    "shipping": {
+      "amount_eur": 10,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "zeta",
+    "name": "Zeta",
+    "domain": "zeta-shoes.com",
+    "country": "FR",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "sneakers in EU sizes, some outerwear",
+    "shipping": {
+      "amount_eur": 10,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "womsh",
+    "name": "WOMSH",
+    "domain": "womsh.com",
+    "country": "IT",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "sneakers in EU sizes",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "ideight",
+    "name": "ID.EIGHT",
+    "domain": "www.id-eight.com",
+    "country": "IT",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "sneakers in EU sizes",
+    "shipping": {
+      "amount_eur": 12,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "jlindeberg",
+    "name": "J.Lindeberg",
+    "domain": "www.jlindeberg.com",
+    "country": "SE",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "knitwear, trousers, outerwear - mid old_money",
+    "shipping": {
+      "amount_eur": 10,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
+  },
+  {
+    "id": "komodo",
+    "name": "Komodo",
+    "domain": "komodo.co.uk",
+    "country": "UK",
+    "currency": "EUR",
+    "default_delivery_days": 7,
+    "products_json_ok": true,
+    "notes": "merino knitwear - UK, longer delivery",
+    "shipping": {
+      "amount_eur": 20,
+      "ships_to": [
+        "DE"
+      ],
+      "estimated": true
+    }
   }
 ]

@@ -79,8 +79,13 @@ async function collectShop(shop, offline) {
     source = "live";
   }
 
+  // A product can land on two pages when the shop's ordering shifts between the
+  // two requests, so the same id comes back twice.
+  const seen = new Set();
   const items = [];
   for (const p of products) {
+    if (seen.has(p.id)) continue;
+    seen.add(p.id);
     const item = normalizeProduct(p, shop, fetchedAt);
     if (item) items.push(item);
   }
@@ -101,6 +106,15 @@ async function main() {
   if (!shops.length) throw new Error(only ? `no shop with id ${only}` : "no usable shops in seed");
 
   const results = [];
+  // --shop refreshes one shop: keep every other shop's items instead of
+  // overwriting the catalogue with just this one.
+  let kept = [];
+  if (only) {
+    try {
+      const prev = JSON.parse(await readFile(OUT, "utf8"));
+      kept = prev.filter((i) => i.shop_id !== only);
+    } catch { /* no catalogue yet */ }
+  }
   const queue = [...shops];
   await Promise.all(
     Array.from({ length: Math.min(SHOP_CONCURRENCY, queue.length) }, async () => {
@@ -116,7 +130,8 @@ async function main() {
   );
 
   results.sort((a, b) => a.shop.id.localeCompare(b.shop.id));
-  const items = results.flatMap((r) => r.items);
+  const items = [...kept, ...results.flatMap((r) => r.items)];
+  items.sort((a, b) => a.shop_id.localeCompare(b.shop_id) || a.id.localeCompare(b.id));
   await mkdir(path.dirname(OUT), { recursive: true });
   await writeFile(OUT, JSON.stringify(items, null, 1));
 
@@ -131,7 +146,8 @@ async function main() {
   }
   const totals = {};
   for (const i of items) totals[i.category] = (totals[i.category] ?? 0) + 1;
-  console.log(`\n${items.length} items -> ${path.relative(ROOT, OUT)}`);
+  if (kept.length) console.log(`\nkept ${kept.length} items from the other shops`);
+  console.log(`${items.length} items -> ${path.relative(ROOT, OUT)}`);
   console.log(`by category: ${Object.entries(totals).sort().map(([c, n]) => `${c}:${n}`).join("  ")}`);
   const themes = {};
   for (const i of items) for (const t of i.themes) themes[t] = (themes[t] ?? 0) + 1;
