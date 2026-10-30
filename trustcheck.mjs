@@ -1182,6 +1182,7 @@ function normaliseVerdict(object) {
  */
 export async function doTrustCheck(storeUrl, options = {}) {
   const url = parseStoreUrl(storeUrl);
+  fs.mkdirSync("trustCache", { recursive: true });
   const cachePath = `trustCache/${url.hostname}.json`;
 //   if file exists
   if (fs.existsSync(cachePath)) {

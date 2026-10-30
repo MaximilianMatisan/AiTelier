@@ -1,21 +1,3 @@
-// Person 2 candidate filter: read the customer brief, decide which catalogue
-// values it asks for, and keep only the items that match.
-//
-//   echo "autumn outfit, old money, 300 EUR, top M, waist 32, shoes 43" |
-//     node candidateFilter.mjs --out catalog/cache/shortlist.json
-//
-// --in/--out default to catalog/cache/products.json and
-// catalog/cache/shortlist.json. The brief comes from --user-info or stdin.
-//
-// Same pattern as trustcheck.mjs: generateObject with a Zod schema. Two
-// provider quirks shape the schema:
-// - Every field is nullable, because this OpenAI-compatible endpoint ignores
-//   the JSON schema and freely renames or drops fields. `reconcile` turns that
-//   into a usable, in-catalogue selection instead of throwing.
-// - The enum lists are prompt hints, not Zod enums, for the same reason.
-//   `reconcile` is what keeps a hallucinated value out.
-// The filtering itself is a deterministic string match: the model selects,
-// the code applies.
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
 import { readFileSync, writeFileSync } from "node:fs";
