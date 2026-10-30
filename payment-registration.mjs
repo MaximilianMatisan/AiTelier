@@ -124,10 +124,10 @@ if (process.argv[2] === "key") {
       },
     ],
     ExampleOutputs: [],
-    Tags: ["hackathon", "team-names"],
-    name: "Hackathon Team Name Finder",
+    Tags: ["hackathon", "fashion", "wardrobe"],
+    name: "AiTelier",
     description:
-      "Suggests hackathon team names from a project topic and style.",
+      "Builds a complete capsule wardrobe from a budget, style theme, fit, season, and measurements.",
     Capability: { name: process.env.ZAI_MODEL, version: "1" },
     Author: { name: author },
     apiBaseUrl: registrationUrl(process.env.AGENT_API_PORT),
