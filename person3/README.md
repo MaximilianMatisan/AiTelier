@@ -36,6 +36,12 @@ the real Person 1 catalogue, or an uploaded JSON file. Every look exposes each l
 alternative images and sizes; swapping one part reruns resolution, final checks, board
 composition, and the A2UI build.
 
+Direct demo links:
+
+- `http://127.0.0.1:21951/?demo=synthetic&run=1`
+- `http://127.0.0.1:21951/?demo=real&run=1`
+- `http://127.0.0.1:21951/gallery/{task_id}` — every input image for a task
+
 `ARTIFACT_BASE_URL` defaults to `http://127.0.0.1:21951`. If the A2UI renderer is remote,
 set it to a URL it can reach.
 
