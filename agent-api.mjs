@@ -38,10 +38,10 @@ const schema = {
     {
       id: "prompt",
       type: "string",
-      name: "Team brief",
+      name: "Your outfit order",
       data: {
         description:
-          "Describe your hackathon project and preferred name style.",
+          "Describe the outfits you want in plain words: your sizes (top, waist in inches, shoes in EU), budget in EUR, number of outfits, style and season.",
       },
       validations: [
         { validation: "min", value: "1" },
