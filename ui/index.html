@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiTelier Studio</title>
+<style>
+  :root {
+    --ink: #1f2a44; --ink-soft: #4a5571; --paper: #f7f3ec; --card: #fffdf9;
+    --line: #e4dccd; --gold: #a8844c; --ok: #2f6b4f; --warn: #9a5b13; --bad: #9b2c2c;
+    --a2ui-primary: var(--ink);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  h1, h2, h3, .serif { font-family: "Iowan Old Style", Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: .01em; }
+  header { padding: 28px 16px 8px; text-align: center; }
+  header h1 { margin: 0; font-size: 34px; }
+  header p { margin: 4px 0 0; color: var(--ink-soft); }
+  main { max-width: 860px; margin: 0 auto; padding: 16px 16px 64px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; }
+  [hidden] { display: none !important; }
+
+  /* order form */
+  form { display: grid; gap: 18px; }
+  fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  legend { font-family: Georgia, serif; font-size: 18px; margin-bottom: 8px; padding: 0; }
+  label { display: grid; gap: 4px; font-size: 13px; color: var(--ink-soft); }
+  input, select { font: inherit; color: var(--ink); background: #fff; border: 1px solid var(--line); border-radius: 8px; padding: 9px 10px; width: 100%; }
+  input:focus, select:focus { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .styles { display: flex; gap: 8px; flex-wrap: wrap; }
+  .styles label { display: block; }
+  .styles input { position: absolute; opacity: 0; width: 0; }
+  .styles span { display: inline-block; padding: 9px 16px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--ink); cursor: pointer; font-size: 15px; }
+  .styles input:checked + span { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .styles input:focus-visible + span { outline: 2px solid var(--gold); }
+  .toggle { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--ink); }
+  .toggle input { width: auto; }
+  .hint { font-size: 13px; color: var(--ink-soft); margin: 0; }
+  .primary { font: inherit; font-size: 16px; background: var(--ink); color: #fff; border: 0; border-radius: 999px; padding: 12px 28px; cursor: pointer; justify-self: start; }
+  .primary:disabled { opacity: .5; cursor: wait; }
+  .ghost { font: inherit; background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 8px 18px; cursor: pointer; }
+  .errors { background: #fbeeee; border: 1px solid #efcaca; color: var(--bad); border-radius: 10px; padding: 12px 16px; }
+  .errors ul { margin: 6px 0 0; padding-left: 18px; }
+
+  /* progress */
+  .progress h2 { margin: 0 0 4px; }
+  .steps { list-style: none; margin: 20px 0 0; padding: 0; display: grid; gap: 14px; }
+  .steps li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; align-items: start; color: var(--ink-soft); }
+  .steps li .dot { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 13px; background: #fff; }
+  .steps li.done { color: var(--ink); }
+  .steps li.done .dot { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .steps li.running { color: var(--ink); }
+  .steps li.running .dot { border-color: var(--gold); border-top-color: transparent; animation: spin 0.9s linear infinite; }
+  .steps strong { display: block; font-weight: 600; }
+  .steps small { font-size: 13px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .steps li.running .dot { animation: none; border-top-color: var(--gold); } }
+  .elapsed { font-variant-numeric: tabular-nums; color: var(--ink-soft); }
+  pre.log { white-space: pre-wrap; background: #f3efe7; border-radius: 8px; padding: 12px; font-size: 12px; overflow-x: auto; }
+
+  /* result */
+  .verdict { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; margin-bottom: 16px; }
+  .badge { display: inline-block; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+  .badge.APPROVED { background: #e3f1ea; color: var(--ok); }
+  .badge.REFUND, .badge.REJECTED { background: #fbf0e1; color: var(--warn); }
+  .refund-note { background: #fbf0e1; border-radius: 10px; padding: 12px 16px; color: var(--warn); margin-bottom: 16px; }
+  details.raw { margin-top: 24px; }
+  details.raw summary { cursor: pointer; color: var(--ink-soft); }
+  details.raw pre { max-height: 360px; overflow: auto; background: #1f2a44; color: #e8e4da; border-radius: 10px; padding: 14px; font-size: 12px; }
+
+  /* A2UI basic catalog */
+  .a2ui { display: grid; gap: 16px; }
+  .a2ui-text { margin: 0; }
+  .a2ui-text-h1 { font-family: Georgia, serif; font-weight: 500; font-size: 28px; color: var(--a2ui-primary); }
+  .a2ui-text-h2 { font-family: Georgia, serif; font-weight: 500; font-size: 22px; color: var(--a2ui-primary); }
+  .a2ui-text-h3 { font-size: 17px; font-weight: 600; }
+  .a2ui-text-caption { display: block; font-size: 14px; color: var(--ink-soft); }
+  .a2ui-column { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .a2ui-row { display: flex; gap: 8px; }
+  .a2ui-row > .a2ui-text { flex: 1 1 auto; min-width: 0; }
+  .a2ui-align-start { align-items: flex-start; } .a2ui-align-center { align-items: center; }
+  .a2ui-align-end { align-items: flex-end; } .a2ui-align-stretch { align-items: stretch; }
+  .a2ui-list { display: flex; flex-direction: column; gap: 20px; }
+  .a2ui-list-horizontal { flex-direction: row; overflow-x: auto; }
+  .a2ui-card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: 0 1px 2px rgba(31,42,68,.04); }
+  .a2ui-image { display: block; width: 100%; max-height: 380px; border-radius: 10px; background: #efe9de; }
+  .a2ui-image-largeFeature { max-height: none; height: auto; }
+  .a2ui-image-mediumFeature, .a2ui-image-default { max-height: 260px; }
+  .a2ui-image-missing { border: 1px dashed var(--line); border-radius: 10px; padding: 24px; text-align: center; color: var(--ink-soft); font-size: 13px; }
+  .a2ui-icon { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: 700; background: #e3f1ea; color: var(--ok); flex: none; }
+  .a2ui-icon-close, .a2ui-icon-error { background: #fbeeee; color: var(--bad); }
+  .a2ui-icon-warning { background: #fbf0e1; color: var(--warn); }
+  .a2ui-button { font: inherit; border-radius: 999px; padding: 8px 16px; cursor: pointer; border: 1px solid var(--a2ui-primary); background: var(--a2ui-primary); color: #fff; }
+  .a2ui-button-borderless { background: transparent; border-color: transparent; color: var(--a2ui-primary); padding: 4px 0; text-decoration: underline; text-underline-offset: 3px; }
+  .a2ui-button .a2ui-text { color: inherit; }
+  .a2ui-button:disabled { opacity: .5; cursor: default; }
+  .a2ui-tabbar { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  .a2ui-tab { font: inherit; font-size: 13px; white-space: nowrap; border: 1px solid var(--line); background: #fff; color: var(--ink-soft); border-radius: 999px; padding: 6px 12px; cursor: pointer; max-width: 260px; overflow: hidden; text-overflow: ellipsis; }
+  .a2ui-tab[aria-selected="true"] { background: var(--a2ui-primary); color: #fff; border-color: var(--a2ui-primary); }
+  .a2ui-tabpanel { padding-top: 14px; }
+  .a2ui-tabpanel .a2ui-image { max-width: 320px; }
+  .a2ui-divider { border: 0; border-top: 1px solid var(--line); width: 100%; }
+  .a2ui-unknown { border: 1px dashed var(--bad); color: var(--bad); border-radius: 8px; padding: 8px; font-size: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>AiTelier</h1>
+  <p>A capsule wardrobe from real shops, checked before you pay.</p>
+</header>
+<main>
+
+<section id="order" class="panel">
+  <form id="form" novalidate>
+    <fieldset>
+      <legend>Your budget</legend>
+      <label>Total budget (€)<input name="budget_eur" type="number" min="1" max="10000" value="500" required></label>
+      <label>Number of outfits<input name="outfits" type="number" min="1" max="10" value="2" required></label>
+    </fieldset>
+
+    <fieldset style="grid-template-columns: 1fr;">
+      <legend>Your style</legend>
+      <div class="styles" role="radiogroup" aria-label="Style">
+        <label><input type="radio" name="theme" value="old_money" checked><span>Old money</span></label>
+        <label><input type="radio" name="theme" value="casual"><span>Lässig / casual</span></label>
+        <label><input type="radio" name="theme" value="streetwear"><span>Streetwear</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>When and for whom</legend>
+      <label>Season
+        <select name="season"><option value="autumn">Autumn</option><option value="winter">Winter</option><option value="spring">Spring</option><option value="summer">Summer</option></select>
+      </label>
+      <label>Collection
+        <select name="gender"><option value="men">Men</option><option value="women">Women</option></select>
+      </label>
+      <label>Fit (optional)<input name="fit" placeholder="slim, regular, relaxed"></label>
+      <label>Climate (optional)<input name="climate" placeholder="Munich, wet, 8-15 C"></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your sizes</legend>
+      <label>Tops
+        <select name="top"><option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option></select>
+      </label>
+      <label>Waist (inches)<input name="waist" type="number" min="24" max="50" value="32" required></label>
+      <label>Shoes (EU)<input name="shoe_eu" type="number" min="34" max="50" step="0.5" value="43" required></label>
+    </fieldset>
+
+    <fieldset style="grid-template-columns: 1fr;">
+      <label>Avoid (optional, comma separated)<input name="avoid" placeholder="neon, polyester"></label>
+    </fieldset>
+
+    <label class="toggle"><input type="checkbox" name="fast" checked> Fast demo mode</label>
+    <p class="hint">Fast mode uses a prepared shortlist of 100 products (old money, autumn, men) and takes about 30 seconds. Turn it off to search the whole catalogue of 8,725 products, which takes about 2 minutes.</p>
+
+    <div id="form-errors" class="errors" hidden></div>
+    <button class="primary" id="submit" type="submit">Style me</button>
+  </form>
+</section>
+
+<section id="progress" class="panel progress" hidden>
+  <h2>Styling your wardrobe</h2>
+  <p class="elapsed" id="elapsed">0 s</p>
+  <ol class="steps" id="steps"></ol>
+  <div id="run-error" hidden>
+    <div class="errors" style="margin-top:20px">The pipeline stopped. Nothing was charged for this order.</div>
+    <pre class="log" id="run-log"></pre>
+    <button class="ghost" type="button" data-restart>Try again</button>
+  </div>
+</section>
+
+<section id="result" hidden>
+  <div class="verdict">
+    <span class="badge" id="badge"></span>
+    <button class="ghost" type="button" data-restart>New order</button>
+  </div>
+  <div id="refund-note" class="refund-note" hidden>
+    No look passed all five guarantees, so the agent recommends refunding your payment from the escrow. The reasons are listed below.
+  </div>
+  <div id="surface" class="a2ui"></div>
+  <details class="raw">
+    <summary>Show the A2UI messages the agent sent</summary>
+    <p class="hint">The agent describes this whole screen as A2UI v0.9.1 messages; this page only draws them.</p>
+    <pre id="raw"></pre>
+  </details>
+</section>
+
+</main>
+<script type="module">
+import { renderSurface } from "./a2ui.js";
+
+const $ = (id) => document.getElementById(id);
+const show = (name) => ["order", "progress", "result"].forEach((s) => ($(s).hidden = s !== name));
+let poll;
+
+function readForm(form) {
+  const data = new FormData(form);
+  const list = (v) => String(v || "").split(",").map((s) => s.trim()).filter(Boolean);
+  const order = {
+    budget_eur: Number(data.get("budget_eur")),
+    outfits: Number(data.get("outfits")),
+    theme: data.get("theme"),
+    season: data.get("season"),
+    gender: data.get("gender"),
+    sizes: { top: data.get("top"), waist: data.get("waist"), shoe_eu: data.get("shoe_eu") },
+  };
+  for (const key of ["fit", "climate"]) if (String(data.get(key)).trim()) order[key] = String(data.get(key)).trim();
+  if (list(data.get("avoid")).length) order.avoid = list(data.get("avoid"));
+  return { order, fast: data.get("fast") === "on" };
+}
+
+function showErrors(box, errors) {
+  box.replaceChildren(Object.assign(document.createElement("strong"), { textContent: "Please fix your order:" }));
+  const ul = document.createElement("ul");
+  for (const e of errors) ul.append(Object.assign(document.createElement("li"), { textContent: e }));
+  box.append(ul);
+  box.hidden = false;
+}
+
+function drawSteps(stages) {
+  const all = [{ label: "Order checked", detail: "Budget, sizes, season and style are valid.", state: "done" }, ...stages];
+  $("steps").replaceChildren(...all.map((s) => {
+    const li = document.createElement("li");
+    li.className = s.state;
+    const dot = Object.assign(document.createElement("span"), { className: "dot", textContent: s.state === "done" ? "✓" : "" });
+    const text = document.createElement("div");
+    text.append(Object.assign(document.createElement("strong"), { textContent: s.label }), Object.assign(document.createElement("small"), { textContent: s.detail }));
+    li.append(dot, text);
+    return li;
+  }));
+}
+
+function showResult(result) {
+  $("badge").textContent = result.status;
+  $("badge").className = `badge ${result.status}`;
+  $("refund-note").hidden = result.status === "APPROVED";
+  if (result.a2ui?.valid && result.a2ui.messages?.length) {
+    renderSurface(result.a2ui.messages, $("surface"));
+  } else {
+    const pre = Object.assign(document.createElement("pre"), { className: "log", textContent: result.a2ui?.fallback_markdown ?? result.markdown ?? "No result." });
+    $("surface").replaceChildren(pre);
+  }
+  $("raw").textContent = JSON.stringify(result.a2ui?.messages ?? [], null, 2);
+  show("result");
+  window.scrollTo({ top: 0 });
+}
+
+async function follow(id) {
+  const res = await fetch(`/api/runs/${id}`);
+  const run = await res.json();
+  $("elapsed").textContent = `${run.seconds} s`;
+  drawSteps(run.stages);
+  if (run.state === "done") return showResult(run.result);
+  if (run.state === "failed") {
+    $("run-log").textContent = run.error;
+    $("run-error").hidden = false;
+    return;
+  }
+  poll = setTimeout(() => follow(id), 1000);
+}
+
+$("form").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  $("form-errors").hidden = true;
+  $("submit").disabled = true;
+  try {
+    const res = await fetch("/api/runs", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(readForm(event.target)) });
+    const body = await res.json();
+    if (!res.ok) return showErrors($("form-errors"), body.errors ?? ["The order could not be started."]);
+    $("run-error").hidden = true;
+    drawSteps([]);
+    show("progress");
+    follow(body.id);
+  } catch {
+    showErrors($("form-errors"), ["The AiTelier server is not reachable. Is npm run ui still running?"]);
+  } finally {
+    $("submit").disabled = false;
+  }
+});
+
+document.querySelectorAll("[data-restart]").forEach((b) => b.addEventListener("click", () => {
+  clearTimeout(poll);
+  show("order");
+}));
+</script>
+</body>
+</html>
