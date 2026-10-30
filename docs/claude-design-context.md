@@ -1,75 +1,46 @@
-# Kontext für Claude Design: das Design der AiTelier-Studio-Website
+Redesign the whole website of the AiTelier Studio: all three screens (order, waiting, result) plus header and footer. The page already works; I need the design, not new features. Read everything below before you start.
 
-Diesen Text als Kontext an Claude Design geben. Auftrag: **die ganze Website neu gestalten**,
-alle drei Screens, siehe **„Auftrag“** am Ende. Die Seite funktioniert bereits; gesucht ist
-das Design, nicht neue Funktionen.
+## The product
 
-## Produkt in einem Absatz
+AiTelier is an AI agent built for the Cardano track of the TUM Blockchain & AI Hackathon. A customer enters a budget, a style, a season and their sizes. The agent builds outfits from real products in real online shops (a catalogue of 8,725 items) and checks every outfit in code against five guarantees: budget, fit, availability, price integrity and delivery. Payment goes into an escrow on Cardano; if no outfit passes, the customer is refunded. Core principle: the AI decides, the code checks.
 
-AiTelier ist ein KI-Agent für den Cardano-Track des TUM Blockchain & AI Hackathons. Eine
-Kundin oder ein Kunde gibt Budget, Stil, Saison und Größen ein. Der Agent stellt daraus
-Outfits aus **echten Produkten echter Online-Shops** zusammen (Katalog mit 8.725 Artikeln)
-und prüft jedes Outfit per Code gegen fünf Garantien: Budget, Passform, Verfügbarkeit,
-Preis-Integrität und Lieferung. Bezahlt wird per Escrow auf Cardano. Fällt ein Outfit durch,
-gibt es eine Rückerstattung. Grundprinzip: **Die KI entscheidet, der Code prüft.**
-Tonalität: ruhig, hochwertig, „Atelier“, kein Tech-Startup-Look.
+Tone: calm, premium, an atelier. Not a tech-startup look.
 
-## Die GUI heute
+## The site today
 
-Lokale Web-App, gestartet mit `npm run ui`, erreichbar unter `http://127.0.0.1:21960`.
+A local web app. Three screens, exactly one visible at a time:
 
-| Datei | Inhalt |
-|---|---|
-| `ui/index.html` | Seite, gesamtes CSS, Seitenlogik (Formular, Polling, Screens) |
-| `ui/a2ui.js` | Renderer: zeichnet A2UI-Nachrichten des Agenten als DOM |
-| `ui/server.mjs` | lokaler Server: prüft die Bestellung, startet die Pipeline, liefert Bilder aus |
+1. **Order** (owned by the page): total budget, number of outfits, style (Old money, Lässig/casual, Streetwear), season, collection, fit, climate, sizes (tops, waist in inches, shoes EU), things to avoid, and a "Fast demo mode" switch. Validation errors come back from the server all at once and appear in one error box.
+2. **Waiting** (owned by the page): "Order checked" plus five pipeline stages, each `pending`, `running` or `done`, with a seconds counter. It takes about 25 to 40 seconds.
+3. **Result** (owned by the agent): a status badge (`APPROVED` or `REFUND`), then the interface the agent sends as A2UI, then a collapsible block that shows the raw A2UI messages.
 
-Drei Screens:
+## The key constraint: A2UI
 
-1. **Bestellung** (gehört der Seite): Budget, Anzahl Outfits, Stil als Chips
-   (Old money, Lässig/casual, Streetwear), Saison, Kollektion, Passform, Klima, Größen
-   (Top, Taille in Zoll, Schuhe EU), Ausschlüsse, Schalter „Fast demo mode“.
-   Fehler kommen gesammelt vom Server und stehen in einer roten Box.
-2. **Warten** (gehört der Seite): fünf Pipeline-Stufen plus „Order checked“, jede
-   `pending`, `running` oder `done`, mit Sekundenzähler. Dauer etwa 25–40 s.
-3. **Ergebnis** (gehört dem Agenten): Status-Badge (`APPROVED` oder `REFUND`), darunter die
-   A2UI-Oberfläche des Agenten, darunter ein aufklappbarer Block mit den rohen A2UI-Nachrichten.
+The agent describes the result screen itself as A2UI v0.9.1 messages (Agent-to-User Interface, Basic Catalog). The page has no outfit layout of its own; a renderer draws whatever the agent sends. So anything on the result screen can change in three ways, from least to most work:
 
-## Das Wichtigste: A2UI
+1. **Restyle only**: CSS on the classes below. Nothing changes in the agent.
+2. **New composition**: a new pattern built from existing components, such as a colour palette as a `Row` of small `Text` and `Icon`. The agent must then send that structure.
+3. **Custom catalog component**: a new type such as `OutfitCard`. Renderer, agent and catalog ID all change. Only when 1 and 2 cannot do it.
 
-Den Ergebnis-Screen beschreibt der Agent selbst, als **A2UI v0.9.1**-Nachrichten
-(Agent-to-User Interface, Basic Catalog). Die Seite hat kein eigenes Outfit-Layout; sie
-zeichnet nur, was der Agent schickt. Daraus folgt für jede Komponente im Ergebnis-Screen,
-von der einfachsten zur aufwendigsten Variante:
+The order and waiting screens are not A2UI; anything goes there.
 
-1. **Nur Gestaltung**: eine vorhandene Basic-Catalog-Komponente neu stylen (CSS auf die
-   Klassen unten). Am Agenten ändert sich nichts.
-2. **Neue Zusammensetzung**: aus vorhandenen Komponenten ein neues Muster bauen, z. B.
-   Farbpalette als `Row` aus kleinen `Text`/`Icon`. Dafür muss der Agent (Person 3,
-   `person3/app/services/a2ui.py`) diese Struktur senden.
-3. **Eigene Katalog-Komponente**: ein neuer Typ wie `OutfitCard`. Dafür sind Renderer,
-   Agent und eine eigene Catalog-ID zu ändern. Nur wählen, wenn 1 und 2 nicht reichen.
+### Components the agent sends, and the HTML the renderer makes of them
 
-Formular- und Warte-Screen sind kein A2UI; dort ist alles erlaubt.
-
-### Komponenten, die der Agent heute sendet
-
-| Komponente | Felder | Gerendert als (CSS-Klassen) |
+| Component | Fields | Rendered as |
 |---|---|---|
-| `Text` | `text`, `variant`: `h1` `h2` `h3` `body` `caption` | `h2/h3/h4/p/small.a2ui-text.a2ui-text-{variant}` |
-| `Image` | `url`, `description`, `fit` (`cover`/`contain`), `variant` (`largeFeature`, …) | `img.a2ui-image.a2ui-image-{variant}`; ohne Bild `div.a2ui-image-missing` |
+| `Text` | `text`, `variant`: `h1` `h2` `h3` `body` `caption` | `h2`/`h3`/`h4`/`p`/`small` with `.a2ui-text.a2ui-text-{variant}` |
+| `Image` | `url`, `description`, `fit` (`cover`/`contain`), `variant` (`largeFeature`, …) | `img.a2ui-image.a2ui-image-{variant}`; if it fails, `div.a2ui-image-missing` |
 | `Card` | `child` | `div.a2ui-card` |
-| `Column` / `Row` | `children`, `align` | `div.a2ui-column` / `div.a2ui-row` + `.a2ui-align-{align}` |
+| `Column` / `Row` | `children`, `align` | `div.a2ui-column` / `div.a2ui-row` plus `.a2ui-align-{align}` |
 | `List` | `children`, `direction` | `div.a2ui-list.a2ui-list-{direction}` |
-| `Tabs` | `tabs: [{title, child}]` | `.a2ui-tabs` > `.a2ui-tabbar` (`.a2ui-tab[aria-selected]`) + `.a2ui-tabpanel` |
+| `Tabs` | `tabs: [{title, child}]` | `.a2ui-tabs` > `.a2ui-tabbar` (buttons `.a2ui-tab[aria-selected]`) + `.a2ui-tabpanel` |
 | `Button` | `child`, `variant` (`primary`, `borderless`), `action.functionCall` `openUrl` | `button.a2ui-button.a2ui-button-{variant}` |
 | `Icon` | `name`: `check`, `close`, `warning`, `info` | `span.a2ui-icon.a2ui-icon-{name}` |
 | `Divider` | – | `hr.a2ui-divider` |
 
-Die Wurzel heißt immer `root`; Komponenten verweisen über `id` aufeinander (flache Liste).
-Das Theme kommt mit: `primaryColor: #1F2A44`, `agentDisplayName: "AiTelier Stylist"`.
+Components reference each other by `id` in a flat list; the root is always `root`. The theme the agent sends: `primaryColor: #1F2A44`, `agentDisplayName: "AiTelier Stylist"`. An unknown component renders as `div.a2ui-unknown`.
 
-### Echter Ausschnitt (ein Outfit, gekürzt)
+### A real outfit from a run (trimmed)
 
 ```json
 {"id": "root", "component": "Column", "align": "stretch",
@@ -99,8 +70,7 @@ Das Theme kommt mit: `primaryColor: #1F2A44`, `agentDisplayName: "AiTelier Styli
 {"id": "decision", "component": "Text", "variant": "h3", "text": "Approved: all five guarantees passed."}
 ```
 
-Ein Outfit besteht aus etwa 47 Komponenten. Zusätzlich sendet der Agent per
-`updateDataModel` die Rohdaten jedes Outfits:
+One outfit is about 47 components. The agent also sends each outfit's raw data:
 
 ```json
 {"outfit_id": "look-1", "name": "Refined Old Money", "style_blend": ["old money"],
@@ -116,114 +86,76 @@ Ein Outfit besteht aus etwa 47 Komponenten. Zusätzlich sendet der Agent per
    "price_integrity": {"ok": true, "detail": "…"}, "delivery": {"ok": true, "detail": "…"}}}}
 ```
 
-## Design-Tokens (aus `ui/index.html`)
+## Real data the design has to survive
 
-| Token | Wert | Verwendung |
+- Long product titles, such as "Easy Weejuns Larson Penny Loafers for Men (262 / M / CHOCOLATE)".
+- Mixed languages from the shops: "Polo manga larga blanco", "Short Bodhi argile".
+- A missing brand shows as the text "false" (a data bug being fixed).
+- Images can be missing or fail to load. The outfit board image is portrait.
+- `color_palette` is often empty; the rationale now starts with the palette, for example "Palette: navy, cream, tan. …".
+- Warnings repeat, for example `GUARANTEE_ASSUMED` twenty times in one line.
+- The refund case: status `REFUND`, no outfits, one reason such as "look-1 budget: 373.88 EUR <= 300.00 EUR".
+- 1 to 10 outfits, each with 3 to 5 pieces (base, mid, outer, bottom, shoes).
+
+## Current design tokens (a starting point, not a requirement)
+
+| Token | Value | Use |
 |---|---|---|
-| `--ink` | `#1f2a44` | Text, Primärfarbe (= A2UI `primaryColor`) |
-| `--ink-soft` | `#4a5571` | Sekundärtext |
-| `--paper` | `#f7f3ec` | Seitenhintergrund |
-| `--card` | `#fffdf9` | Karten |
-| `--line` | `#e4dccd` | Rahmen, Trennlinien |
-| `--gold` | `#a8844c` | Fokus, Akzent, „läuft“ |
-| `--ok` / `--warn` / `--bad` | `#2f6b4f` / `#9a5b13` / `#9b2c2c` | Garantie bestanden / Refund / Fehler |
+| `--ink` | `#1f2a44` | text, primary (matches the A2UI `primaryColor`) |
+| `--ink-soft` | `#4a5571` | secondary text |
+| `--paper` | `#f7f3ec` | page background |
+| `--card` | `#fffdf9` | cards |
+| `--line` | `#e4dccd` | borders, dividers |
+| `--gold` | `#a8844c` | focus, accent, "running" |
+| `--ok` / `--warn` / `--bad` | `#2f6b4f` / `#9a5b13` / `#9b2c2c` | guarantee passed / refund / error |
 
-- Schrift: Überschriften Serif (`"Iowan Old Style", Georgia, serif`, Gewicht 500),
-  Fließtext `system-ui`. Keine Webfonts nötig.
-- Radien: Karten 14px, Felder 8px, Chips und Buttons voll rund (999px).
-- Abstände: Karten-Innenabstand 18–24px, Seitenrand 16px, maximale Breite 860px.
-- Nur Light Mode.
+Headings in a serif ("Iowan Old Style", Georgia, serif, weight 500), body in system-ui, no web fonts required. Card radius 14px, inputs 8px, chips and buttons fully round. Card padding 18–24px, page gutter 16px, max width 860px. Light mode only. A better system of your own is welcome, as long as all text reaches WCAG AA contrast.
 
-## Technische Rahmenbedingungen
+## Technical rules
 
-- Vanilla HTML, CSS und JavaScript (ES-Module). Kein Framework, kein Build-Schritt, keine
-  neuen Abhängigkeiten.
-- CSS kommt in den `<style>`-Block von `ui/index.html`; neue A2UI-Darstellung kommt als
-  `case` in `draw()` in `ui/a2ui.js`.
-- Sicherheit: Text nur über `textContent`, nie `innerHTML`. Bilder nur aus http(s) oder vom
-  eigenen Server. Aktionen nur `openUrl` auf http(s).
-- Muss bei 375px Breite ohne horizontales Scrollen funktionieren.
-- Barrierefreiheit: echte Labels, `role`/`aria-selected` bei Tabs, sichtbarer Fokus,
-  `prefers-reduced-motion` respektieren.
+- Vanilla HTML, CSS and JavaScript (ES modules). No framework, no build step, no new dependencies, no external scripts.
+- All CSS in one `<style>` block.
+- Never insert text as HTML (`textContent` only). Images only from http(s) or the same server. The only action is `openUrl` to an http(s) address.
+- Works at 375px wide with no horizontal scrolling.
+- Accessibility: real labels, `role` and `aria-selected` on tabs, visible focus, respect `prefers-reduced-motion`.
 
-## Echte Daten, mit denen die Komponente umgehen muss
+## Hooks the page logic depends on: keep these exactly
 
-- **Lange Produkttitel**, z. B. „Easy Weejuns Larson Penny Loafers for Men (262 / M / CHOCOLATE)“.
-- **Gemischte Sprachen** aus den Shops: „Polo manga larga blanco“, „Short Bodhi argile“.
-- **Fehlende Marke**: manche Artikel haben die Marke `"false"` (Datenfehler, wird behoben).
-- **Bilder können fehlen** oder nicht laden; das Bild-Board ist hochformatig.
-- **`color_palette` ist oft leer.** Seit Commit `8a93fdf` beginnt das `rationale` mit der
-  Palette („Palette: navy, cream, tan. …“); ältere Ergebnisse wie der Ausschnitt oben noch nicht.
-- **Warnungen** wiederholen sich, z. B. 20× `GUARANTEE_ASSUMED`.
-- **Refund-Fall**: `status: "REFUND"`, keine Outfits, eine Begründung, z. B.
-  „look-1 budget: 373.88 EUR <= 300.00 EUR“.
-- 1 bis 10 Outfits mit je 3 bis 5 Teilen (base, mid, outer, bottom, shoes).
+Look, order and surrounding markup are yours to change; these are not.
 
-## Was beim Redesign gleich bleiben muss
+- Three `<section>` elements with the IDs `order`, `progress` and `result`. The logic shows one at a time by toggling the `hidden` attribute.
+- The form `#form`, its submit button `#submit`, and the error box `#form-errors`. Field names go to the server unchanged:
 
-Die Seitenlogik in `ui/index.html` und der Server hängen an diesen Stellen. Aussehen,
-Reihenfolge und Markup drumherum sind frei; diese Haken nicht.
-
-- **Screens**: drei `<section>` mit den IDs `order`, `progress` und `result`. Es ist immer
-  genau einer sichtbar; die Logik schaltet über das Attribut `hidden` um.
-- **Formular** `#form` mit Absende-Button `#submit` und Fehlerbox `#form-errors`. Die
-  Feldnamen gehen 1:1 an den Server:
-
-  | `name` | Typ | Werte |
+  | `name` | Type | Values |
   |---|---|---|
-  | `budget_eur` | Zahl | 1–10000, Euro |
-  | `outfits` | Zahl | 1–10 |
-  | `theme` | genau eine Auswahl | `old_money`, `casual`, `streetwear` |
-  | `season` | Auswahl | `autumn`, `winter`, `spring`, `summer` |
-  | `gender` | Auswahl | `men`, `women` |
-  | `fit`, `climate` | Text, optional | frei, kurz |
-  | `top` | Auswahl | `XS`, `S`, `M`, `L`, `XL`, `XXL` |
-  | `waist` | Zahl | 24–50, Zoll |
-  | `shoe_eu` | Zahl | 34–50, halbe Größen erlaubt |
-  | `avoid` | Text, optional | kommagetrennt |
-  | `fast` | Checkbox | an = Demo-Shortlist, etwa 30 s |
+  | `budget_eur` | number | 1–10000, euros |
+  | `outfits` | number | 1–10 |
+  | `theme` | exactly one choice (radio) | `old_money`, `casual`, `streetwear` |
+  | `season` | choice | `autumn`, `winter`, `spring`, `summer` |
+  | `gender` | choice | `men`, `women` |
+  | `fit`, `climate` | text, optional | short free text |
+  | `top` | choice | `XS`, `S`, `M`, `L`, `XL`, `XXL` |
+  | `waist` | number | 24–50, inches |
+  | `shoe_eu` | number | 34–50, half sizes allowed |
+  | `avoid` | text, optional | comma separated |
+  | `fast` | checkbox | on = prepared demo shortlist, about 30 s |
 
-- **Warten**: Liste `#steps` und Zähler `#elapsed`. Die Logik baut die Einträge selbst, als
-  `<li class="done|running|pending">` mit `<span class="dot">` und darin `<strong>`
-  (Titel) und `<small>` (Erklärung). Das Aussehen dieser Klassen ist frei. Fehlerfall:
-  `#run-error` mit `#run-log`.
-- **Ergebnis**: `#badge` bekommt die Klasse `badge APPROVED` oder `badge REFUND`,
-  `#refund-note` erscheint nur bei Refund, `#surface` ist der Container, in den der
-  A2UI-Renderer zeichnet, `#raw` zeigt die rohen A2UI-Nachrichten.
-- Buttons mit dem Attribut `data-restart` führen zurück zum Formular.
+- Waiting: the list `#steps` and the counter `#elapsed`. The logic builds each entry itself as `<li class="done|running|pending">` containing `<span class="dot">` and a `<div>` with `<strong>` (title) and `<small>` (explanation). Style those classes however you like. Failure state: `#run-error` containing `#run-log`.
+- Result: `#badge` gets the class `badge APPROVED` or `badge REFUND`; `#refund-note` is shown only on refund; `#surface` is the container the A2UI renderer draws into; `#raw` shows the raw A2UI messages.
+- Any button with the attribute `data-restart` returns to the form.
+- Where the page script belongs, put exactly this comment instead of writing the logic: `<!-- AITELIER PAGE SCRIPT -->`. I will insert the existing script there.
 
-## Auftrag
+## The brief
 
-**Gestalte die ganze Website des AiTelier Studios neu**: Bestellung, Warten, Ergebnis,
-dazu Kopf- und Fußbereich. Ziel ist eine Demo, die in den ersten fünf Sekunden „hochwertiges
-Atelier“ ausstrahlt und gleichzeitig zeigt, dass hier geprüft und auf Cardano bezahlt wird.
+Goal: a demo that says "premium atelier" within five seconds, and shows at the same time that every order is checked and paid on Cardano.
 
-Pro Screen:
+1. **Order**: should feel like a conversation with a tailor, not a government form. Choose the style visually instead of with text chips. Group the sizes clearly. Keep "Fast demo mode" visible but quiet. Show server errors together.
+2. **Waiting**: make 25 to 40 seconds worth watching. The stages should show what is happening ("Removing sizes you cannot buy") and that code is checking. No fake progress: state comes only from the `done`, `running` and `pending` classes.
+3. **Result**: style every A2UI Basic Catalog component in the table as one coherent design system (restyle only). This part is required. If a clearly better result needs a new structure, for example an outfit card that shows every piece at once instead of behind tabs, add it as a proposal with the exact A2UI JSON the agent would have to send. `APPROVED` and `REFUND` must be easy to tell apart; a refund protects the customer, it is not an error.
 
-1. **Bestellung**: soll sich wie ein Gespräch mit einem Schneider anfühlen, nicht wie ein
-   Behördenformular. Stilwahl visuell statt als Text-Chips. Größen klar gruppiert. Der
-   Schalter „Fast demo mode“ bleibt sichtbar, darf aber zurücktreten. Fehler vom Server
-   erscheinen gesammelt.
-2. **Warten**: 25–40 Sekunden, die sich lohnen. Die fünf Stufen sollen zeigen, was gerade
-   passiert („Removing sizes you cannot buy“) und dass Code prüft. Kein Fake-Fortschritt:
-   der Zustand kommt nur aus den Klassen `done`, `running` und `pending`.
-3. **Ergebnis**: gestalte alle A2UI-Basic-Catalog-Komponenten aus der Tabelle oben als
-   zusammenhängendes Designsystem (Variante 1, nur CSS). Das ist der Pflichtteil.
-   Wenn ein besseres Ergebnis nur mit neuer Struktur geht, etwa eine Outfit-Karte mit
-   allen Teilen auf einen Blick statt hinter Tabs, liefere das als Vorschlag mit dem
-   A2UI-JSON, das der Agent dafür senden müsste (Variante 2 oder 3). Status `APPROVED` und
-   `REFUND` müssen klar unterscheidbar sein; der Refund-Fall ist ein Schutz, kein Fehler.
+## What to deliver
 
-Die Tokens oben sind der Ausgangspunkt, kein Zwang; ein eigenes, besseres System ist
-willkommen, solange Text auf Hintergrund mindestens WCAG AA erreicht.
-
-**Erwartetes Ergebnis von Claude Design:**
-
-- Eine vollständige `index.html` mit allen drei Screens und eingebettetem CSS, die die
-  Haken aus „Was beim Redesign gleich bleiben muss“ unverändert enthält. Den
-  `<script type="module">`-Block der bestehenden Datei darf sie übernehmen, statt ihn
-  neu zu schreiben.
-- CSS für alle `a2ui-*`-Klassen aus der Komponententabelle.
-- Optional: Vorschläge für neue A2UI-Strukturen mit Beispiel-JSON.
-- Zustände: leeres Formular, Formular mit Fehlern, jede Wartestufe, `APPROVED` mit
-  1 und mit 3 Outfits, `REFUND`, fehlendes Bild, sehr langer Produkttitel, mobil (375px).
+- One complete `index.html` with all three screens, header, footer and all CSS embedded, containing every hook above unchanged and the `<!-- AITELIER PAGE SCRIPT -->` placeholder.
+- CSS for every `a2ui-*` class in the component table.
+- Optional: proposals for new A2UI structures with example JSON.
+- Show these states: empty form, form with errors, each waiting stage, `APPROVED` with 1 and with 3 outfits, `REFUND`, a missing image, a very long product title, and mobile at 375px.
