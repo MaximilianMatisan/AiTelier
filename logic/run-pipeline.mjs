@@ -12,6 +12,7 @@ import { spawn } from "node:child_process";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { readOrder, refusal } from "./intake.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PYTHON = process.env.PYTHON ?? "python3";
@@ -112,7 +113,15 @@ async function main() {
   const outDir = flag("--out", "catalog/cache/run");
   await mkdir(path.resolve(ROOT, outDir), { recursive: true });
 
-  const order = JSON.parse(await readFile(path.resolve(ROOT, orderPath), "utf8"));
+  // Step 1: refuse a bad order here, before the filter spends model calls on it.
+  const intake = readOrder(await readFile(path.resolve(ROOT, orderPath), "utf8"));
+  if (!intake.ok) {
+    console.log(refusal(intake));
+    process.exitCode = 1;
+    return;
+  }
+  for (const w of intake.warnings) console.log(`warning: ${w}`);
+  const order = intake.order;
   const shortlist = path.join(outDir, "shortlist.json");
   const envelope = path.join(outDir, "person3.input.json");
   const customer = path.join(outDir, "customer.json");
