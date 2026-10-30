@@ -1,0 +1,13 @@
+{
+  "budget_eur": 300,
+  "outfits": 2,
+  "theme": "old_money",
+  "season": "autumn",
+  "sizes": { "top": "M", "waist": "32", "shoe_eu": "43" },
+  "fit": "slim",
+  "needed_by": "2026-11-06",
+  "owned": ["black slim jeans"],
+  "avoid": ["neon", "polyester"],
+  "gender": "men",
+  "climate": "Munich, wet, 8-15 C"
+}
