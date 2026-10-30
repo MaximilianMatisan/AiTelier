@@ -10,6 +10,7 @@ Everything here is fetched from the shops' public Shopify product feed.
 | `shops.seed.json` | The 12 shops. Person 2 keys `trust.json` off these `id`s. |
 | `cache/products.json` | **The handover artifact.** Normalised items, one array. |
 | `cache/raw/<shop_id>.json` | Untouched feed responses, so the demo runs with no network. |
+| `cache/person3.input.json` | 100-item sample in Person 3's envelope shape, for smoke tests. |
 
 ## Commands
 
@@ -18,6 +19,7 @@ node logic/data/collect.js                 # all shops, live, rewrites raw + pro
 node logic/data/collect.js --shop afew     # one shop
 OFFLINE=1 node logic/data/collect.js       # rebuild products.json from raw only
 node logic/data/refetch.js <item-id>       # fresh stock/price for one item
+node logic/data/to_person3.js --limit 100  # emit Person 3's envelope shape
 MAX_PAGES=4 node logic/data/collect.js     # widen (default 2 pages = 500 products/shop)
 ```
 
@@ -62,6 +64,49 @@ Numeric waist sizing (e.g. `32`) comes mainly from **overkill, norseprojects, mf
    points at the *cheapest available* variant for that size, so two sizes of one product can be
    different colours.
 9. **Duplicates are real.** Shops list each colourway as its own product, so similar names repeat.
+
+## Person 3 adapter
+
+`PERSON3_INPUT_CONTRACT.md` v1.0 uses different field names from the Frame 16 schema we agreed
+on. Five of its six required item fields differ, and their normalization matrix (section 7)
+normalizes *values*, not field *names* - so our items would be rejected or degraded if sent raw.
+
+`logic/data/to_person3.js` converts on the way out. **`catalog/cache/products.json` keeps the
+agreed Frame 16 shape**, because Person 2 consumes that. Nothing was renamed in place.
+
+| Frame 16 (ours) | Person 3 v1.0 |
+| --- | --- |
+| `id` | `item_id` |
+| `name` | `title` |
+| `vendor` | `brand` |
+| `category: "outer"` | `category: "outerwear"` — their slot list has no `outer`, so it would have become `other` and stopped satisfying a required slot |
+| `price_eur: 49` | `price: {amount: 49, currency: "EUR"}` |
+| `url` | `product_url` |
+| `image` (one string) | `images: [{url, role: "front"}]` |
+| `stock: {M: 1}` | `sizes: [{label: "M", in_stock: true}]` |
+| `themes: ["old_money"]` | `style.style_tags: ["old-money"]` |
+| `source.fetched_at` | `collected_at` |
+| `variants`, `seasons`, `stock_kind` | kept under `raw` (preserved, never sent to the LLM) |
+
+Descriptions are pulled from `body_html` in the raw cache (89% coverage) and stripped to plain
+text, so `products.json` keeps its agreed shape.
+
+The adapter emits **our half** of the envelope — `contract_version`, `currency`, `shops`, `items`.
+Person 3 adds `task_id`, `customer` and `options`.
+
+### What the adapter cannot fix
+
+1. **The contract caps a request at 100 items** (section 11) and we hold 3346. `--limit` samples
+   round-robin across shops for smoke tests; the real shortlist is Person 2's filter step
+   (`--in <shortlist.json>`).
+2. **`shipping.default_amount` is unknown.** The Shopify feed carries no shipping cost, so all 12
+   shops raise `SHIPPING_UNKNOWN`. Their G1 (budget) and G5 (delivery) need a value at the final
+   check. Either hand-enter shipping per shop in the seed, or relax G5 to `delivery_days`.
+3. **`options.fit_mode` must be `size_only`.** The canonical envelope uses `measurements`, which
+   needs per-size `measurements_cm`. The feed has no garment measurements at all.
+4. **No `guarantee` on any shop** — that is Person 2's `catalog/trust.json`. Careful: their
+   section 5 treats an **absent guarantee as guaranteed** with only a `GUARANTEE_ASSUMED`
+   warning. Until Person 2 wires trust in, shop trust silently passes.
 
 ## Budget finding (matters for the demo)
 
