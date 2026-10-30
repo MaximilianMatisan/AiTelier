@@ -9,6 +9,12 @@
 // Step 1 refuses a bad order before anything runs. A good order goes through
 // logic/run-pipeline.mjs, and the customer reads Person 3's result. A pipeline
 // that fails or overruns throws, so the paid flow never submits half a result.
+//
+// A run whose guarantees do not hold throws too. Submitting a result is what
+// moves the escrow towards paying us, so an agent that submits a REFUND would
+// be charging for work it has just declared unfit. Without a submitted result
+// `submitResultTime` lapses and the buyer gets their money back, which is the
+// promise the product is sold on.
 import { spawn } from "node:child_process";
 import { existsSync, openSync, closeSync, writeFileSync } from "node:fs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
@@ -43,6 +49,28 @@ export function runPipeline(args, timeoutMs, logFile) {
     child.on("error", () => done(false));
     child.on("close", (code) => done(code === 0));
   });
+}
+
+/**
+ * Thrown when Person 3 returns REFUND. `refund` marks it apart from a crash:
+ * the work ran, the guarantees were checked, and they did not hold. The caller
+ * must not submit a result for this task.
+ */
+export class GuaranteesFailed extends Error {
+  constructor(failed, outDir) {
+    super(`Guarantees failed, nothing submitted: ${failed.join("; ") || "no detail"}`);
+    this.name = "GuaranteesFailed";
+    this.refund = true;
+    this.failed = failed;
+    this.outDir = outDir;
+  }
+}
+
+/** The guarantees that did not hold, named with Person 3's own wording. */
+export function failedGuarantees(result) {
+  return Object.entries(result?.guarantees ?? {})
+    .filter(([, check]) => !check?.ok)
+    .map(([name, check]) => `${name}: ${check?.detail ?? "failed"}`);
 }
 
 /** Person 3's own markdown when present, otherwise a plain summary. */
@@ -85,6 +113,17 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
   if (!ok) throw new Error(`Pipeline failed or overran; see ${outDir}/pipeline.log`);
 
   const result = JSON.parse(await readFile(path.join(ROOT, outDir, "person3", "result.json"), "utf8"));
+  if (result?.status === "REFUND") {
+    const failed = failedGuarantees(result);
+    // Journal it so the refusal is a recorded decision, not a crash: someone
+    // has to be able to tell the customer why their money came back.
+    writeFileSync(
+      journal,
+      JSON.stringify({ phase: "refund", outDir, status: result.status, failed }),
+      { mode: 0o600 },
+    );
+    throw new GuaranteesFailed(failed, outDir);
+  }
   writeFileSync(journal, JSON.stringify({ phase: "pipeline-done", outDir, status: result.status }), { mode: 0o600 });
   return formatResult(result);
 }

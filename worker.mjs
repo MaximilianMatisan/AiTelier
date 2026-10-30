@@ -132,7 +132,11 @@ while (true) {
         }
         if (state.phase === "completed") await reply(t);
       } catch (e) {
-        console.error("Task blocked", t.id, e.message.slice(0, 200));
+        // A refund is a decision the agent made, not a failure to work: say so,
+        // or it disappears into the same line as a crash.
+        if (e?.refund)
+          console.error("Refund due, no result submitted", t.id, e.message.slice(0, 300));
+        else console.error("Task blocked", t.id, e.message.slice(0, 200));
       }
     }
   } catch (e) {

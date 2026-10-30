@@ -1,9 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { pipelineAnswer, formatResult } from "./logic/lead-agent.mjs";
+import { pipelineAnswer, formatResult, failedGuarantees } from "./logic/lead-agent.mjs";
 import { TEMPLATE } from "./logic/intake.mjs";
 
 const order = JSON.stringify({ ...TEMPLATE, needed_by: undefined });
@@ -61,4 +61,46 @@ test("a result without markdown still names outfits, links and the reason", () =
   assert.match(text, /REFUND/);
   assert.match(text, /Coat \(B\), size M, 99 EUR: https:\/\/x/);
   assert.match(text, /not in stock/);
+});
+
+test("a REFUND is not submitted, so the escrow can return the money", async (t) => {
+  // Submitting a result is what moves the escrow towards paying us. An agent
+  // that submits a REFUND charges for work it has just declared unfit.
+  const id = "lead-refund";
+  t.after(() => cleanup(id));
+  const error = await pipelineAnswer(order, journalFor(id), undefined, {
+    run: async () => {
+      const dir = path.join("catalog", "cache", "run", id, "person3");
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(
+        path.join(dir, "result.json"),
+        JSON.stringify({
+          status: "REFUND",
+          guarantees: {
+            budget: { ok: false, detail: "341.90 EUR <= 300.00 EUR" },
+            fit: { ok: true, detail: "sizes compatible" },
+            availability: { ok: false, detail: "no outfit passed" },
+          },
+          markdown: "# looks",
+        }),
+      );
+      return true;
+    },
+  }).then(() => null, (e) => e);
+  assert.ok(error, "a REFUND must not resolve with a result");
+  assert.equal(error.refund, true, "callers tell a refund apart from a crash by this flag");
+  assert.deepEqual(error.failed, [
+    "budget: 341.90 EUR <= 300.00 EUR",
+    "availability: no outfit passed",
+  ]);
+  const journal = JSON.parse(readFileSync(journalFor(id), "utf8"));
+  assert.equal(journal.phase, "refund", "the refusal is recorded, not lost in a crash log");
+});
+
+test("failedGuarantees names only the checks that did not hold", () => {
+  const named = failedGuarantees({
+    guarantees: { budget: { ok: true }, fit: { ok: false, detail: "size M gone" }, delivery: { ok: false } },
+  });
+  assert.deepEqual(named, ["fit: size M gone", "delivery: failed"]);
+  assert.deepEqual(failedGuarantees({}), []);
 });
