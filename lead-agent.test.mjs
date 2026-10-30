@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { pipelineAnswer, formatResult, failedGuarantees } from "./logic/lead-agent.mjs";
+import { pipelineAnswer, formatResult, failedGuarantees, embedImages } from "./logic/lead-agent.mjs";
 import { TEMPLATE } from "./logic/intake.mjs";
 
 const order = JSON.stringify({ ...TEMPLATE, needed_by: undefined });
@@ -95,6 +95,30 @@ test("a REFUND is not submitted, so the escrow can return the money", async (t) 
   ]);
   const journal = JSON.parse(readFileSync(journalFor(id), "utf8"));
   assert.equal(journal.phase, "refund", "the refusal is recorded, not lost in a crash log");
+});
+
+test("images are embedded, so the customer's viewer loads nothing from a server", async (t) => {
+  const dir = path.join(tmpdir(), "embed-test");
+  mkdirSync(path.join(dir, "task"), { recursive: true });
+  writeFileSync(path.join(dir, "task", "look-1-board.jpg"), "board");
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const markdown = [
+    "![Look board](http://127.0.0.1:21951/artifacts/task/look-1-board.jpg)",
+    "![Shop photo](https://cdn.example/shoe.jpg)",
+    "![Gone](http://127.0.0.1:21951/artifacts/task/missing.jpg)",
+  ].join("\n");
+  const shrink = (files) => files.map((f) => Buffer.from(readFileSync(f)).toString("base64"));
+  const fetchImpl = async () => new Response("photo");
+  const out = await embedImages(markdown, { artifactDir: dir, workDir: dir, shrink, fetchImpl });
+  assert.equal(
+    out,
+    [
+      `![Look board](data:image/jpeg;base64,${Buffer.from("board").toString("base64")})`,
+      `![Shop photo](data:image/jpeg;base64,${Buffer.from("photo").toString("base64")})`,
+      "_Gone_",
+    ].join("\n"),
+  );
+  assert.doesNotMatch(out, /https?:\/\//, "no image address is left for the viewer to load");
 });
 
 test("failedGuarantees names only the checks that did not hold", () => {

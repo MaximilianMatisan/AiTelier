@@ -15,7 +15,7 @@
 // be charging for work it has just declared unfit. Without a submitted result
 // `submitResultTime` lapses and the buyer gets their money back, which is the
 // promise the product is sold on.
-import { spawn } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
 import { existsSync, openSync, closeSync, writeFileSync } from "node:fs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
@@ -73,6 +73,74 @@ export function failedGuarantees(result) {
     .map(([name, check]) => `${name}: ${check?.detail ?? "failed"}`);
 }
 
+// Embedded images are shrunk to this width so a result with several boards stays
+// small enough to submit; Person 3 renders boards at 1200 px.
+const EMBED_WIDTH = 600;
+const SHRINK = `
+import base64, io, json, sys
+from PIL import Image
+out = []
+for path in sys.argv[2:]:
+    try:
+        img = Image.open(path).convert("RGB")
+        width = int(sys.argv[1])
+        if img.width > width:
+            img = img.resize((width, round(img.height * width / img.width)))
+        buf = io.BytesIO()
+        img.save(buf, "JPEG", quality=72, optimize=True)
+        out.append(base64.b64encode(buf.getvalue()).decode())
+    except Exception:
+        out.append(None)
+print(json.dumps(out))
+`;
+
+/** Base64 JPEGs for the given files, shrunk with Person 3's Pillow; null where one fails. */
+function shrinkWithPillow(files) {
+  const python = process.env.PYTHON ?? (existsSync(path.join(ROOT, VENV_PYTHON)) ? path.join(ROOT, VENV_PYTHON) : "python3");
+  const run = spawnSync(python, ["-c", SHRINK, String(EMBED_WIDTH), ...files], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  if (run.status !== 0) return files.map(() => null);
+  return JSON.parse(run.stdout);
+}
+
+/**
+ * Puts every image in the markdown inside it as a data: URI, so the customer's
+ * viewer loads nothing from another server. Person 3's boards come from its own
+ * artifact folder; any other http(s) image is fetched once here. An image that
+ * cannot be embedded is replaced by its caption rather than left as a link.
+ */
+export async function embedImages(markdown, { artifactDir = path.join(ROOT, "person3", "artifacts"), workDir, shrink = shrinkWithPillow, fetchImpl = fetch } = {}) {
+  const refs = [...markdown.matchAll(/!\[([^\]]*)\]\(([^)\s]+)\)/g)].filter(([, , url]) => !url.startsWith("data:"));
+  if (!refs.length) return markdown;
+  const files = [];
+  for (const [, , url] of refs) {
+    const local = url.match(/\/artifacts\/([\w./-]+)$/)?.[1];
+    if (local && !local.includes("..")) {
+      const file = path.join(artifactDir, local);
+      files.push(existsSync(file) ? file : null);
+      continue;
+    }
+    try {
+      if (!/^https?:\/\//.test(url) || !workDir) throw new Error("not fetchable");
+      const response = await fetchImpl(url, { signal: AbortSignal.timeout(10_000) });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const file = path.join(workDir, `embed-${files.length}`);
+      await writeFile(file, Buffer.from(await response.arrayBuffer()));
+      files.push(file);
+    } catch {
+      files.push(null);
+    }
+  }
+  const present = files.filter(Boolean);
+  const encoded = present.length ? shrink(present) : [];
+  const byFile = new Map(present.map((file, i) => [file, encoded[i]]));
+  let i = 0;
+  return markdown.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (whole, alt, url) => {
+    if (url.startsWith("data:")) return whole;
+    const data = byFile.get(files[i++]);
+    return data ? `![${alt}](data:image/jpeg;base64,${data})` : `_${alt || "image unavailable"}_`;
+  });
+}
+
 /** Person 3's own markdown when present, otherwise a plain summary. */
 export function formatResult(result) {
   if (typeof result?.markdown === "string" && result.markdown.trim()) return result.markdown;
@@ -125,5 +193,5 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     throw new GuaranteesFailed(failed, outDir);
   }
   writeFileSync(journal, JSON.stringify({ phase: "pipeline-done", outDir, status: result.status }), { mode: 0o600 });
-  return formatResult(result);
+  return embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
 }
