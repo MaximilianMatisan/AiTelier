@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { publishPage, prepare, pagesConfig } from "./logic/publish.mjs";
 
-const env = { CLOUDFLARE_API_TOKEN: "t", CLOUDFLARE_ACCOUNT_ID: "a", AITELIER_PAGES_PROJECT: "aitelier-results" };
+const env = { CLOUDFLARE_ACCOUNT_ID: "a", AITELIER_PAGES_PROJECT: "aitelier-results" };
 
 function setup(t) {
   const base = path.join(tmpdir(), `publish-${process.pid}-${Math.random().toString(36).slice(2)}`);
@@ -30,7 +30,7 @@ test("a page gets an unguessable address that survives a retry", async (t) => {
   const { runsDir, siteDir } = setup(t);
   const opts = { env, runsDir, siteDir, deploy: async () => ({ ok: true }), check: async () => true };
   const url = await publishPage(path.join(runsDir, "task-a"), opts);
-  assert.match(url, /^https:\/\/aitelier-results\.pages\.dev\/r\/[A-Za-z0-9_-]{32}\.html$/);
+  assert.match(url, /^https:\/\/aitelier-results\.pages\.dev\/r\/[A-Za-z0-9_-]{32}$/);
   assert.doesNotMatch(url, /task-a/, "the address does not reveal the task");
   assert.equal(await publishPage(path.join(runsDir, "task-a"), opts), url);
 });
@@ -44,6 +44,7 @@ test("every deploy carries all pages published before, so none disappear", async
   assert.equal(pages.length, 2);
   for (const page of pages) assert.match(readFileSync(path.join(siteDir, "r", page), "utf8"), /noindex/);
   assert.match(readFileSync(path.join(siteDir, "_headers"), "utf8"), /X-Robots-Tag: noindex/);
+  assert.match(readFileSync(path.join(siteDir, "404.html"), "utf8"), /Not found/, "unknown addresses are 404, not the start page");
 });
 
 test("a failed deploy or an unreachable page gives no link, never an error", async (t) => {

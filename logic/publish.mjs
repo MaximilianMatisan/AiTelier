@@ -2,10 +2,12 @@
 // Cloudflare Pages, so the customer can open the whole page from Sokosumi,
 // which only renders text and links.
 //
-//   CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID   set in .env; without them nothing is published
+//   CLOUDFLARE_ACCOUNT_ID       set in .env; without it nothing is published
+//   CLOUDFLARE_API_TOKEN        optional: without it wrangler uses `wrangler login`
+//                               (stored in the macOS Keychain, Pages-only scopes)
 //   AITELIER_PAGES_PROJECT                        the Pages project, default aitelier-results
 //
-// Each page gets an unguessable address, /r/<random>.html, and is marked
+// Each page gets an unguessable address, /r/<random>, and is marked
 // noindex. A Pages deployment replaces the whole site, so every deploy
 // rebuilds the site from all runs published before (catalog/cache/run/*/
 // published.json); a cleared .local/ then loses nothing.
@@ -21,13 +23,14 @@ const log = logger("publish");
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RUNS = path.join(ROOT, "catalog", "cache", "run");
 const SITE = path.join(ROOT, ".local", "pages");
-const WRANGLER = path.join(ROOT, "node_modules", ".bin", "wrangler");
+// Run with this Node, not whatever `node` is first on PATH: wrangler needs Node 22+.
+const WRANGLER = path.join(ROOT, "node_modules", "wrangler", "bin", "wrangler.js");
 
 /** Whether publishing is set up; the reason when it is not. */
 export function pagesConfig(env = process.env) {
   const project = env.AITELIER_PAGES_PROJECT?.trim() || "aitelier-results";
-  if (!env.CLOUDFLARE_API_TOKEN?.trim() || !env.CLOUDFLARE_ACCOUNT_ID?.trim())
-    return { ok: false, reason: "CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID are not set" };
+  if (!env.CLOUDFLARE_ACCOUNT_ID?.trim())
+    return { ok: false, reason: "CLOUDFLARE_ACCOUNT_ID is not set" };
   if (!/^[a-z0-9-]{1,58}$/.test(project)) return { ok: false, reason: "AITELIER_PAGES_PROJECT is not a valid project name" };
   return { ok: true, project };
 }
@@ -44,6 +47,8 @@ async function buildSite(runsDir = RUNS, siteDir = SITE) {
   await mkdir(path.join(siteDir, "r"), { recursive: true });
   await writeFile(path.join(siteDir, "_headers"), "/*\n  X-Robots-Tag: noindex, nofollow\n  Referrer-Policy: no-referrer\n");
   await writeFile(path.join(siteDir, "index.html"), '<!doctype html><meta name="robots" content="noindex"><title>AiTelier</title><p>AiTelier</p>\n');
+  // Without a 404 page Pages answers every unknown address with index.html and 200.
+  await writeFile(path.join(siteDir, "404.html"), '<!doctype html><meta name="robots" content="noindex"><title>Not found</title><p>Not found</p>\n');
   let pages = 0;
   for (const run of existsSync(runsDir) ? readdirSync(runsDir) : []) {
     const record = path.join(runsDir, run, "published.json");
@@ -61,9 +66,9 @@ function wranglerDeploy(project, siteDir = SITE) {
   if (!existsSync(WRANGLER)) return Promise.resolve({ ok: false, output: "wrangler is not installed: npm install" });
   return new Promise((resolve) => {
     const child = spawn(
-      WRANGLER,
-      ["pages", "deploy", siteDir, "--project-name", project, "--branch", "main", "--commit-dirty=true"],
-      { cwd: ROOT, env: process.env, stdio: ["ignore", "pipe", "pipe"] },
+      process.execPath,
+      [WRANGLER, "pages", "deploy", siteDir, "--project-name", project, "--branch", "main", "--commit-dirty=true"],
+      { cwd: ROOT, env: { ...process.env, WRANGLER_SEND_METRICS: "false" }, stdio: ["ignore", "pipe", "pipe"] },
     );
     let output = "";
     child.stdout.on("data", (d) => (output += d));
@@ -122,7 +127,8 @@ export async function publishPage(outDir, { env = process.env, deploy = wrangler
       log.error("page deploy failed", { output: result.output.trim().split("\n").slice(-3).join(" | ") });
       return null;
     }
-    const url = `https://${config.project}.pages.dev/r/${slug}.html`;
+    // Pages serves r/<slug>.html at r/<slug>; linking the .html form costs a redirect.
+    const url = `https://${config.project}.pages.dev/r/${slug}`;
     if (!(await check(url))) {
       log.error("page deployed but not reachable", { run: path.basename(dir) });
       return null;
