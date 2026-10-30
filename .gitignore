@@ -15,3 +15,4 @@ person3/.pytest_cache/
 testsperson3/
 trustCache/
 catalog/cache/run/
+person3/.venv/

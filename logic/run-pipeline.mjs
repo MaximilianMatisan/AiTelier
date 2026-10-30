@@ -4,6 +4,11 @@
 //   node logic/run-pipeline.mjs
 //   node logic/run-pipeline.mjs --order catalog/order.json --out catalog/cache/run
 //   PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs
+//   node logic/run-pipeline.mjs --shortlist catalog/cache/shortlist.demo.json
+//
+// --shortlist skips the model-backed filter and uses a prepared shortlist.
+// The provider behind the filter returned Service Unavailable and Too Many
+// Requests repeatedly, so the demo needs a path that does not depend on it.
 //
 // Person 1 owns the catalogue and this wiring. Person 2 owns candidateFilter,
 // Person 3 owns the stylist. Each stage is a separate process on purpose: a
@@ -15,7 +20,11 @@ import path from "node:path";
 import { readOrder, refusal } from "./intake.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PYTHON = process.env.PYTHON ?? "python3";
+
+// The stylist stage runs with cwd=person3, so a relative interpreter path has
+// to be resolved against the repo root first or it lands in person3/person3.
+const rawPython = process.env.PYTHON ?? "python3";
+const PYTHON = rawPython.includes(path.sep) ? path.resolve(ROOT, rawPython) : rawPython;
 
 const flag = (name, fallback) => {
   const i = process.argv.indexOf(name);
@@ -122,7 +131,8 @@ async function main() {
   }
   for (const w of intake.warnings) console.log(`warning: ${w}`);
   const order = intake.order;
-  const shortlist = path.join(outDir, "shortlist.json");
+  const prepared = flag("--shortlist", null);
+  const shortlist = prepared ?? path.join(outDir, "shortlist.json");
   const envelope = path.join(outDir, "person3.input.json");
   const customer = path.join(outDir, "customer.json");
   const resultDir = path.join(outDir, "person3");
@@ -134,15 +144,21 @@ async function main() {
   const ok =
     (await stage(
       "1/4 candidateFilter (Person 2)",
-      "Needs ZAI_API_KEY, ZAI_BASE_URL and ZAI_MODEL in .env.",
-      () =>
-        run("node", [
+      "Needs ZAI_API_KEY, ZAI_BASE_URL and ZAI_MODEL in .env. If the provider\n" +
+        "is down, rerun with --shortlist catalog/cache/shortlist.demo.json.",
+      async () => {
+        if (prepared) {
+          console.log(`skipped, using the prepared shortlist ${prepared}`);
+          return { ok: true };
+        }
+        return run("node", [
           "--env-file-if-exists=.env",
           "candidateFilter.mjs",
           "--user-info", orderToBrief(order),
           "--in", "catalog/cache/products.json",
           "--out", shortlist,
-        ])
+        ]);
+      }
     )) &&
     (await stage(
       "2/4 to_person3 (Person 1)",
