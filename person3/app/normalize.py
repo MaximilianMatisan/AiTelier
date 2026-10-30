@@ -369,21 +369,30 @@ def _parse_shipping(
     return None
 
 
-def classify_slot(category: str, explicit: str | None = None) -> str:
+def classify_slot(
+    category: str,
+    explicit: str | None = None,
+    title: str = "",
+    description: str = "",
+    style: dict[str, Any] | None = None,
+) -> str:
     if explicit and str(explicit).lower() in ALLOWED_LAYERS:
         return str(explicit).lower()
-    text = str(category).lower()
+    tags = " ".join(str(v) for v in (style or {}).get("style_tags", []))
+    text = " ".join((str(category), str(title), tags)).lower()
     rules = [
-        ("outer", ("coat", "jacket", "trench", "parka", "mantel", "overcoat", "blazer")),
-        ("mid", ("sweater", "pullover", "knit", "cardigan", "hoodie", "sweatshirt")),
-        ("base", ("t-shirt", "tshirt", "tee", "shirt", "blouse", "top", "polo", "henley")),
+        ("outer", ("outerwear", "coat", "jacket", "trench", "parka", "mantel", "overcoat", "blazer", "abrigo")),
+        ("mid", ("sweater", "pullover", "knit", "cardigan", "hoodie", "sweatshirt", "jumper")),
+        ("base", ("t-shirt", "tshirt", "tee", "shirt", "blouse", "polo", "henley")),
         ("bottom", ("trouser", "pant", "chino", "jean", "skirt", "short", "hose")),
-        ("shoes", ("boot", "sneaker", "loafer", "shoe", "schuh", "derby", "oxford")),
+        ("shoes", ("boot", "sneaker", "loafer", "shoe", "schuh", "derby", "oxford", "sandal", "flip flop", "flip-flop", "slipper", "trainer", "clog", "mule")),
         ("accessory", ("belt", "bag", "scarf", "hat", "watch", "tie", "cap")),
     ]
     for slot, needles in rules:
         if any(needle in text for needle in needles):
             return slot
+    if "top" in str(category).lower():
+        return "base"
     return "other"
 
 
@@ -627,7 +636,13 @@ def normalize_request(raw: dict[str, Any], settings: Settings) -> StylistRequest
         fit_description = raw_item.get("fit_description")
         if not fit_description and isinstance(style.get("fit"), str):
             fit_description = style["fit"]
-        slot = classify_slot(category, raw_item.get("layer") or raw_item.get("slot"))
+        slot = classify_slot(
+            category,
+            raw_item.get("layer") or raw_item.get("slot"),
+            title=title,
+            description=description,
+            style=style,
+        )
         sizes = _parse_item_sizes(raw_item.get("sizes"))
         availability = _parse_availability(
             raw_item.get("availability", raw_item.get("available")),

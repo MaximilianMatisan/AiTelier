@@ -69,3 +69,18 @@ def test_invalid_budget_is_rejected(settings, raw_input):
     del raw["customer"]["budget"]
     with pytest.raises(ContractError):
         normalize_request(raw, settings)
+
+
+def test_real_catalogue_titles_disambiguate_top_mid_and_shoes(settings, raw_input):
+    raw = deepcopy(raw_input)
+    raw["items"][0]["category"] = "top"
+    raw["items"][0]["title"] = "Rippstrick Pullover Style MANIKA"
+    raw["items"][1]["category"] = "top"
+    raw["items"][1]["title"] = "Long Sleeve T-Shirt"
+    raw["items"][2]["category"] = "top"
+    raw["items"][2]["title"] = "Top Senses Flip Flops"
+    request = normalize_request(raw, settings)
+    slots = {item.item_id: item.slot for item in request.items}
+    assert slots["base-oxford"] == "mid"
+    assert slots["base-check"] == "base"
+    assert slots["mid-merino"] == "shoes"

@@ -137,7 +137,9 @@ Failure outcome:
 
 The board is a deterministic Pillow composition of the **garment product images themselves**.
 
-- No person, face, model, or mannequin body is drawn.
+- No person, face, model, or mannequin body is drawn by the service.
+- Source images are shop product images; some shops photograph garments on a model, and those
+  images are used as-is.
 - Garments are arranged in layer order and connected to a thin central spine.
 - Each panel has layer, brand, title, and price labels.
 - The number of panels follows the season: 3 in summer, 4 in mild weather, 5 in winter.

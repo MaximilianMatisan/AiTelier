@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 from typing import Any
 
@@ -61,10 +62,16 @@ class GeminiClient:
             "Content-Type": "application/json",
         }
         with httpx.Client(timeout=self.settings.request_timeout_seconds) as client:
-            response = client.post(self.url, headers=headers, json=payload)
-            if response.status_code == 400 and json_mode:
-                payload.pop("response_format", None)
+            response = None
+            for attempt in range(3):
                 response = client.post(self.url, headers=headers, json=payload)
+                if response.status_code == 400 and json_mode:
+                    payload.pop("response_format", None)
+                    response = client.post(self.url, headers=headers, json=payload)
+                if response.status_code < 500 and response.status_code != 429:
+                    break
+                time.sleep(1.5 * (attempt + 1))
+            assert response is not None
             response.raise_for_status()
             data = response.json()
         message = data["choices"][0]["message"]["content"]
@@ -130,11 +137,15 @@ def _mock_selection(request: StylistRequest) -> OutfitSelection:
         chosen: list[SelectedItem] = []
         used: set[str] = set()
         for layer_index, layer in enumerate(request.required_layers):
-            candidates = grouped.get(layer, [])
+            candidates = [
+                item
+                for item in grouped.get(layer, [])
+                if item.item_id not in used and _has_customer_size(item, request, layer)
+            ]
             if candidates:
                 offset = (index + layer_index) % len(candidates)
                 candidates = candidates[offset:] + candidates[:offset]
-            candidate = next((item for item in candidates if item.item_id not in used), None)
+            candidate = candidates[0] if candidates else None
             if candidate is None:
                 continue
             size = _pick_size(candidate, request, layer)
@@ -164,11 +175,23 @@ def _mock_selection(request: StylistRequest) -> OutfitSelection:
     return OutfitSelection(outfits=outfits)
 
 
+def _has_customer_size(item: Item, request: StylistRequest, layer: str) -> bool:
+    preferred = request.customer.sizes.get(layer) or request.customer.sizes.get(item.slot)
+    if not preferred or not item.sizes:
+        return True
+    return any(
+        size.label.lower() == preferred.lower() and size.in_stock is not False
+        for size in item.sizes
+    )
+
+
 def _pick_size(item: Item, request: StylistRequest, layer: str) -> str | None:
     preferred = request.customer.sizes.get(layer) or request.customer.sizes.get(item.slot)
     available = [size.label for size in item.sizes if size.in_stock is not False]
     if preferred and (not item.sizes or preferred in available):
         return preferred
+    if preferred and item.sizes:
+        return None
     if available:
         return available[0]
     if len(item.sizes) == 1:

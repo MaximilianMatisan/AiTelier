@@ -9,11 +9,11 @@ from ..config import Settings
 from ..models import Item, StylistRequest
 
 
-def live_check(item: Item, settings: Settings) -> dict[str, Any]:
+def live_check(item: Item, settings: Settings, shop=None) -> dict[str, Any]:
     if settings.live_check_mode == "stale":
-        return _snapshot(item, stale=True)
+        return _snapshot(item, stale=True, shop=shop)
     if settings.live_check_mode == "snapshot" or not settings.person1_refresh_url:
-        return _snapshot(item, stale=False)
+        return _snapshot(item, stale=False, shop=shop)
     try:
         with httpx.Client(timeout=20.0) as client:
             response = client.post(
@@ -39,17 +39,28 @@ def live_check(item: Item, settings: Settings) -> dict[str, Any]:
             return value
     except (httpx.HTTPError, ValueError):
         pass
-    return _snapshot(item, stale=True)
+    return _snapshot(item, stale=True, shop=shop)
 
 
-def _snapshot(item: Item, stale: bool) -> dict[str, Any]:
+def _snapshot(item: Item, stale: bool, shop=None) -> dict[str, Any]:
+    shipping = item.shipping
+    if not shipping and shop is not None and isinstance(shop.shipping, dict):
+        amount = shop.shipping.get("default_amount", shop.shipping.get("amount"))
+        if amount is not None:
+            shipping = {
+                "amount": amount,
+                "currency": shop.shipping.get("currency", item.price.currency),
+                "regions": shop.shipping.get("regions", []),
+                "days": shop.shipping.get("max_days") or shop.shipping.get("min_days"),
+                "estimated": shop.shipping.get("estimated", False),
+            }
     return {
         "item_id": item.item_id,
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "price": {"amount": item.price.amount, "currency": item.price.currency},
         "availability": item.availability,
         "sizes_in_stock": [size.label for size in item.sizes if size.in_stock is not False],
-        "shipping": item.shipping,
+        "shipping": shipping,
         "product_url": item.product_url,
         "stale": stale,
         "source": "snapshot",

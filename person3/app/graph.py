@@ -54,8 +54,9 @@ def _final_check(state: StylistState) -> StylistState:
     request = state["request"]
     settings = state["settings"]
     live: dict[str, dict[str, Any]] = {}
+    shops = {shop.shop_id: shop for shop in request.shops}
     for item in request.items:
-        live[item.item_id] = live_check(item, settings)
+        live[item.item_id] = live_check(item, settings, shops.get(item.shop_id))
     approved: list[dict[str, Any]] = []
     rejected: list[dict[str, Any]] = []
     feedback: list[str] = []
@@ -251,7 +252,13 @@ def build_graph():
 _GRAPH = build_graph()
 
 
-def run_style(raw: dict[str, Any], settings: Settings | None = None) -> dict[str, Any]:
+def run_style_debug(
+    raw: dict[str, Any],
+    settings: Settings | None = None,
+) -> dict[str, Any]:
     settings = settings or Settings.from_env()
-    state = _GRAPH.invoke({"raw": raw, "settings": settings})
-    return state["result"]
+    return _GRAPH.invoke({"raw": raw, "settings": settings})
+
+
+def run_style(raw: dict[str, Any], settings: Settings | None = None) -> dict[str, Any]:
+    return run_style_debug(raw, settings)["result"]

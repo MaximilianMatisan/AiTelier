@@ -18,25 +18,20 @@ LAYER_LABELS = {
 
 
 def _size_for_item(item: Item, requested: str | None, request: StylistRequest, layer: str) -> str:
-    if requested:
-        matching = next((size for size in item.sizes if size.label.lower() == requested.lower()), None)
-        if matching and matching.in_stock is False:
-            raise ValueError(f"{item.item_id}: size {requested} is not in stock")
-        if item.sizes and not matching:
-            raise ValueError(f"{item.item_id}: size {requested} is not offered")
-        return requested
-    preferred = request.customer.sizes.get(layer) or request.customer.sizes.get(item.slot)
+    customer_size = request.customer.sizes.get(layer) or request.customer.sizes.get(item.slot)
+    preferred = customer_size or requested
     if preferred:
         matching = next((size for size in item.sizes if size.label.lower() == preferred.lower()), None)
-        if not item.sizes or (matching and matching.in_stock is not False):
-            return preferred
+        if item.sizes and not matching:
+            raise ValueError(f"{item.item_id}: customer size {preferred} is not offered")
+        if matching and matching.in_stock is False:
+            raise ValueError(f"{item.item_id}: size {preferred} is not in stock")
+        return preferred
     available = [size.label for size in item.sizes if size.in_stock is not False]
     if available:
         return available[0]
     if len(item.sizes) == 1:
         return item.sizes[0].label
-    if preferred:
-        return preferred
     raise ValueError(f"{item.item_id}: no usable size")
 
 

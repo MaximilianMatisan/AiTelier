@@ -1,0 +1,32 @@
+{
+  "task_id": "aitelier-catalog-demo",
+  "currency": "EUR",
+  "customer": {
+    "budget": {"amount": 800, "currency": "EUR"},
+    "item_count": 5,
+    "outfit_count": 2,
+    "style": ["old money", "streetwear", "casual", "minimal", "heritage"],
+    "fit": ["regular", "straight"],
+    "fit_description": "Relaxed but clean; straight leg and no oversized shoulders.",
+    "gender": "men",
+    "season": "winter",
+    "climate": "Munich, cold and wet",
+    "sizes": {
+      "base": "M",
+      "mid": "M",
+      "outer": "M",
+      "bottom": "32",
+      "shoes": "43"
+    },
+    "must_have": ["water-resistant outer layer"],
+    "avoid": ["neon", "large logos"],
+    "deadline": "2030-12-31",
+    "photo": null
+  },
+  "options": {
+    "strict_guarantees": true,
+    "fit_mode": "size_only",
+    "max_selection_retries": 1,
+    "country": "DE"
+  }
+}

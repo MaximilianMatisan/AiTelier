@@ -61,6 +61,18 @@ def test_budget_fails(settings, raw_input):
     assert result["checks"]["budget"]["ok"] is False
 
 
+def test_snapshot_uses_shop_shipping_when_item_shipping_is_missing(settings, raw_input):
+    raw = deepcopy(raw_input)
+    for item in raw["items"]:
+        item.pop("shipping", None)
+    request = normalize_request(raw, settings)
+    item = next(item for item in request.items if item.item_id == "base-oxford")
+    shop = next(shop for shop in request.shops if shop.shop_id == item.shop_id)
+    live = live_check(item, settings, shop)
+    assert live["shipping"]["amount"] == 4.9
+    assert live["shipping"]["regions"] == ["DE"]
+
+
 def test_delivery_region_fails(settings, raw_input):
     request, outfit = _outfit(settings, raw_input)
     live = {item.item_id: live_check(item, settings) for item in request.items}

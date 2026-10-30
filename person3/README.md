@@ -14,7 +14,8 @@ Python/FastAPI/LangGraph service. It runs only in Podman for the project workflo
 6. Builds an A2UI v0.9.1 gallery with layer tabs and product links.
 7. Returns JSON, A2UI messages, and a Markdown fallback.
 
-The board uses the garment product images themselves; no person or mannequin body is drawn.
+The board uses the shop-provided garment images; no person or mannequin body is drawn by the
+service. Some shop images themselves include a model.
 
 ## Build and run
 

@@ -30,8 +30,9 @@ guaranteed shops) and the customer result. It owns:
   - spring / autumn / mild or wet: base + mid + bottom + shoes
   - winter / cold / snow: base + mid + outer + bottom + shoes
   - accessory optional
-- Product images are garment product shots. The output board composes those images; it does not
-  draw a person or a mannequin body.
+- Product images are the shop-provided images. The output board composes those images; it does
+  not draw a person or a mannequin body. Some shop photography includes a model; the service
+  uses the source image as-is.
 
 ## Final checks
 
