@@ -1,8 +1,8 @@
 # AiTelier — capsule wardrobe agent on Sokosumi
 
 Built for the Cardano track of the TUM Blockchain & AI Hackathon (30–31 October 2026).
-A customer hires the agent on Sokosumi with a short order: budget, number of outfits, style,
-season and sizes. The agent answers with complete outfits made of **real, in-stock products from
+A customer hires the agent on Sokosumi with a short order in plain words or as JSON: budget,
+number of outfits, style, season and sizes. The agent answers with complete outfits made of **real, in-stock products from
 real EU shops**, each with its image, shop link, price and a reason for choosing it. Before an
 outfit is returned, the agent checks five guarantees on it.
 
@@ -16,46 +16,55 @@ holds.
 | Part | State |
 | --- | --- |
 | Sokosumi worker → pipeline | ✅ Every task, free or paid, runs through the pipeline |
-| Step 1 · read and check the order | ✅ `logic/intake.mjs` |
+| Step 1 · read and check the order | ✅ `logic/intake.mjs`; free text or JSON |
 | Step 2 · real shop catalogue | ✅ 8725 items, 36 Shopify shops, cached in `catalog/cache/` |
 | Step 3 · candidate filter | ✅ `candidateFilter.mjs` (LLM picks filters, code applies them) |
+| Step 3a · customer profile | ✅ `logic/run-pipeline.mjs`: drops garments marked for the other gender, maps a waist size to the letter size shops use when that reaches a cheaper item |
 | Step 3b · drop sizes the customer cannot buy | ✅ `logic/buyable.mjs` |
 | Step 4 · shop trust check | ⚠️ `trustcheck.mjs` works on its own, **not yet in the pipeline** |
-| Step 5 · stylist (LLM) | ✅ Person 3, `person3/` |
-| Step 6 · final check, five guarantees | ✅ Person 3; ⚠️ checks the cached snapshot by default, not the live shop |
-| Step 7 · result page | ⚠️ Markdown result on Sokosumi; no hosted page yet |
+| Step 5 · stylist (LLM) | ✅ Person 3, `person3/`; outfits that misuse shorts are rejected by code |
+| Step 6 · final check, five guarantees | ✅ Person 3; ⚠️ checks the cached snapshot unless the live re-check service runs |
+| Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; ⚠️ not hosted yet, Sokosumi gets Markdown |
+| Refund path | ✅ A `REFUND` result is not submitted, so the escrow returns the money |
+| Local studio UI | ✅ `npm run ui`: enter an order, watch the stages, see the looks |
 | Masumi payment (escrow, Preprod) | ⏳ Template code present, not set up; quote fixed at 1 test USDM |
 | Trust check as an x402 service | ⏳ Not started |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
-`npm test` passes (64 tests). The last measured end-to-end runs ended in `APPROVED` with a
-500 EUR budget and in `REFUND` with 300 EUR (see [Known limits](#known-limits)).
+`npm test` passes (142 tests, 2 of them marked todo); Person 3's `pytest` passes 30, skips 1.
+The last measured end-to-end runs ended in `APPROVED` with a 500 EUR budget and in `REFUND`
+with 300 EUR (see [Known limits](#known-limits)).
 
 ## How a task flows
 
 ```text
-Sokosumi Task (order as JSON)
+Sokosumi Task (order as free text or JSON)
   │
   ▼
 worker.mjs ── polls tasks, runtime start / complete, paid flow
   │
   ▼
 logic/lead-agent.mjs   pipelineAnswer(): same signature as client.mjs answer()
-  │  1  logic/intake.mjs        validate the order; refuse before anything runs
+  │  1  logic/intake.mjs        check a JSON order, or pass free text on; refuse before anything runs
   ▼
 logic/run-pipeline.mjs  one process per stage, output in catalog/cache/run/<task-id>/
-  │  2  candidateFilter.mjs     catalog/cache/products.json -> shortlist.json (≤100 items, ≤30 shops)
+  │  3  candidateFilter.mjs     catalog/cache/products.json -> shortlist.json (≤100 items, ≤30 shops)
+  │                             and selection.json (what the model read out of the brief)
   │     logic/data/to_person3.js shortlist -> Person 3 envelope
-  │  3  customer envelope        order -> customer.json
+  │  3a customer envelope        order or brief -> customer.json; drop the other gender, map sizes
   │  3b logic/buyable.mjs       keep only sizes the customer can buy
-  │  4  person3 scripts.run_catalog   stylist + final check -> person3/result.json
+  │  5  person3 scripts.run_catalog   stylist + final check (6) -> person3/result.json
+  │  7  logic/result-page.mjs   result.json -> index.html, the page the customer reads
   ▼
-Markdown result -> runtime complete -> Sokosumi
+APPROVED: Markdown result -> runtime complete -> Sokosumi
+REFUND:   nothing submitted -> submitResultTime lapses -> escrow refunds the buyer
 ```
 
 A refused order returns the reasons from step 1 and starts nothing. A pipeline that fails or
-overruns throws, so the paid flow never submits half a result. On the paid path the pipeline is
-stopped one minute before the escrow's `submitResultTime`.
+overruns throws, so the paid flow never submits half a result. A run whose guarantees do not
+hold throws `GuaranteesFailed`: the worker logs `Refund due, no result submitted` and the reason
+is kept in the task journal. On the paid path the pipeline is stopped one minute before the
+escrow's `submitResultTime`.
 
 ## Repository map
 
@@ -65,14 +74,16 @@ stopped one minute before the escrow's `submitResultTime`.
 | `paid-task.mjs`, `settlement.mjs`, `payment-registration.mjs`, `agent-api.mjs` | template | Masumi payment, registration and MIP-003 API |
 | `logic/lead-agent.mjs` | lead agent | Connects a Sokosumi task to the pipeline |
 | `logic/intake.mjs` | lead agent | Step 1: order format and checks |
-| `logic/run-pipeline.mjs` | Person 1 | Chains all stages |
-| `logic/data/` | Person 1 | Catalogue collector, normaliser, live refetch, Person 3 adapter |
+| `logic/run-pipeline.mjs` | Person 1 | Chains all stages; builds the customer profile |
+| `logic/result-page.mjs` | Person 1 | Step 7: one self-contained HTML result page per run |
+| `logic/data/` | Person 1 | Catalogue collector, normaliser, live refetch and its HTTP service, Person 3 adapter |
 | `catalog/` | Person 1 | Shop seed, cached catalogue, demo order and shortlist — see [catalog/README.md](catalog/README.md) |
 | `candidateFilter.mjs` | Person 2 | Candidate filter |
 | `trustcheck.mjs` | Person 2 | Shop trust check (imprint, policies, domain, LLM verdict) |
 | `logic/buyable.mjs` | Person 2/3 | Drops unbuyable sizes before the stylist |
 | `person3/` | Person 3 | Python stylist and final check — see [person3/README.md](person3/README.md) |
 | `PERSON3_*.md` | Person 3 | Input and output contracts, global context |
+| `ui/` | — | Local studio page: order form, stage progress, A2UI result |
 | `agent/instructions.md` | — | Instructions for the plain-LLM fallback |
 
 ## Setup
@@ -86,7 +97,11 @@ chmod 600 .env
 ```
 
 In `.env`, set `ZAI_API_KEY`, `ZAI_BASE_URL`, `ZAI_MODEL` (and `ZAI_MODEL_PROVIDER_NAME`) for
-your OpenAI-compatible model. The filter, the trust check and the stylist all use it.
+your OpenAI-compatible model; the filter and the trust check use it. Give the stylist its own
+key in `GEMINI_API_KEY` (`GEMINI_BASE_URL` and `GEMINI_MODEL` fall back to the `ZAI_` values).
+Without it the stylist falls back to `ZAI_API_KEY`, both steps share one quota, and a single run
+can make both fail with 429. `run-pipeline.mjs` prints which key each step uses and warns when
+they are the same.
 
 Set up Person 3's Python environment once:
 
@@ -119,12 +134,41 @@ Keep `PAID_TASKS_ENABLED=false` until payments are set up.
 PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs --order catalog/order.json --out catalog/cache/run
 ```
 
-The result is in `catalog/cache/run/person3/result.json`. When the filter's model provider is
-down or rate-limited, skip the filter with the prepared shortlist:
+The result is in `catalog/cache/run/person3/result.json`, the page the customer reads in
+`catalog/cache/run/index.html`. When the filter's model provider is down or rate-limited, skip
+the filter with the prepared shortlist:
 
 ```sh
 PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs --order catalog/order.json --out catalog/cache/run --shortlist catalog/cache/shortlist.demo.json
 ```
+
+To rebuild the result page from a finished run:
+
+```sh
+node logic/result-page.mjs --run catalog/cache/run
+```
+
+### Live re-checks in step 6
+
+By default the final check decides stock and price on the cached catalogue. To re-query the
+shops instead, start the refresh service and point Person 3 at it:
+
+```sh
+node logic/data/refresh-service.mjs --port 8787
+```
+
+```sh
+PERSON1_REFRESH_URL=http://127.0.0.1:8787/refresh LIVE_CHECK_MODE=live PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs --order catalog/order.json --out catalog/cache/run
+```
+
+### The studio UI
+
+```sh
+npm run ui
+```
+
+Opens on <http://127.0.0.1:21960> (`AITELIER_UI_PORT` changes it). It checks the order with
+step 1, runs the pipeline, shows each stage and renders the looks. One run at a time.
 
 ### As a Sokosumi Coworker
 
@@ -140,7 +184,13 @@ Terminal 2, the worker. Run only one worker per Coworker:
 npm run worker
 ```
 
-Terminal 3, create a task. The description must contain the order as a JSON object:
+Terminal 3, create a task. The description is the order, in plain words:
+
+```sh
+sokosumi --preprod tasks create --personal --coworker-id YOUR_COWORKER_ID --status READY --json --description 'Two autumn outfits, old money style, budget 500 EUR, men, top M, waist 32, shoes EU 43.'
+```
+
+or as JSON, which step 1 checks field by field:
 
 ```sh
 sokosumi --preprod tasks create --personal --coworker-id YOUR_COWORKER_ID --status READY --json --description '{"budget_eur": 500, "outfits": 2, "theme": "old_money", "season": "autumn", "sizes": {"top": "M", "waist": "32", "shoe_eu": "43"}, "fit": "slim", "gender": "men", "climate": "Munich, wet, 8-15 C"}'
@@ -153,6 +203,7 @@ Worker switches:
 | `AITELIER_PIPELINE=false` | Answer with the plain LLM instead of the pipeline |
 | `AITELIER_SHORTLIST=catalog/cache/shortlist.demo.json` | Skip the model-backed filter |
 | `PYTHON=…` | Use another interpreter for Person 3 |
+| `AITELIER_DEFAULT_BUDGET_EUR=500` | Budget assumed when a free-text order names none |
 
 Each run writes its order, intermediate files and `pipeline.log` to
 `catalog/cache/run/<task-id>/` (git-ignored).
@@ -160,7 +211,6 @@ Each run writes its order, intermediate files and `pipeline.log` to
 ### Trust check for a single shop
 
 ```sh
-mkdir -p trustCache
 node trustcheck.mjs https://www.knowledgecottonapparel.com
 ```
 
@@ -168,8 +218,16 @@ Results are cached for 24 hours in `trustCache/<host>.json`.
 
 ## The order format
 
-Step 1 reads the first JSON object in the task description. [`catalog/order.json`](catalog/order.json)
-is a complete example.
+A task description is either free text or contains a JSON object.
+
+**Free text** (at most 4000 characters) goes to the candidate filter as written. The filter
+reads style, season, sizes and budget out of it. Sizes the customer wrote out ("waist 32",
+"shoes EU 43") win over the filter's reading, and a size is only assigned when it is
+unambiguous. Without a budget in the text, `AITELIER_DEFAULT_BUDGET_EUR` (500) is used and the
+run log says so. Only an empty description is refused.
+
+**JSON**: step 1 reads the first JSON object and checks every field below before anything runs.
+[`catalog/order.json`](catalog/order.json) is a complete example.
 
 | Field | Required | Rule |
 | --- | --- | --- |
@@ -185,8 +243,8 @@ is a complete example.
 | `climate` | no | Short text |
 | `owned`, `avoid` | no | Short text lists |
 
-A theme the catalogue cannot serve is refused here, so the customer is not charged for a
-guaranteed refund later.
+In a JSON order, a theme the catalogue cannot serve is refused here, so the customer is not
+charged for a guaranteed refund later.
 
 ## The five guarantees
 
@@ -198,7 +256,14 @@ Checked by Person 3 after the stylist picks:
 4. **Price integrity** — the price has not changed since collection.
 5. **Delivery** — the shop delivers to the customer's region before `needed_by`.
 
-If no outfit passes, the result recommends a refund. Nothing is executed.
+Before that, code rejects outfits built around shorts that do not belong together: shorts
+outside summer, or shorts with a polo, a warm or long-sleeve top, a jacket or dress shoes
+(`person3/app/services/combinations.py`). Other combination and colour rules are in the
+stylist prompt only.
+
+If no outfit passes, the result is `REFUND` and nothing is bought. On Sokosumi the agent then
+submits no result, so `submitResultTime` lapses and the escrow returns the buyer's money. The
+result page says nothing was charged and shows no cart.
 
 ## Tests
 
@@ -216,10 +281,13 @@ cd person3 && .venv/bin/pytest -q
 
 - **Budget refunds.** With 300 EUR, the demo order ends in `REFUND` because both looks cost
   more than 300 EUR. With 500 EUR it ends in `APPROVED`.
-- **Two size systems for bottoms.** 761 bottoms use letter sizes, 709 use waist sizes. A
-  waist-32 customer loses most of the letter-sized bottoms.
-- **Final check uses the snapshot.** `LIVE_CHECK_MODE` defaults to `snapshot`. Set it to
-  `person1` with `PERSON1_REFRESH_URL` for live re-checks.
+- **Two size systems for bottoms.** 894 bottoms use waist sizes, 713 letter sizes. Step 3a
+  maps a waist size to its letter size when that reaches a cheaper trouser, and logs each swap.
+  The mapping (`WAIST_TO_LETTER` in `logic/data/normalize.js`) is an inference and varies by
+  brand.
+- **Gender is read from shop data.** Tags, vendor and title decide; items marked for the other
+  gender are dropped. About 40% of the catalogue says nothing and is kept.
+- **Final check uses the snapshot by default.** See [Live re-checks in step 6](#live-re-checks-in-step-6).
 - **Cart links cannot be verified by a script.** Shops answer 403 on `/cart/`; availability is
   proven by the live product refetch instead. See [catalog/README.md](catalog/README.md).
 - **Themes are keyword heuristics.** Only `casual`, `old_money` and `streetwear` exist; punk,
@@ -231,9 +299,11 @@ cd person3 && .venv/bin/pytest -q
 
 1. Put the trust check into the pipeline (cached per shop), then offer it as an x402 service.
 2. Set up Masumi payments on Preprod and complete one paid task with a transaction hash.
-3. Turn on live re-checks in step 6.
-4. Publish a result page per task and link it in the Sokosumi result.
+3. Turn on live re-checks in step 6 for paid tasks.
+4. Host the result page per task and link it in the Sokosumi result.
 5. Accept a photo URL and give a per-item reason in the report.
+6. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to the
+   wardrobe.
 
 ## Security
 
