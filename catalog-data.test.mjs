@@ -394,6 +394,46 @@ test("one cart link per shop, not per item", async () => {
   assert.equal(links[1].url, "https://two.example/cart/33:1");
 });
 
+test("each outfit is its own set: every piece with picture, link and price, and its total", async () => {
+  const { renderPage } = await import("./logic/result-page.mjs");
+  const piece = (id, layer, amount) => ({ item_id: id, title: `T-${id}`, brand: "B", layer, layer_label: layer,
+    size: "M", price: { amount, currency: "EUR" }, product_url: `https://s/${id}`, image_url: `https://s/${id}.jpg` });
+  const html = renderPage({
+    result: {
+      status: "APPROVED",
+      guarantees: { budget: { ok: true, detail: "ok" }, fit: { ok: true, detail: "ok" } },
+      outfits: [
+        { name: "First", items: [piece("a", "base", 10), piece("b", "shoes", 20)],
+          totals: { items: 30, shipping: 5, grand_total: 35, currency: "EUR" } },
+        { name: "Second", items: [piece("c", "base", 40)],
+          totals: { items: 40, shipping: 5, grand_total: 45, currency: "EUR" } },
+      ],
+    },
+    envelope: { items: [], shops: [] },
+    live: {},
+  });
+  assert.equal(html.match(/<section class="set"/g).length, 2);
+  assert.match(html, /href="#set-2"/, "the index jumps to every set");
+  assert.match(html, /Set 2 of 2/);
+  for (const id of ["a", "b", "c"]) {
+    assert.match(html, new RegExp(`class="card" href="https://s/${id}"`), `piece ${id} links to its shop`);
+    assert.match(html, new RegExp(`src="https://s/${id}.jpg"`), `piece ${id} shows its picture`);
+  }
+  assert.match(html, /2 layers · 35\.00 EUR/);
+  assert.match(html, /All 2 guarantees held/);
+});
+
+test("a failed guarantee is shown open, not folded away", async () => {
+  const { renderPage } = await import("./logic/result-page.mjs");
+  const html = renderPage({
+    result: { status: "REFUND", guarantees: { budget: { ok: false, detail: "over" }, fit: { ok: true } }, outfits: [] },
+    envelope: { items: [], shops: [] },
+    live: {},
+  });
+  assert.match(html, /<details class="checked" open>/);
+  assert.match(html, /1 of 2 guarantees failed/);
+});
+
 test("a REFUND page says nothing was charged and offers no cart", async () => {
   const { renderPage } = await import("./logic/result-page.mjs");
   const html = renderPage({

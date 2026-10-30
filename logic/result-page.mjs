@@ -3,11 +3,12 @@
 //   node logic/result-page.mjs --run catalog/cache/run
 //   node logic/result-page.mjs --run catalog/cache/run --out /tmp/result.html
 //
-// Its job is not to look pretty. The customer is about to let money go, or has
-// just had it returned, and the page has to show why: what was chosen, what it
-// costs with shipping, and for each of the five guarantees what was actually
-// checked and when. The live-check timestamps are the point - they are the
-// difference between a promise and a claim.
+// The customer is about to let money go, or has just had it returned, and the
+// page has to show why: what was chosen, what it costs with shipping, and for
+// each of the five guarantees what was actually checked and when. The
+// live-check timestamps are the point - they are the difference between a
+// promise and a claim. Each outfit is one set in a gallery: its pieces hang
+// off one line like Person 3's look board, and the facts and links sit below.
 //
 // One self-contained file, no build step and no external assets beyond the
 // shops' own product images, so it can be hosted anywhere or opened offline.
@@ -81,65 +82,93 @@ function guaranteeRows(result, live) {
         name === "availability" || name === "price_integrity"
           ? `<div class="ev">${liveCount} of ${checked.length} items re-queried at the shop, last at ${esc(clock(latest))}</div>`
           : "";
-      return `<tr class="${check?.ok ? "ok" : "no"}">
-        <td class="mark">${check?.ok ? "✓" : "✕"}</td>
-        <td><strong>${esc(GUARANTEE_LABEL[name] ?? name)}</strong>
-          <div class="detail">${esc(check?.detail ?? "")}</div>${evidence}</td>
-      </tr>`;
+      return `<li class="${check?.ok ? "ok" : "no"}">
+        <span class="mark">${check?.ok ? "✓" : "✕"}</span>
+        <strong>${esc(GUARANTEE_LABEL[name] ?? name)}</strong>
+        <div class="detail">${esc(check?.detail ?? "")}</div>${evidence}
+      </li>`;
     })
     .join("");
 }
 
-function itemRow(item, byItem, shops, live) {
+/** One garment on the set's spine: the picture, what it is, what it costs. */
+function itemCard(item, index) {
+  const image = item.image_url;
+  return `<li class="piece ${index % 2 ? "right" : "left"}">
+      <a class="card" href="${esc(item.product_url)}" target="_blank" rel="noopener noreferrer">
+        <div class="pic">${image ? `<img src="${esc(image)}" alt="${esc(item.title)}" loading="lazy">` : ""}</div>
+        <div class="cap">
+          <div class="tag">${esc(item.layer_label ?? item.layer ?? "")} · ${esc(item.brand ?? "")}</div>
+          <div class="name"><span>${esc(item.title)}</span><span class="amt">${esc(money(item.price?.amount, item.price?.currency))}</span></div>
+        </div>
+      </a>
+    </li>`;
+}
+
+/** The facts under a set: shop, size and the live check for every piece. */
+function itemDetail(item, byItem, shops, live) {
   const source = byItem.get(item.item_id);
   const shop = shops.get(source?.shop_id);
   const record = live[item.item_id];
   const fresh = record?.stale === false;
-  const image = item.image_url ?? source?.images?.[0]?.url;
-  return `<li class="item">
-    ${image ? `<img src="${esc(image)}" alt="" loading="lazy">` : `<div class="noimg"></div>`}
-    <div class="who">
-      <div class="layer">${esc(item.layer_label ?? item.layer ?? "")}</div>
-      <a class="title" href="${esc(item.product_url)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a>
-      <div class="meta">${esc(item.brand ?? "")} · ${esc(shop?.name ?? source?.shop_id ?? "")} · size ${esc(item.size)}</div>
-      <div class="${fresh ? "fresh" : "stale"}">${
-        fresh
-          ? `checked at the shop ${esc(clock(record.checked_at))} · ${esc(record.availability)}`
-          : "not confirmed live"
-      }</div>
-    </div>
-    <div class="price">${esc(money(item.price?.amount, item.price?.currency))}</div>
-  </li>`;
+  return `<li>
+      <div class="row">
+        <span class="layer">${esc(item.layer_label ?? item.layer ?? "")}</span>
+        <a href="${esc(item.product_url)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a>
+        <span class="amt">${esc(money(item.price?.amount, item.price?.currency))}</span>
+      </div>
+      <div class="meta">${esc(item.brand ?? "")} · ${esc(shop?.name ?? source?.shop_id ?? "")} · size ${esc(item.size)}
+        · <span class="${fresh ? "fresh" : "stale"}">${
+          fresh
+            ? `checked at the shop ${esc(clock(record.checked_at))} · ${esc(record.availability)}`
+            : "not confirmed live"
+        }</span></div>
+    </li>`;
 }
 
 export function renderPage({ result, envelope, live }) {
   const byItem = new Map((envelope.items ?? []).map((i) => [i.item_id, i]));
   const shops = new Map((envelope.shops ?? []).map((s) => [s.shop_id, s]));
   const approved = result.status === "APPROVED";
+  const checks = Object.values(result.guarantees ?? {});
+  const held = checks.filter((check) => check?.ok).length;
+  const looks = result.outfits ?? [];
+  // Item cards fall back to the catalogue's first image when Person 3 gave none.
+  const withImage = (item) => ({ ...item, image_url: item.image_url ?? byItem.get(item.item_id)?.images?.[0]?.url });
 
-  const outfits = (result.outfits ?? [])
-    .map((outfit) => {
+  const sets = looks
+    .map((outfit, n) => {
       const t = outfit.totals ?? {};
+      const items = (outfit.items ?? []).map(withImage);
       const carts = cartLinks(outfit, byItem, shops);
-      return `<section class="outfit">
-        <h2>${esc(outfit.name ?? "Outfit")}</h2>
-        ${outfit.rationale ? `<p class="why">${esc(outfit.rationale)}</p>` : ""}
-        <ul class="items">${(outfit.items ?? []).map((i) => itemRow(i, byItem, shops, live)).join("")}</ul>
-        <table class="sum">
-          <tr><td>Items</td><td>${esc(money(t.items, t.currency))}</td></tr>
-          <tr><td>Shipping <span class="est">estimated</span></td><td>${esc(money(t.shipping, t.currency))}</td></tr>
-          <tr class="grand"><td>Total</td><td>${esc(money(t.grand_total, t.currency))}</td></tr>
-        </table>
-        ${
-          carts.length
-            ? `<div class="carts">${carts
-                .map(
-                  (c) =>
-                    `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">Add ${c.count} to cart · ${esc(c.shop)}</a>`,
-                )
-                .join("")}</div>`
-            : ""
-        }
+      const id = `set-${n + 1}`;
+      return `<section class="set" id="${id}">
+        <header class="set-head">
+          <div class="count">Set ${n + 1} of ${looks.length}</div>
+          <h2>${esc(outfit.name ?? "Outfit")}</h2>
+          <div class="set-sub">${esc((outfit.style_blend ?? result.style_blend ?? []).join(", "))}</div>
+          <div class="set-sub">${items.length} layers · ${esc(money(t.grand_total, t.currency))}</div>
+        </header>
+        <ol class="spine">${items.map(itemCard).join("")}</ol>
+        <div class="below">
+          ${outfit.rationale ? `<p class="why">${esc(outfit.rationale)}</p>` : ""}
+          <ul class="details">${items.map((i) => itemDetail(i, byItem, shops, live)).join("")}</ul>
+          <table class="sum">
+            <tr><td>Items</td><td>${esc(money(t.items, t.currency))}</td></tr>
+            <tr><td>Shipping <span class="est">estimated</span></td><td>${esc(money(t.shipping, t.currency))}</td></tr>
+            <tr class="grand"><td>Total</td><td>${esc(money(t.grand_total, t.currency))}</td></tr>
+          </table>
+          ${
+            carts.length
+              ? `<div class="carts">${carts
+                  .map(
+                    (c) =>
+                      `<a href="${esc(c.url)}" target="_blank" rel="noopener noreferrer">Add ${c.count} to cart · ${esc(c.shop)}</a>`,
+                  )
+                  .join("")}</div>`
+              : ""
+          }
+        </div>
       </section>`;
     })
     .join("");
@@ -152,68 +181,124 @@ export function renderPage({ result, envelope, live }) {
       </section>`
     : "";
 
+  const index =
+    looks.length > 1
+      ? `<nav class="index">${looks.map((_, n) => `<a href="#set-${n + 1}">Set ${n + 1}</a>`).join("")}</nav>`
+      : "";
+
   return `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AiTelier — ${esc(result.status ?? "result")}</title>
 <style>
-  :root { color-scheme: light dark; --ink:#1a1a1a; --soft:#595959; --line:#e2e2e2; --bg:#ffffff;
-          --ok:#067429; --okbg:#eaf9ef; --no:#bd0a0a; --nobg:#fff0f0; }
-  @media (prefers-color-scheme: dark) { :root { --ink:#f2f2f2; --soft:#a8a8a8; --line:#333; --bg:#131313;
-          --okbg:#10291a; --nobg:#2a1313; --ok:#5ad68a; --no:#ff8a8a; } }
+  :root { color-scheme: light dark; --bg:#f5f0e8; --card:#ffffff; --cap:#f3ede4; --ink:#2b2622; --soft:#7a6f65;
+          --line:#c8bcae; --dot:#8a7e72; --ok:#3f6b45; --no:#a2392f; --nobg:#f6e3df; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#191613; --card:#23201c; --cap:#2b2723; --ink:#efe8de;
+          --soft:#a99d90; --line:#4a423a; --dot:#8a7e72; --ok:#8fbf8f; --no:#e48b80; --nobg:#33201d; } }
   * { box-sizing:border-box }
   body { margin:0; background:var(--bg); color:var(--ink);
-         font:16px/1.55 ui-sans-serif,system-ui,"Noto Sans",Arial,sans-serif; }
-  .wrap { max-width:820px; margin:0 auto; padding:40px 16px 80px }
-  header { border-bottom:1px solid var(--line); padding-bottom:24px; margin-bottom:32px }
-  h1 { font-size:30px; margin:0 0 8px }
-  .status { display:inline-block; padding:4px 12px; border-radius:999px; font-weight:700; font-size:14px;
-            background:var(--okbg); color:var(--ok) }
-  .status.no { background:var(--nobg); color:var(--no) }
-  .sub { color:var(--soft); font-size:14px; margin-top:10px }
-  h2 { font-size:20px; margin:0 0 6px }
-  table.g { width:100%; border-collapse:collapse; margin-bottom:36px }
-  table.g td { border-bottom:1px solid var(--line); padding:12px 8px; vertical-align:top }
-  td.mark { width:28px; font-weight:700; color:var(--ok) }
-  tr.no td.mark { color:var(--no) }
-  .detail, .ev { color:var(--soft); font-size:13px; margin-top:2px }
+         font:15px/1.55 "Helvetica Neue",ui-sans-serif,system-ui,Arial,sans-serif; font-weight:300 }
+  a { color:inherit }
+  .wrap { max-width:1000px; margin:0 auto; padding:48px 16px 96px }
+  .top { margin-bottom:56px }
+  .brand { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft) }
+  .status { margin-left:10px; font-size:11px; letter-spacing:.14em; padding:3px 10px; border:1px solid var(--ok);
+            border-radius:999px; color:var(--ok); vertical-align:2px }
+  .status.no { border-color:var(--no); color:var(--no) }
+  .sub { color:var(--soft); font-size:13px; margin-top:10px }
+  .sub code { font-size:12px }
+  .index { display:flex; flex-wrap:wrap; gap:20px; margin-top:22px; font-size:13px; letter-spacing:.06em }
+  .index a { text-decoration:none; color:var(--soft); border-bottom:1px solid var(--line); padding-bottom:2px }
+  .index a:hover { color:var(--ink) }
+  h2 { font-size:clamp(28px,5vw,40px); font-weight:400; letter-spacing:-.01em; line-height:1.15; margin:4px 0 6px }
+  h3 { font-size:13px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 14px }
+  .checked { margin:0 0 64px; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
+  .checked summary { display:flex; gap:16px; align-items:baseline; padding:14px 0; cursor:pointer; list-style:none; font-size:13px }
+  .checked summary::-webkit-details-marker { display:none }
+  .checked summary::after { content:"+"; margin-left:auto; color:var(--soft) }
+  .checked[open] summary::after { content:"−" }
+  .checked h3 { margin:0 }
+  .checks { list-style:none; margin:0; padding:0; border-top:1px solid var(--line) }
+  .checks li:last-child { border-bottom:0 }
+  .checks li { display:grid; grid-template-columns:22px 1fr; gap:4px 10px; padding:12px 0; border-bottom:1px solid var(--line) }
+  .checks .mark { color:var(--ok) } .checks li.no .mark { color:var(--no) }
+  .checks strong { font-weight:500 }
+  .detail, .ev { grid-column:2; color:var(--soft); font-size:13px }
   .ev { color:var(--ok) }
-  .outfit { border:1px solid var(--line); border-radius:12px; padding:20px; margin-bottom:28px }
-  .why { color:var(--soft); font-size:14px; margin:0 0 16px }
-  ul.items { list-style:none; margin:0; padding:0 }
-  li.item { display:flex; gap:14px; align-items:flex-start; padding:12px 0; border-top:1px solid var(--line) }
-  li.item img, .noimg { width:72px; height:92px; object-fit:cover; border-radius:6px; background:var(--line); flex:none }
-  .who { flex:1; min-width:0 }
-  .layer { font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--soft) }
-  a.title { color:var(--ink); font-weight:600; text-decoration:none }
-  a.title:hover { text-decoration:underline }
-  .meta { color:var(--soft); font-size:13px }
-  .fresh { color:var(--ok); font-size:12px; margin-top:3px }
-  .stale { color:var(--no); font-size:12px; margin-top:3px }
-  .price { font-variant-numeric:tabular-nums; white-space:nowrap }
-  table.sum { width:100%; margin-top:16px; border-collapse:collapse; font-variant-numeric:tabular-nums }
+  .set { padding:24px 0 88px; scroll-margin-top:16px }
+  .set + .set { border-top:1px solid var(--line); padding-top:72px }
+  .count { font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--soft) }
+  .set-sub { color:var(--soft); font-size:clamp(16px,2.2vw,20px) }
+  /* The spine: one vertical line, each piece hangs off it, left and right in turn. */
+  ol.spine { position:relative; list-style:none; margin:36px 0 0; padding:0 }
+  ol.spine::before { content:""; position:absolute; top:0; bottom:0; left:50%; width:2px; margin-left:-1px; background:var(--line) }
+  .piece { position:relative; width:calc(50% - 56px); margin-bottom:-40px }
+  .piece:last-child { margin-bottom:0 }
+  .piece.right { margin-left:auto }
+  .piece::before { content:""; position:absolute; top:50%; height:2px; width:56px; background:var(--line) }
+  .piece.left::before { right:-56px } .piece.right::before { left:-56px }
+  .piece::after { content:""; position:absolute; top:50%; width:13px; height:13px; margin-top:-5.5px; border-radius:50%; background:var(--dot) }
+  .piece.left::after { right:-62.5px } .piece.right::after { left:-62.5px }
+  .card { display:block; text-decoration:none; background:var(--card); border:2px solid var(--line); border-radius:12px;
+          overflow:hidden; transition:transform .2s ease, border-color .2s ease }
+  .card:hover { transform:translateY(-2px); border-color:var(--dot) }
+  .pic { background:#fff; height:240px; display:flex; align-items:center; justify-content:center; padding:8px }
+  .pic img { max-width:100%; max-height:100%; object-fit:contain }
+  .cap { background:var(--cap); padding:10px 14px 9px }
+  .tag { font-size:13px; letter-spacing:.06em; text-transform:uppercase; font-weight:400 }
+  .name { display:flex; gap:10px; justify-content:space-between; font-size:12px; color:var(--soft) }
+  .name span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
+  .amt { font-variant-numeric:tabular-nums; white-space:nowrap }
+  .below { max-width:640px; margin:72px auto 0 }
+  .why { margin:0 0 28px; font-size:15px }
+  ul.details { list-style:none; margin:0; padding:0; border-top:1px solid var(--line) }
+  ul.details li { padding:12px 0; border-bottom:1px solid var(--line) }
+  .row { display:flex; gap:12px; align-items:baseline }
+  .row a { flex:1; min-width:0; text-decoration:none; font-weight:400 }
+  .row a:hover { text-decoration:underline }
+  .layer { width:64px; flex:none; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--soft) }
+  .meta { color:var(--soft); font-size:12px; margin-left:76px }
+  .fresh { color:var(--ok) } .stale { color:var(--no) }
+  table.sum { width:100%; margin-top:18px; border-collapse:collapse; font-variant-numeric:tabular-nums }
   table.sum td { padding:4px 0 } table.sum td:last-child { text-align:right }
-  tr.grand td { border-top:1px solid var(--line); padding-top:8px; font-weight:700 }
+  tr.grand td { border-top:1px solid var(--line); padding-top:10px; font-weight:500; font-size:17px }
   .est { color:var(--soft); font-size:11px }
-  .carts { display:flex; flex-wrap:wrap; gap:8px; margin-top:16px }
-  .carts a { border:1px solid var(--line); border-radius:999px; padding:7px 14px; font-size:13px;
-             text-decoration:none; color:var(--ink) }
-  .refused { border:1px solid var(--no); background:var(--nobg); border-radius:12px; padding:20px; margin-bottom:28px }
-  footer { border-top:1px solid var(--line); margin-top:40px; padding-top:20px; color:var(--soft); font-size:13px }
+  .carts { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px }
+  .carts a { background:var(--ink); color:var(--bg); border-radius:999px; padding:9px 18px; font-size:13px;
+             text-decoration:none; letter-spacing:.02em }
+  .carts a:hover { opacity:.85 }
+  .refused { border:1px solid var(--no); background:var(--nobg); border-radius:12px; padding:22px; margin-bottom:56px }
+  .refused h2 { font-size:24px }
+  footer { border-top:1px solid var(--line); margin-top:24px; padding-top:22px; color:var(--soft); font-size:13px }
+  footer ul { padding-left:18px }
   footer li { margin-bottom:6px }
+  @media (max-width:680px) {
+    ol.spine::before { left:6px }
+    .piece, .piece.right { width:auto; margin:0 0 20px 34px }
+    .piece::before, .piece.left::before, .piece.right::before { left:-28px; right:auto; width:28px }
+    .piece::after, .piece.left::after, .piece.right::after { left:-34.5px; right:auto }
+    .pic { height:200px }
+    .below { margin-top:40px }
+    .meta { margin-left:0 }
+  }
+  @media (prefers-reduced-motion:reduce) { .card { transition:none } .card:hover { transform:none } }
 </style>
 <div class="wrap">
-<header>
-  <h1>AiTelier</h1>
-  <span class="status ${approved ? "" : "no"}">${esc(result.status ?? "UNKNOWN")}</span>
+<header class="top">
+  <span class="brand">AiTelier</span><span class="status ${approved ? "" : "no"}">${esc(result.status ?? "UNKNOWN")}</span>
   <div class="sub">Style: ${esc((result.style_blend ?? []).join(", ") || "—")} · Budget: ${esc(result.budget_label ?? "—")} · Task <code>${esc(result.task_id ?? "")}</code></div>
+  ${index}
 </header>
 
-<h2>What was checked</h2>
-<table class="g">${guaranteeRows(result, live)}</table>
+<details class="checked"${held === checks.length ? "" : " open"}>
+  <summary><h3>What was checked</h3><span class="${held === checks.length ? "fresh" : "stale"}">${
+    held === checks.length ? `All ${checks.length} guarantees held` : `${checks.length - held} of ${checks.length} guarantees failed`
+  }</span></summary>
+  <ul class="checks">${guaranteeRows(result, live)}</ul>
+</details>
 
 ${refused}
-${outfits}
+${sets}
 
 <footer>
   <strong>What these numbers rest on</strong>
