@@ -17,3 +17,8 @@ trustCache/
 catalog/cache/run/
 person3/.venv/
 person3/*.egg-info/
+
+# Local, per-machine files
+.DS_Store
+.idea/
+.claude/launch.json
