@@ -22,6 +22,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { readOrder, refusal } from "./intake.mjs";
 import { logger } from "../log.mjs";
+import { publishPage } from "./publish.mjs";
 const log = logger("lead-agent");
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -158,7 +159,7 @@ export function formatResult(result) {
   return lines.join("\n").trim();
 }
 
-export async function pipelineAnswer(input, journal, deadline, { run = runPipeline } = {}) {
+export async function pipelineAnswer(input, journal, deadline, { run = runPipeline, publish = publishPage } = {}) {
   const intake = readOrder(input);
   if (!intake.ok) {
     log.warn("order refused", { errors: intake.errors.length, first: intake.errors[0] });
@@ -209,7 +210,10 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     throw new GuaranteesFailed(failed, outDir);
   }
   writeFileSync(journal, JSON.stringify({ phase: "pipeline-done", outDir, status: result.status }), { mode: 0o600 });
-  const text = await embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
+  let text = await embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
+  // Sokosumi renders text and links only, so the full page goes up as a link.
+  const page = await publish(outDir);
+  if (page) text = `**Your AiTelier page:** [open the full result with every check](${page})\n\n${text}`;
   log.info("pipeline done", {
     task: taskId,
     status: result.status,
@@ -217,6 +221,7 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     seconds: Math.round((Date.now() - started) / 1000),
     resultKb: Math.round(text.length / 1024),
     images: (text.match(/\]\(data:image/g) ?? []).length,
+    page: page ? "published" : "none",
   });
   return text;
 }
