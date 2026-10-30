@@ -15,11 +15,32 @@ export const NOT_APPAREL = [
 
 export const CATEGORY_KEYWORDS = {
   // order matters: first match wins, so the more specific groups come first
-  shoes: ["loafer", "sneaker", "trainer", "shoe", "schuh", "boot", "stiefel", "derby", "brogue", "mocassin", "sandal"],
-  outer: ["coat", "mantel", "jacket", "jacke", "blazer", "parka", "anorak", "trench", "overcoat", "puffer"],
+  shoes: ["loafer", "sneaker", "trainer", "shoe", "schuh", "boot", "stiefel", "derby", "brogue", "mocassin", "sandal", "flip flop", "espadrille"],
+  outer: ["coat", "mantel", "jacket", "jacke", "blazer", "parka", "anorak", "trench", "overcoat", "puffer", "abrigo"],
   bottom: ["trouser", "hose", "chino", "jeans", "pant", "short", "skirt", "rock", "denim"],
-  top: ["shirt", "hemd", "oxford", "polo", "sweater", "pullover", "knit", "strick", "cardigan", "t-shirt", "tee", "roll-neck", "turtleneck", "jumper", "hoodie", "sweat", "top", "blouse", "vest"],
+  top: ["shirt", "hemd", "oxford", "polo", "sweater", "pullover", "knit", "strick", "cardigan", "t-shirt", "tee", "roll-neck", "turtleneck", "jumper", "hoodie", "sweat", "top", "blouse", "vest", "sleeve"],
 };
+
+/**
+ * Keywords that must appear as whole words. Most match as substrings so German
+ * compounds still work ("Strickpullover" -> strick), but these are short enough
+ * to collide inside unrelated words and did: "short" matched the tag
+ * "style:Shortsleeves" and turned 600+ t-shirts into trousers, "boot" matched
+ * "Jeans Boot Cut", and "top" matched the brand name in "Top Senses Flip Flops".
+ */
+const WHOLE_WORD_ONLY = new Set(["short", "top", "boot", "rock", "tee", "cap"]);
+
+/** Phrases that decide the category outright, ahead of the keyword groups. */
+const CATEGORY_PHRASES = [
+  [/boot[- ]?cut|bootleg/, "bottom"], // a trouser cut, not footwear
+];
+
+const matchers = new Map();
+function matches(text, word) {
+  if (!WHOLE_WORD_ONLY.has(word)) return text.includes(word);
+  if (!matchers.has(word)) matchers.set(word, new RegExp(`(?:^|[^a-z])${word}s?(?:[^a-z]|$)`));
+  return matchers.get(word).test(text);
+}
 
 export const THEME_KEYWORDS = {
   old_money: ["cashmere", "merino", "wool", "lambswool", "tweed", "oxford", "loafer", "cable", "chino", "blazer", "camel", "polo", "cardigan", "corduroy", "flannel", "herringbone", "knit", "trench", "pleated", "tailored", "linen", "suede", "mohair"],
@@ -55,41 +76,53 @@ export function normalizeSize(raw) {
   return s.toUpperCase();
 }
 
-/** Category may use tags: they carry useful "Category:Oberteile" style hints. */
-function categoryText(product) {
-  const tags = Array.isArray(product.tags)
-    ? product.tags
-    : String(product.tags ?? "").split(",");
-  return [product.title, product.product_type, ...tags].join(" ").toLowerCase();
-}
-
 /**
- * Themes and seasons must NOT use tags. Shops mix customs and logistics junk in
- * there - asphaltgold tags every jersey tee "knitted or crocheted" (HS code),
- * which made Nike t-shirts read as old_money.
+ * What the shop itself calls the product. Themes and seasons use only this -
+ * shops mix customs and logistics junk into tags, and asphaltgold tags every
+ * jersey tee "knitted or crocheted" (an HS code), which made Nike t-shirts read
+ * as old_money.
  */
 function styleText(product) {
   return [product.title, product.product_type].join(" ").toLowerCase();
 }
 
-export function categoryOf(text) {
-  if (NOT_APPAREL.some((w) => text.includes(w))) return null;
-  for (const [category, words] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (words.some((w) => text.includes(w))) return category;
+/** Tags, as a fallback for category only: they carry "Category:Oberteile" hints. */
+function tagText(product) {
+  const tags = Array.isArray(product.tags)
+    ? product.tags
+    : String(product.tags ?? "").split(",");
+  return tags.join(" ").toLowerCase();
+}
+
+/**
+ * Tags are the last resort, as they are for themes. "Not Listening T-Shirt" has
+ * product_type "T-Shirts" and would classify correctly from that alone; it only
+ * went wrong because a tag was thrown into the same bag.
+ */
+export function categoryOf(primary, tagText = "") {
+  for (const text of [primary, tagText]) {
+    if (!text) continue;
+    if (NOT_APPAREL.some((w) => matches(text, w))) return null;
+    for (const [pattern, category] of CATEGORY_PHRASES) {
+      if (pattern.test(text)) return category;
+    }
+    for (const [category, words] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (words.some((w) => matches(text, w))) return category;
+    }
   }
   return null;
 }
 
 export function themesOf(text) {
   const themes = Object.entries(THEME_KEYWORDS)
-    .filter(([, words]) => words.some((w) => text.includes(w)))
+    .filter(([, words]) => words.some((w) => matches(text, w)))
     .map(([theme]) => theme);
   return themes.length ? themes : ["casual"];
 }
 
 export function seasonsOf(text) {
-  const cold = SEASON_KEYWORDS.cold.some((w) => text.includes(w));
-  const warm = SEASON_KEYWORDS.warm.some((w) => text.includes(w));
+  const cold = SEASON_KEYWORDS.cold.some((w) => matches(text, w));
+  const warm = SEASON_KEYWORDS.warm.some((w) => matches(text, w));
   if (cold && !warm) return ["autumn", "winter"];
   if (warm && !cold) return ["spring", "summer"];
   return [...ALL_SEASONS];
@@ -112,9 +145,9 @@ export function sizeIndexOf(options) {
  * in at least one size, so guarantee 2 can only fail on the customer's size.
  */
 export function normalizeProduct(product, shop, fetchedAt = new Date().toISOString()) {
-  const category = categoryOf(categoryText(product));
-  if (!category) return null;
   const style = styleText(product);
+  const category = categoryOf(style, tagText(product));
+  if (!category) return null;
 
   const idx = sizeIndexOf(product.options);
   const stock = {};

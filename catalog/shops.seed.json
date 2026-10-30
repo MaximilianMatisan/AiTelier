@@ -578,23 +578,6 @@
     }
   },
   {
-    "id": "ideight",
-    "name": "ID.EIGHT",
-    "domain": "www.id-eight.com",
-    "country": "IT",
-    "currency": "EUR",
-    "default_delivery_days": 5,
-    "products_json_ok": true,
-    "notes": "sneakers in EU sizes",
-    "shipping": {
-      "amount_eur": 12,
-      "ships_to": [
-        "DE"
-      ],
-      "estimated": true
-    }
-  },
-  {
     "id": "jlindeberg",
     "name": "J.Lindeberg",
     "domain": "www.jlindeberg.com",

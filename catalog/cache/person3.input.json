@@ -179,22 +179,6 @@
    }
   },
   {
-   "shop_id": "ideight",
-   "name": "ID.EIGHT",
-   "domain": "www.id-eight.com",
-   "base_url": "https://www.id-eight.com/",
-   "shipping": {
-    "default_amount": 12,
-    "currency": "EUR",
-    "regions": [
-     "DE"
-    ],
-    "min_days": 5,
-    "max_days": 5,
-    "estimated": true
-   }
-  },
-  {
    "shop_id": "jlindeberg",
    "name": "J.Lindeberg",
    "domain": "www.jlindeberg.com",
@@ -471,6 +455,22 @@
    "name": "Scalpers",
    "domain": "scalperscompany.com",
    "base_url": "https://scalperscompany.com/",
+   "shipping": {
+    "default_amount": 12,
+    "currency": "EUR",
+    "regions": [
+     "DE"
+    ],
+    "min_days": 5,
+    "max_days": 5,
+    "estimated": true
+   }
+  },
+  {
+   "shop_id": "silbon",
+   "name": "Silbon",
+   "domain": "silbonshop.com",
+   "base_url": "https://silbonshop.com/",
    "shipping": {
     "default_amount": 12,
     "currency": "EUR",
@@ -863,7 +863,7 @@
    "shop_id": "bravafabrics",
    "title": "Asis Percales Tigris Sweatshirt Blue",
    "brand": "Brava Fabrics",
-   "category": "bottom",
+   "category": "top",
    "description": "Regular fit long sleeve sweatshirt with graphic. It features a roud collar and raglan sleeves. The decorative detail on the sleeve hem adds a distinctive touch. Ethically made from organic cotton.",
    "style": {
     "style_tags": [
@@ -1336,112 +1336,12 @@
    }
   },
   {
-   "item_id": "ideight-15331016147274",
-   "shop_id": "ideight",
-   "title": "MARU STEEL GRAY",
-   "brand": "ID.EIGHT",
-   "category": "top",
-   "description": "Una palette di grigi definisce un look essenziale e contemporaneo, enfatizzato dal contrasto della freccia bianca e dal tallone nero. La tomaia in mesh traspirante, combinata ai dettagli metallici, conferisce alla silhouette un’identità sportiva e raffinata. Una versione versatile, perfetta per chi cerca uno stile dinamico con un tocco urbano. La suola superleggera aggiunge comfort e praticità, rendendola perfetta per l’uso quotidiano. È realizzata con poliestere riciclato idrorepellente, Uppeal e BioVeg. Il sottopiede antibatterico e antiodore assicura comfort e freschezza per tutto il giorno.",
-   "style": {
-    "style_tags": [
-     "casual"
-    ]
-   },
-   "size_system": "EU",
-   "sizes": [
-    {
-     "label": "36",
-     "in_stock": true
-    },
-    {
-     "label": "37",
-     "in_stock": true
-    },
-    {
-     "label": "38",
-     "in_stock": true
-    },
-    {
-     "label": "39",
-     "in_stock": true
-    },
-    {
-     "label": "40",
-     "in_stock": true
-    },
-    {
-     "label": "41",
-     "in_stock": true
-    },
-    {
-     "label": "42",
-     "in_stock": true
-    },
-    {
-     "label": "43",
-     "in_stock": true
-    },
-    {
-     "label": "44",
-     "in_stock": true
-    },
-    {
-     "label": "45",
-     "in_stock": true
-    },
-    {
-     "label": "46",
-     "in_stock": true
-    }
-   ],
-   "price": {
-    "amount": 199,
-    "currency": "EUR"
-   },
-   "availability": "in_stock",
-   "images": [
-    {
-     "url": "https://cdn.shopify.com/s/files/1/0930/6554/4010/files/MARU_Ver7_STEELGRAY_1.jpg?v=1765357444",
-     "role": "front"
-    }
-   ],
-   "product_url": "https://www.id-eight.com/products/maru-steel-gray",
-   "collected_at": "2026-10-30T12:25:37.164Z",
-   "source": {
-    "collector": "person1",
-    "method": "shop_json"
-   },
-   "raw": {
-    "variants": {
-     "36": 53560429707594,
-     "37": 53560429740362,
-     "38": 53560429773130,
-     "39": 53560429805898,
-     "40": 53560429838666,
-     "41": 53560429871434,
-     "42": 53560429904202,
-     "43": 53560429936970,
-     "44": 53560429969738,
-     "45": 53560430002506,
-     "46": 53560430035274
-    },
-    "stock_kind": "boolean",
-    "seasons": [
-     "spring",
-     "summer",
-     "autumn",
-     "winter"
-    ],
-    "delivery_days": 5
-   }
-  },
-  {
-   "item_id": "jlindeberg-15582110286150",
+   "item_id": "jlindeberg-15582047043910",
    "shop_id": "jlindeberg",
-   "title": "Dana Dress / JL Navy",
+   "title": "Enzo Sleeve / JL Navy",
    "brand": "FW2026, G",
-   "category": "bottom",
-   "description": "The Dana Dress is a women's flared golf skirtdress built from High Stretch Jersey with four-way stretch, moisture-wicking properties, and a soft handfeel that holds its shape through hours of play. An open V-neck with a classic collar frames the neckline cleanly, and the fitted bodice flows into a flared skirt that maintains a sharp, confident silhouette as you move. Built-in inner shorts keep everything in place through every rotation and reach, while two zipped side pockets carry what you need without added bulk. The fabric pulls moisture away from the skin and dries quickly, so rising temperatures stay out of the equation during a long Saturday round. The Bridge sits at the chest and center back, a composed signature on a dress that keeps performance and clean Swedish design working in the same direction.",
+   "category": "top",
+   "description": "The Enzo Sleeve is a lightweight men's golf sleeve built from Soft Compression™ fabric, a polyester-elastane blend with a super soft handfeel and a subtle sheen. UPF 40+ protection shields your arms through long hours on the course in open sun, while the stretch construction follows every rotation and moves through a full swing without pulling, riding up, or restricting arm speed. The compression fit sits close to the skin and stays in place without constant readjusting, making it easy to layer under a polo when the morning starts cool or pull on midway through the round as the sun gets stronger. The Bridge sits on the left sleeve and the J.LINDEBERG wordmark on the right, keeping the branding refined and quietly intentional. It pairs cleanly with any polo or tee and adds functional UV coverage without adding bulk.",
    "style": {
     "style_tags": [
      "casual"
@@ -1450,38 +1350,30 @@
    "size_system": "EU",
    "sizes": [
     {
-     "label": "L",
+     "label": "L-XL",
      "in_stock": true
     },
     {
-     "label": "M",
-     "in_stock": true
+     "label": "M-L",
+     "in_stock": false
     },
     {
-     "label": "S",
-     "in_stock": true
-    },
-    {
-     "label": "XL",
-     "in_stock": true
-    },
-    {
-     "label": "XS",
+     "label": "S-M",
      "in_stock": true
     }
    ],
    "price": {
-    "amount": 110,
+    "amount": 30,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/71b087244d4c2dfd358b8691722b5737_001.jpg?v=1780317845",
+     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/4e943d1b5ee5faaa477f4d47743263a9_001.jpg?v=1789048919",
      "role": "front"
     }
    ],
-   "product_url": "https://www.jlindeberg.com/products/dana-dress-jl-navy",
+   "product_url": "https://www.jlindeberg.com/products/enzo-sleeve-jl-navy-2",
    "collected_at": "2026-10-30T12:25:37.518Z",
    "source": {
     "collector": "person1",
@@ -1489,11 +1381,8 @@
    },
    "raw": {
     "variants": {
-     "L": 56688157491526,
-     "M": 56688157524294,
-     "S": 56688157557062,
-     "XL": 56688157589830,
-     "XS": 56688157622598
+     "L-XL": 56688041197894,
+     "S-M": 56688041263430
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -2216,12 +2105,12 @@
    }
   },
   {
-   "item_id": "organicbasics-14993487003980",
+   "item_id": "organicbasics-15091619856716",
    "shop_id": "organicbasics",
-   "title": "Core Shorty 6-Pack",
+   "title": "Core Straight Leg Pants",
    "brand": "Organic Basics",
    "category": "bottom",
-   "description": "A 6-pack of our mid-rise boy shorts made with soft and smooth organic cotton. Finished with an embossed elastic logo waistband.",
+   "description": "The pants you’ll want in your Core Collection of staples. Flattering, fitted, and lightweight, made with a comfortable, thicker fabric blend that’s perfect for dressing up or down.",
    "style": {
     "style_tags": [
      "casual"
@@ -2239,15 +2128,15 @@
     },
     {
      "label": "S",
-     "in_stock": false
+     "in_stock": true
     },
     {
      "label": "M",
-     "in_stock": false
+     "in_stock": true
     },
     {
      "label": "L",
-     "in_stock": false
+     "in_stock": true
     },
     {
      "label": "XL",
@@ -2260,20 +2149,24 @@
     {
      "label": "XXXL",
      "in_stock": true
+    },
+    {
+     "label": "XXXXL",
+     "in_stock": false
     }
    ],
    "price": {
-    "amount": 63,
+    "amount": 70,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_organic_basics-women-organic_cotton-core-shorty-seaweed-studio-1_1_5130e42b-a6d5-410c-b81e-e94bd233ad7f.jpg?v=1753701012",
+     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_ob-wonen-organic_cotton-core-straight_leg_pants-thunder-studio-1.jpg?v=1784812836",
      "role": "front"
     }
    ],
-   "product_url": "https://organicbasics.com/products/womens-core-shorty-6-pack-seaweed-seaweed-seaweed-seaweed-seaweed-seaweed",
+   "product_url": "https://organicbasics.com/products/womens-core-straight-leg-pants-thunder",
    "collected_at": "2026-10-30T12:25:25.457Z",
    "source": {
     "collector": "person1",
@@ -2281,16 +2174,21 @@
    },
    "raw": {
     "variants": {
-     "XXS": 53005320323404,
-     "XS": 53005320356172,
-     "XL": 53005320487244,
-     "XXL": 53005320520012,
-     "XXXL": 53005320552780
+     "XXS": 53377814888780,
+     "XS": 53377814921548,
+     "S": 53377814954316,
+     "M": 53377814987084,
+     "L": 53377815019852,
+     "XL": 53377815052620,
+     "XXL": 53377815085388,
+     "XXXL": 53377815118156
     },
     "stock_kind": "boolean",
     "seasons": [
      "spring",
-     "summer"
+     "summer",
+     "autumn",
+     "winter"
     ],
     "delivery_days": 3
    }
@@ -2756,6 +2654,86 @@
     "variants": {
      "XS": 51588780228935,
      "S": 51588780261703
+    },
+    "stock_kind": "boolean",
+    "seasons": [
+     "spring",
+     "summer",
+     "autumn",
+     "winter"
+    ],
+    "delivery_days": 5
+   }
+  },
+  {
+   "item_id": "silbon-15354437140857",
+   "shop_id": "silbon",
+   "title": "Pantalon traje principe de gales gris",
+   "brand": "false",
+   "category": "bottom",
+   "description": "Pantalón traje clásico príncipe de gales confeccionado en 100% lana. Presenta pinzas, cierre prolonga con botón personalizado y cremallera, bolsillos laterales y bolsillos insertados en trasero. Cuenta con ajustadores en cintura y bajo sin vuelta.",
+   "style": {
+    "style_tags": [
+     "casual"
+    ]
+   },
+   "size_system": "EU",
+   "sizes": [
+    {
+     "label": "38",
+     "in_stock": true
+    },
+    {
+     "label": "40",
+     "in_stock": true
+    },
+    {
+     "label": "42",
+     "in_stock": true
+    },
+    {
+     "label": "44",
+     "in_stock": true
+    },
+    {
+     "label": "46",
+     "in_stock": true
+    },
+    {
+     "label": "48",
+     "in_stock": true
+    },
+    {
+     "label": "50",
+     "in_stock": true
+    }
+   ],
+   "price": {
+    "amount": 119.9,
+    "currency": "EUR"
+   },
+   "availability": "in_stock",
+   "images": [
+    {
+     "url": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/S261060911113.jpg?v=1772030433",
+     "role": "front"
+    }
+   ],
+   "product_url": "https://silbonshop.com/products/pantalon-traje-principe-de-gales-gris-2",
+   "collected_at": "2026-10-30T12:25:33.583Z",
+   "source": {
+    "collector": "person1",
+    "method": "shop_json"
+   },
+   "raw": {
+    "variants": {
+     "38": 56649215443321,
+     "40": 56649215476089,
+     "42": 56649215508857,
+     "44": 56649215541625,
+     "46": 56649215574393,
+     "48": 56649215607161,
+     "50": 56649215639929
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -3667,15 +3645,15 @@
    }
   },
   {
-   "item_id": "jlindeberg-15582621958470",
+   "item_id": "jlindeberg-15582110286150",
    "shop_id": "jlindeberg",
-   "title": "Florian LS Polo / Black",
+   "title": "Dana Dress / JL Navy",
    "brand": "FW2026, G",
-   "category": "top",
-   "description": "The Florian LS Polo is a long-sleeve golf polo shirt made from 37,5® Soft Touch jersey, a modal-polyester-spandex blend that actively regulates body temperature. Active minerals embedded in the fabric remove sweat in vapor form before it turns to liquid, cooling you when you heat up and retaining warmth when the air turns cool. Moisture-wicking and fast-drying construction keeps the fabric light and fresh throughout the round. A ribbed collar and cuffs hold their shape over hours of play, while the button placket keeps the front clean and composed under a vest or mid-layer on a cooler morning. The Bridge appears on both chest and back, a quiet signal of Swedish design intent. Regular fit with built-in stretch moves freely through a full rotation without pulling or bunching.",
+   "category": "bottom",
+   "description": "The Dana Dress is a women's flared golf skirtdress built from High Stretch Jersey with four-way stretch, moisture-wicking properties, and a soft handfeel that holds its shape through hours of play. An open V-neck with a classic collar frames the neckline cleanly, and the fitted bodice flows into a flared skirt that maintains a sharp, confident silhouette as you move. Built-in inner shorts keep everything in place through every rotation and reach, while two zipped side pockets carry what you need without added bulk. The fabric pulls moisture away from the skin and dries quickly, so rising temperatures stay out of the equation during a long Saturday round. The Bridge sits at the chest and center back, a composed signature on a dress that keeps performance and clean Swedish design working in the same direction.",
    "style": {
     "style_tags": [
-     "old-money"
+     "casual"
     ]
    },
    "size_system": "EU",
@@ -3697,7 +3675,7 @@
      "in_stock": true
     },
     {
-     "label": "XXL",
+     "label": "XS",
      "in_stock": true
     }
    ],
@@ -3708,11 +3686,11 @@
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/a5c6b519182d720e9e9832d0078b139e_001.jpg?v=1780321097",
+     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/71b087244d4c2dfd358b8691722b5737_001.jpg?v=1780317845",
      "role": "front"
     }
    ],
-   "product_url": "https://www.jlindeberg.com/products/florian-ls-polo-black-2",
+   "product_url": "https://www.jlindeberg.com/products/dana-dress-jl-navy",
    "collected_at": "2026-10-30T12:25:37.518Z",
    "source": {
     "collector": "person1",
@@ -3720,11 +3698,11 @@
    },
    "raw": {
     "variants": {
-     "L": 56688782836038,
-     "M": 56688782868806,
-     "S": 56688782901574,
-     "XL": 56688782934342,
-     "XXL": 56688782967110
+     "L": 56688157491526,
+     "M": 56688157524294,
+     "S": 56688157557062,
+     "XL": 56688157589830,
+     "XS": 56688157622598
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -4045,12 +4023,12 @@
    }
   },
   {
-   "item_id": "melawear-7809908473903",
+   "item_id": "melawear-7812942004271",
    "shop_id": "melawear",
-   "title": "Laptophülle Style SUMIT",
+   "title": "Rippstrick Pullover Style MANIKA",
    "brand": "MELA",
    "category": "top",
-   "description": "Der stabile Canvas unseres Laptop Sleeves sorgt für eine sichere Polsterung für 13‘‘ - 15‘‘ Laptops verschiedener Firmen. In einer aufgesetzten Tasche lassen sich Notizen und Unterlagen praktisch verstauen. Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau, ist die Laptophülle angenehm zu tragen und gleichermaßen stabil. Das dichte Gewebe schützt zudem vor leichtem Regen und ist dabei schnelltrocknend. Da wir ausschließlich natürliche Materialien verwenden, verändert sich diese Laptophülle über die Zeit und es entsteht ein einzigartiges, individuelles Produkt.SUMIT ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt deine neue Lieblings-Laptophülle! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Taschen tragen kann, unabhängig von Geschlechterstereotypen.",
+   "description": "Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau zeichnet sich dieser atmungsaktive Pullover durch ein besonders angenehmes Tragegefühl aus und ist vollständig vegan. MANIKA ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt deinen neuen Lieblings-Pullover! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Kleidung tragen kann, unabhängig von Geschlechterstereotypen.",
    "style": {
     "style_tags": [
      "casual"
@@ -4059,22 +4037,38 @@
    "size_system": "EU",
    "sizes": [
     {
-     "label": "ONE",
+     "label": "S",
+     "in_stock": false
+    },
+    {
+     "label": "XS",
+     "in_stock": true
+    },
+    {
+     "label": "L",
+     "in_stock": true
+    },
+    {
+     "label": "M",
+     "in_stock": true
+    },
+    {
+     "label": "XL",
      "in_stock": true
     }
    ],
    "price": {
-    "amount": 29.9,
+    "amount": 79.9,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Sumit-Laptop-Sleeve-13-inch-black-0_280f2158-8e3f-4b57-a56b-e6ac4dd644b5.jpg?v=1769692572",
+     "url": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Manika--Knit-Jumper-black-001.jpg?v=1753177992",
      "role": "front"
     }
    ],
-   "product_url": "https://melawear.de/products/unisex-laptophulle-sumit-1",
+   "product_url": "https://melawear.de/products/rippstrick-pullover-manika",
    "collected_at": "2026-10-30T12:25:29.921Z",
    "source": {
     "collector": "person1",
@@ -4082,7 +4076,10 @@
    },
    "raw": {
     "variants": {
-     "ONE": 43294419386415
+     "XS": 43294363975727,
+     "L": 43294364008495,
+     "XL": 43294364074031,
+     "M": 43294364827695
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -4425,12 +4422,12 @@
    }
   },
   {
-   "item_id": "organicbasics-15091619856716",
+   "item_id": "organicbasics-15091623952716",
    "shop_id": "organicbasics",
-   "title": "Core Straight Leg Pants",
+   "title": "Core Flare Pants",
    "brand": "Organic Basics",
    "category": "bottom",
-   "description": "The pants you’ll want in your Core Collection of staples. Flattering, fitted, and lightweight, made with a comfortable, thicker fabric blend that’s perfect for dressing up or down.",
+   "description": "The pants your Core Collection was missing. Flattering, form fitted, and softly flared at the hem. Made with the same comfortable, thicker fabric blend that moves with you, and perfect for dressing up or down.",
    "style": {
     "style_tags": [
      "casual"
@@ -4469,24 +4466,20 @@
     {
      "label": "XXXL",
      "in_stock": true
-    },
-    {
-     "label": "XXXXL",
-     "in_stock": false
     }
    ],
    "price": {
-    "amount": 70,
+    "amount": 79,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_ob-wonen-organic_cotton-core-straight_leg_pants-thunder-studio-1.jpg?v=1784812836",
+     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg-organic-basics_women_organic-cotton-stretch-flare_pants-pavement-studio_1.jpg?v=1784549557",
      "role": "front"
     }
    ],
-   "product_url": "https://organicbasics.com/products/womens-core-straight-leg-pants-thunder",
+   "product_url": "https://organicbasics.com/products/womens-core-flare-pants-pavement",
    "collected_at": "2026-10-30T12:25:25.457Z",
    "source": {
     "collector": "person1",
@@ -4494,14 +4487,14 @@
    },
    "raw": {
     "variants": {
-     "XXS": 53377814888780,
-     "XS": 53377814921548,
-     "S": 53377814954316,
-     "M": 53377814987084,
-     "L": 53377815019852,
-     "XL": 53377815052620,
-     "XXL": 53377815085388,
-     "XXXL": 53377815118156
+     "XXS": 53377825112396,
+     "XS": 53377825145164,
+     "S": 53377825177932,
+     "M": 53377825210700,
+     "L": 53377825243468,
+     "XL": 53377825276236,
+     "XXL": 53377825309004,
+     "XXXL": 53377825341772
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -4984,6 +4977,79 @@
     "seasons": [
      "spring",
      "summer",
+     "autumn",
+     "winter"
+    ],
+    "delivery_days": 5
+   }
+  },
+  {
+   "item_id": "silbon-15524819599737",
+   "shop_id": "silbon",
+   "title": "Cardigan espiga business azul marino",
+   "brand": "false",
+   "category": "top",
+   "description": "Cárdigan de espiga confeccionado en 100% algodón. Diseñado con cuello de pico y cierre frontal de botones para un estilo clásico y versátil. Una prenda cómoda y sofisticada, perfecta para completar el fondo de armario en cualquier temporada.",
+   "style": {
+    "style_tags": [
+     "old-money"
+    ]
+   },
+   "size_system": "EU",
+   "sizes": [
+    {
+     "label": "XS",
+     "in_stock": true
+    },
+    {
+     "label": "S",
+     "in_stock": true
+    },
+    {
+     "label": "M",
+     "in_stock": true
+    },
+    {
+     "label": "L",
+     "in_stock": true
+    },
+    {
+     "label": "XL",
+     "in_stock": true
+    },
+    {
+     "label": "XXL",
+     "in_stock": true
+    }
+   ],
+   "price": {
+    "amount": 69.9,
+    "currency": "EUR"
+   },
+   "availability": "in_stock",
+   "images": [
+    {
+     "url": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/S261050802274_1.jpg?v=1790239535",
+     "role": "front"
+    }
+   ],
+   "product_url": "https://silbonshop.com/products/cardigan-espiga-business-azul-marino",
+   "collected_at": "2026-10-30T12:25:33.583Z",
+   "source": {
+    "collector": "person1",
+    "method": "shop_json"
+   },
+   "raw": {
+    "variants": {
+     "XS": 57366844244345,
+     "S": 57366844178809,
+     "M": 57366844146041,
+     "L": 57366844113273,
+     "XL": 57366844211577,
+     "XXL": 57366844277113
+    },
+    "stock_kind": "boolean",
+    "seasons": [
      "autumn",
      "winter"
     ],
@@ -5860,15 +5926,15 @@
    }
   },
   {
-   "item_id": "jlindeberg-15583040536902",
+   "item_id": "jlindeberg-15582621958470",
    "shop_id": "jlindeberg",
-   "title": "Creek Light Down Jacket / JL Navy",
-   "brand": "FW2026, B",
-   "category": "outerwear",
-   "description": "The Creek Light Down Jacket is a short men's down jacket built around a dual-insulation system: 700 fill power duck down sourced through Allied Feather & Down© pairs with PrimaLoft® Black Insulation Eco to hold warmth without adding bulk. The shell is a shiny-finish VX RE:SKI recycled polyester with a PFC water-repellent treatment that sheds rain and wet snow before they soak through. A two-way open-end zip runs the full front, and a removable drawcord hood gives adjustable coverage when the weather shifts. Adjustable cuffs and a drawcord hem seal in heat, while two zip hand pockets and an inner pocket keep essentials close without disrupting the short silhouette. The regular fit sits over a midlayer on a grey city morning or under a ski shell when the lift opens, and the Bridge on the left sleeve carries the J.LINDEBERG signature without asking for attention.",
+   "title": "Florian LS Polo / Black",
+   "brand": "FW2026, G",
+   "category": "top",
+   "description": "The Florian LS Polo is a long-sleeve golf polo shirt made from 37,5® Soft Touch jersey, a modal-polyester-spandex blend that actively regulates body temperature. Active minerals embedded in the fabric remove sweat in vapor form before it turns to liquid, cooling you when you heat up and retaining warmth when the air turns cool. Moisture-wicking and fast-drying construction keeps the fabric light and fresh throughout the round. A ribbed collar and cuffs hold their shape over hours of play, while the button placket keeps the front clean and composed under a vest or mid-layer on a cooler morning. The Bridge appears on both chest and back, a quiet signal of Swedish design intent. Regular fit with built-in stretch moves freely through a full rotation without pulling or bunching.",
    "style": {
     "style_tags": [
-     "casual"
+     "old-money"
     ]
    },
    "size_system": "EU",
@@ -5890,26 +5956,22 @@
      "in_stock": true
     },
     {
-     "label": "XS",
-     "in_stock": true
-    },
-    {
      "label": "XXL",
      "in_stock": true
     }
    ],
    "price": {
-    "amount": 420,
+    "amount": 110,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/b3cdbefd97856d64320bf24b35591add_001.jpg?v=1785835821",
+     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/a5c6b519182d720e9e9832d0078b139e_001.jpg?v=1780321097",
      "role": "front"
     }
    ],
-   "product_url": "https://www.jlindeberg.com/products/creek-light-down-jacket-jl-navy",
+   "product_url": "https://www.jlindeberg.com/products/florian-ls-polo-black-2",
    "collected_at": "2026-10-30T12:25:37.518Z",
    "source": {
     "collector": "person1",
@@ -5917,15 +5979,16 @@
    },
    "raw": {
     "variants": {
-     "L": 56689277993286,
-     "M": 56689278026054,
-     "S": 56689278058822,
-     "XL": 56689278091590,
-     "XS": 56689278124358,
-     "XXL": 56689278157126
+     "L": 56688782836038,
+     "M": 56688782868806,
+     "S": 56688782901574,
+     "XL": 56688782934342,
+     "XXL": 56688782967110
     },
     "stock_kind": "boolean",
     "seasons": [
+     "spring",
+     "summer",
      "autumn",
      "winter"
     ],
@@ -6250,12 +6313,12 @@
    }
   },
   {
-   "item_id": "melawear-7812942004271",
+   "item_id": "melawear-7824862576687",
    "shop_id": "melawear",
-   "title": "Rippstrick Pullover Style MANIKA",
+   "title": "T-Shirt Style KHIRA",
    "brand": "MELA",
    "category": "top",
-   "description": "Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau zeichnet sich dieser atmungsaktive Pullover durch ein besonders angenehmes Tragegefühl aus und ist vollständig vegan. MANIKA ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt deinen neuen Lieblings-Pullover! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Kleidung tragen kann, unabhängig von Geschlechterstereotypen.",
+   "description": "Khira, unser modernes, klassisches T-Shirt ist der ideale Begleiter für den Alltag und eignet sich daher für jeden Look. Die gerade Passform wird durch einen hohen und runden Halsausschnitt, feine Rippbündchen und Steppnähte komplettiert. Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau zeichnet sich dieses atmungsaktive T-Shirt durch ein besonders angenehmes Tragegefühl aus und ist vollständig vegan. KHIRA ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt dein neues Lieblings-T-Shirt! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Kleidung tragen kann, unabhängig von Geschlechterstereotypen.",
    "style": {
     "style_tags": [
      "casual"
@@ -6263,14 +6326,6 @@
    },
    "size_system": "EU",
    "sizes": [
-    {
-     "label": "S",
-     "in_stock": false
-    },
-    {
-     "label": "XS",
-     "in_stock": true
-    },
     {
      "label": "L",
      "in_stock": true
@@ -6280,22 +6335,30 @@
      "in_stock": true
     },
     {
+     "label": "XS",
+     "in_stock": true
+    },
+    {
+     "label": "S",
+     "in_stock": true
+    },
+    {
      "label": "XL",
      "in_stock": true
     }
    ],
    "price": {
-    "amount": 79.9,
+    "amount": 23.9,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Manika--Knit-Jumper-black-001.jpg?v=1753177992",
+     "url": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Khira-T-Shirt-black-01.jpg?v=1792568631",
      "role": "front"
     }
    ],
-   "product_url": "https://melawear.de/products/rippstrick-pullover-manika",
+   "product_url": "https://melawear.de/products/t-shirt-khira",
    "collected_at": "2026-10-30T12:25:29.921Z",
    "source": {
     "collector": "person1",
@@ -6303,10 +6366,11 @@
    },
    "raw": {
     "variants": {
-     "XS": 43294363975727,
-     "L": 43294364008495,
-     "XL": 43294364074031,
-     "M": 43294364827695
+     "XS": 44437319254063,
+     "XL": 43294100946991,
+     "S": 44913930207279,
+     "M": 44435013795887,
+     "L": 44435013664815
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -6670,12 +6734,12 @@
    }
   },
   {
-   "item_id": "organicbasics-15091623952716",
+   "item_id": "organicbasics-15091625886028",
    "shop_id": "organicbasics",
-   "title": "Core Flare Pants",
+   "title": "Core Straight Leg Pants",
    "brand": "Organic Basics",
    "category": "bottom",
-   "description": "The pants your Core Collection was missing. Flattering, form fitted, and softly flared at the hem. Made with the same comfortable, thicker fabric blend that moves with you, and perfect for dressing up or down.",
+   "description": "The pants you’ll want in your Core Collection of staples. Flattering, fitted, and lightweight, made with a comfortable, thicker fabric blend that’s perfect for dressing up or down.",
    "style": {
     "style_tags": [
      "casual"
@@ -6714,20 +6778,24 @@
     {
      "label": "XXXL",
      "in_stock": true
+    },
+    {
+     "label": "XXXXL",
+     "in_stock": false
     }
    ],
    "price": {
-    "amount": 79,
+    "amount": 70,
     "currency": "EUR"
    },
    "availability": "in_stock",
    "images": [
     {
-     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg-organic-basics_women_organic-cotton-stretch-flare_pants-pavement-studio_1.jpg?v=1784549557",
+     "url": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_ob-wonen-organic_cotton-core-straight_leg_pants-pavement-studio-1.jpg?v=1784551115",
      "role": "front"
     }
    ],
-   "product_url": "https://organicbasics.com/products/womens-core-flare-pants-pavement",
+   "product_url": "https://organicbasics.com/products/womens-core-straight-leg-pants-pavement",
    "collected_at": "2026-10-30T12:25:25.457Z",
    "source": {
     "collector": "person1",
@@ -6735,14 +6803,14 @@
    },
    "raw": {
     "variants": {
-     "XXS": 53377825112396,
-     "XS": 53377825145164,
-     "S": 53377825177932,
-     "M": 53377825210700,
-     "L": 53377825243468,
-     "XL": 53377825276236,
-     "XXL": 53377825309004,
-     "XXXL": 53377825341772
+     "XXS": 53377829863756,
+     "XS": 53377829896524,
+     "S": 53377829929292,
+     "M": 53377829962060,
+     "L": 53377829994828,
+     "XL": 53377830027596,
+     "XXL": 53377830060364,
+     "XXXL": 53377830093132
     },
     "stock_kind": "boolean",
     "seasons": [
@@ -7227,6 +7295,81 @@
    }
   },
   {
+   "item_id": "silbon-15527311966585",
+   "shop_id": "silbon",
+   "title": "Falda midi evase estampado flores verde",
+   "brand": "false",
+   "category": "bottom",
+   "description": "Falda midi evasé de color verde, con estampado floral y corte a la cintura. Incluye cierre con cremallera invisible trasera, y cuenta con forro y apertura lateral. Una prenda con tejido fluido, que aporta movimiento. Disponible blusa a conjunto.",
+   "style": {
+    "style_tags": [
+     "casual"
+    ]
+   },
+   "size_system": "EU",
+   "sizes": [
+    {
+     "label": "34",
+     "in_stock": true
+    },
+    {
+     "label": "36",
+     "in_stock": true
+    },
+    {
+     "label": "38",
+     "in_stock": true
+    },
+    {
+     "label": "40",
+     "in_stock": true
+    },
+    {
+     "label": "42",
+     "in_stock": true
+    },
+    {
+     "label": "44",
+     "in_stock": true
+    }
+   ],
+   "price": {
+    "amount": 69.9,
+    "currency": "EUR"
+   },
+   "availability": "in_stock",
+   "images": [
+    {
+     "url": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/FW262050703430_4.jpg?v=1790059863",
+     "role": "front"
+    }
+   ],
+   "product_url": "https://silbonshop.com/products/falda-midi-evase-estampado-flores-verde",
+   "collected_at": "2026-10-30T12:25:33.583Z",
+   "source": {
+    "collector": "person1",
+    "method": "shop_json"
+   },
+   "raw": {
+    "variants": {
+     "34": 57375243436409,
+     "36": 57375243469177,
+     "38": 57375243501945,
+     "40": 57375243534713,
+     "42": 57375243567481,
+     "44": 57375243600249
+    },
+    "stock_kind": "boolean",
+    "seasons": [
+     "spring",
+     "summer",
+     "autumn",
+     "winter"
+    ],
+    "delivery_days": 5
+   }
+  },
+  {
    "item_id": "afew-10645995323658",
    "shop_id": "afew",
    "title": "Autry Action Shoes MEDALIST LOW",
@@ -7519,7 +7662,7 @@
    "shop_id": "bellerose",
    "title": "Top Senses Flip Flops for Women  (251 / W / ECRU)",
    "brand": "Havaianas",
-   "category": "top",
+   "category": "shoes",
    "description": "The Havaianas Top Senses Flip Flop sandals feature a square-toe design made of flexible premium Brazilian rubber. New to Havaianas? We suggest choosing a size down from your regular size. Style: 4149369 8811 Colour: Beige",
    "style": {
     "style_tags": [
@@ -7948,173 +8091,6 @@
      "41": 55156523172226,
      "44": 55156523270530,
      "45": 55156523303298
-    },
-    "stock_kind": "boolean",
-    "seasons": [
-     "autumn",
-     "winter"
-    ],
-    "delivery_days": 5
-   }
-  },
-  {
-   "item_id": "flamingoslife-10013130981705",
-   "shop_id": "flamingoslife",
-   "title": "WAIROA JEANS SAND",
-   "brand": "Flamingos' Life",
-   "category": "shoes",
-   "description": null,
-   "style": {
-    "style_tags": [
-     "streetwear"
-    ]
-   },
-   "size_system": "EU",
-   "sizes": [
-    {
-     "label": "37",
-     "in_stock": true
-    },
-    {
-     "label": "38",
-     "in_stock": true
-    },
-    {
-     "label": "39",
-     "in_stock": true
-    },
-    {
-     "label": "40",
-     "in_stock": true
-    },
-    {
-     "label": "41",
-     "in_stock": true
-    },
-    {
-     "label": "42",
-     "in_stock": true
-    },
-    {
-     "label": "43",
-     "in_stock": true
-    },
-    {
-     "label": "44",
-     "in_stock": true
-    },
-    {
-     "label": "45",
-     "in_stock": true
-    },
-    {
-     "label": "46",
-     "in_stock": true
-    }
-   ],
-   "price": {
-    "amount": 179,
-    "currency": "EUR"
-   },
-   "availability": "in_stock",
-   "images": [
-    {
-     "url": "https://cdn.shopify.com/s/files/1/0946/4796/files/WAJEASAN_csinslogan.jpg?v=1789724708",
-     "role": "front"
-    }
-   ],
-   "product_url": "https://flamingoslife.com/products/wairoa-jeans-sand",
-   "collected_at": "2026-10-30T12:25:32.600Z",
-   "source": {
-    "collector": "person1",
-    "method": "shop_json"
-   },
-   "raw": {
-    "variants": {
-     "37": 53629705912649,
-     "38": 53629705945417,
-     "39": 53629705978185,
-     "40": 53629706010953,
-     "41": 53629706043721,
-     "42": 53629706076489,
-     "43": 53629706109257,
-     "44": 53629706142025,
-     "45": 53629706174793,
-     "46": 53629706207561
-    },
-    "stock_kind": "boolean",
-    "seasons": [
-     "spring",
-     "summer",
-     "autumn",
-     "winter"
-    ],
-    "delivery_days": 5
-   }
-  },
-  {
-   "item_id": "jlindeberg-15583053054278",
-   "shop_id": "jlindeberg",
-   "title": "Creek Light Down Jacket / Black",
-   "brand": "FW2026, B",
-   "category": "outerwear",
-   "description": "The Creek Light Down Jacket is a short men's down jacket built around a dual-insulation system: 700 fill power duck down sourced through Allied Feather & Down© pairs with PrimaLoft® Black Insulation Eco to hold warmth without adding bulk. The shell is a shiny-finish VX RE:SKI recycled polyester with a PFC water-repellent treatment that sheds rain and wet snow before they soak through. A two-way open-end zip runs the full front, and a removable drawcord hood gives adjustable coverage when the weather shifts. Adjustable cuffs and a drawcord hem seal in heat, while two zip hand pockets and an inner pocket keep essentials close without disrupting the short silhouette. The regular fit sits over a midlayer on a grey city morning or under a ski shell when the lift opens, and the Bridge on the left sleeve carries the J.LINDEBERG signature without asking for attention.",
-   "style": {
-    "style_tags": [
-     "casual"
-    ]
-   },
-   "size_system": "EU",
-   "sizes": [
-    {
-     "label": "L",
-     "in_stock": true
-    },
-    {
-     "label": "M",
-     "in_stock": true
-    },
-    {
-     "label": "S",
-     "in_stock": true
-    },
-    {
-     "label": "XL",
-     "in_stock": true
-    },
-    {
-     "label": "XS",
-     "in_stock": false
-    },
-    {
-     "label": "XXL",
-     "in_stock": true
-    }
-   ],
-   "price": {
-    "amount": 420,
-    "currency": "EUR"
-   },
-   "availability": "in_stock",
-   "images": [
-    {
-     "url": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/f53528a8c3d3e3a11f280b8952b1c96b_001.jpg?v=1780323276",
-     "role": "front"
-    }
-   ],
-   "product_url": "https://www.jlindeberg.com/products/creek-light-down-jacket-black",
-   "collected_at": "2026-10-30T12:25:37.518Z",
-   "source": {
-    "collector": "person1",
-    "method": "shop_json"
-   },
-   "raw": {
-    "variants": {
-     "L": 56689295032646,
-     "M": 56689295065414,
-     "S": 56689295098182,
-     "XL": 56689295130950,
-     "XXL": 56689295196486
     },
     "stock_kind": "boolean",
     "seasons": [

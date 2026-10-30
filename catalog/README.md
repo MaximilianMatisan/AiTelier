@@ -3,15 +3,15 @@
 Real products from real EU shops, normalised to the agreed schema (Frame 16).
 Everything is fetched from the shops' public Shopify product feed — nothing is scraped.
 
-**8650 items across 37 shops.** Tops 4224, bottoms 2042, shoes 1291, outerwear 1093.
-Themes: casual 5978, old\_money 1485, streetwear 1263. Prices 5.50–1995 EUR.
+**8725 items across 36 shops.** Tops 4405, bottoms 1844, shoes 1285, outerwear 1191.
+Themes: casual 6007, old\_money 1513, streetwear 1281. Prices 5.50–1995 EUR.
 Every item carries an image and is in stock in at least one size.
 
 ## Files
 
 | File | What |
 | --- | --- |
-| `shops.seed.json` | The 37 shops. Person 2 keys `trust.json` off these `id`s. |
+| `shops.seed.json` | The 36 shops. Person 2 keys `trust.json` off these `id`s. |
 | `cache/products.json` | **The handover artifact.** Normalised items, one array. |
 | `cache/raw/<shop_id>.json` | Untouched feed responses, so the demo runs with no network. |
 | `cache/person3.input.json` | 100-item sample in Person 3's envelope shape, for smoke tests. |
@@ -77,10 +77,12 @@ A real entry, shortened only in the image URL:
 
 ## Shops
 
-All 37 answer `/products.json` and price in EUR (confirmed via `/cart.js`), and all 37 product
-pages answer `200` to our User-Agent. 84 candidates were probed; the other 47 either closed
-their feed (403/404/410/429) or price in another currency (Velasca USD, Won Hundred DKK,
-Les Deux unconfirmed).
+All 36 answer `/products.json` and price in EUR (confirmed via `/cart.js`), and their product
+pages answer `200` to our User-Agent. 84 candidates were probed; the rest either closed their
+feed (403/404/410/429) or price in another currency (Velasca USD, Won Hundred DKK, Les Deux
+unconfirmed). **ID.EIGHT** passed every check but was dropped anyway: its titles and
+`product_type` are bare model names ("URIDURI", "MARU") with no category word anywhere, so
+nothing in its 62 products can be classified.
 
 Shoes in EU sizing: **asphaltgold, afew, overkill, eytys** (premium) and **saye, naevegan,
 ecoalf, ethletic, womsh, zeta, flamingoslife, ideight** (affordable).
@@ -121,10 +123,15 @@ returned nothing usable, so the collector stays Shopify-only.
 4. **Items with no buyable size are dropped at collect time**, so guarantee 2 can only fail on
    the *customer's* size.
 5. **Category, theme and season are keyword heuristics** (tables at the top of
-   `logic/data/normalize.js`). Themes and seasons read the title and `product_type` only —
-   **not tags.** Shop tags carry customs and logistics junk: asphaltgold tags every jersey tee
-   `"knitted or crocheted"` (an HS code), which classified Nike t-shirts as `old_money` until
-   tags were excluded. Tune the tables, not the mapper.
+   `logic/data/normalize.js`). Tune the tables, not the mapper. Two rules keep them honest:
+   - **Tags are a fallback, never the first source.** Themes and seasons ignore them entirely;
+     category only reaches for them when the title and `product_type` say nothing. Shop tags
+     carry customs and logistics junk — asphaltgold tags every jersey tee
+     `"knitted or crocheted"` (an HS code), which classified Nike t-shirts as `old_money`.
+   - **Short keywords match whole words only** (`WHOLE_WORD_ONLY`). Plain substring matching
+     turned 600+ t-shirts into trousers, because `"style:Shortsleeves".includes("short")`, and
+     read `"steel gray"` as a tee. `CATEGORY_PHRASES` handles the rest: "boot cut" is a trouser
+     cut, not footwear.
 6. **Sizes are normalised** (`Medium`→`M`, `EU 43 1/3`→`43`, `W32`→`32`). Fractional shoe sizes
    lose the fraction. Products with no size option are stored under `"ONE"`.
 7. **One colour per size.** When a product has both Colour and Size options, `variants[size]`
@@ -158,7 +165,7 @@ Frame 16 shape**, because Person 2 consumes that. Nothing was renamed in place.
 | `source.fetched_at` | `collected_at` |
 | `variants`, `seasons`, `stock_kind` | kept under `raw` (preserved, never sent to the LLM) |
 
-Descriptions come from `body_html` in the raw cache (8236 of 8650 items) and are stripped to
+Descriptions come from `body_html` in the raw cache (8305 of 8725 items) and are stripped to
 plain text, so `products.json` keeps its agreed shape.
 
 The adapter emits **our half** of the envelope — `contract_version`, `currency`, `shops`,
@@ -186,8 +193,8 @@ strict mode cannot both be on during the demo.**
 
 ### What the adapter cannot fix
 
-1. **The contract caps a request at 100 items and 30 shops** (section 11); we hold 8650 items
-   across 37 shops. `--limit` samples round-robin within the 30-shop cap for smoke tests. The
+1. **The contract caps a request at 100 items and 30 shops** (section 11); we hold 8725 items
+   across 36 shops. `--limit` samples round-robin within the 30-shop cap for smoke tests. The
    real shortlist is Person 2's filter step (`--in <shortlist.json>`), **which must also stay
    within 30 shops.**
 2. **`options.fit_mode` must be `size_only`.** The canonical envelope uses `measurements`, which
@@ -200,7 +207,7 @@ strict mode cannot both be on during the demo.**
 
 The feed carries no shipping, and `/cart/shipping_rates.json` answers `200` with an empty list
 because Shopify only computes rates for a session that already holds a cart. Building carts on
-37 shops to read their rates is a write to someone else's store, so it was not done.
+36 shops to read their rates is a write to someone else's store, so it was not done.
 
 `shops.seed.json` carries a hand-entered estimate per shop, flagged `estimated: true` and
 carried through to Person 3:
@@ -225,7 +232,7 @@ The first seed was 12 premium EU labels, and the demo order (`old_money`, `autum
 waist `32` / shoe `43`, budget 300 EUR, avoid neon+polyester) could not be met: two independent
 outfits cost **686 EUR** at the cheapest.
 
-Adding 25 affordable shops fixed it. The same order now matches **910 items across 32 shops**:
+Adding 25 affordable shops fixed it. The same order now matches **932 items across 32 shops**:
 
 | Scenario | Total | |
 | --- | --- | --- |
@@ -237,16 +244,43 @@ Cheapest matching pieces: top 12 EUR (thokkthokk), bottom 59.98 (knowledgecotton
 (ecoalf), outer 80.90 (armedangels). **The 300 EUR demo order stands**, as long as the stylist
 shares pieces across outfits — which is what a capsule wardrobe does anyway.
 
+## Checked against Person 3's service
+
+`person3/scripts/run_catalog.py --catalog catalog/cache/person3.input.json` reads this layer's
+output directly, so the adapter is the live integration point. Running Person 3's own
+`classify_slot` over all 8725 converted items:
+
+| Their layer | base | mid | outer | bottom | shoes | other |
+| --- | --- | --- | --- | --- | --- | --- |
+| items | 3413 | 963 | 1192 | 1417 | 1296 | 313 |
+
+**All five required layers are covered**, so no outfit fails for want of a layer. Their
+normalisation reads the title as well as `category`, which is why our single `top` splits into
+`base` and `mid`.
+
+Their layer disagrees with our category on **470 of 8725 items (5.4%)**, down from 8.0% before
+the keyword fixes above. What is left is mostly on their side and worth telling them:
+
+- **313 of our `bottom` items land in `other`**, which satisfies no required layer — e.g.
+  "ROA x Wrangler Denim Cargo Washed Pattern". That is 313 real trousers the stylist cannot use.
+- **112 more become `base`**, including German titles like "HERRINGBONE BARREL LEG HOSE"
+  (*Hose* = trousers) and "Nike Tailored Dri-FIT Loose Short".
+- 22 of our tops become `shoes` on the word "Oxford", which is both a shirt fabric and a shoe
+  style — genuinely ambiguous.
+
 ## Open items for the team
 
 These are decisions Person 1 cannot make alone:
 
-1. **Person 2's `catalog/trust.json` is not there yet.** Until it is, every shop reaches
+1. **Person 3 drops 313 of our trousers into the `other` layer**, which satisfies no required
+   layer, and reads 112 more as `base`. Their `classify_slot` needs cargo/denim trousers and
+   German titles (*Hose*). Measured above.
+2. **Person 2's `catalog/trust.json` is not there yet.** Until it is, every shop reaches
    Person 3 without a `guarantee`, and their contract reads that as guaranteed. Shop trust —
    one of the five paid guarantees — currently passes without being checked.
-2. **Set `options.fit_mode` to `size_only`.** `measurements` cannot work with feed data.
-3. **Pick one: offline fallback or `strict_guarantees`.** They contradict each other (see
+3. **Set `options.fit_mode` to `size_only`.** `measurements` cannot work with feed data.
+4. **Pick one: offline fallback or `strict_guarantees`.** They contradict each other (see
    "Final-check record" above).
-4. **Person 2's shortlist must stay within 100 items and 30 shops.**
-5. **Replace the shipping estimates with measured values** if G1 or G5 are to mean anything
+5. **Person 2's shortlist must stay within 100 items and 30 shops.**
+6. **Replace the shipping estimates with measured values** if G1 or G5 are to mean anything
    beyond the demo.
