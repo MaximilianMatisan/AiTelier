@@ -213,7 +213,7 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
   let text = await embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
   // Sokosumi renders text and links only, so the full page goes up as a link.
   const page = await publish(outDir);
-  if (page) text = `**Your AiTelier page:** [open the full result with every check](${page})\n\n${text}`;
+  if (page) text = `# **Your AiTelier page:** [open the full result with every check](${page})\n\n${text}`;
   log.info("pipeline done", {
     task: taskId,
     status: result.status,
