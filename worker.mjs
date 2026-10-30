@@ -14,9 +14,20 @@ for (const signal of ["SIGINT", "SIGTERM"])
     releaseLock();
     process.exit(0);
   });
+function runSokosumi(args, options) {
+  if (process.platform === "win32")
+    return execFileSync(process.env.ComSpec || "cmd.exe", [
+      "/d",
+      "/s",
+      "/c",
+      "sokosumi",
+      ...args,
+    ], options);
+  return execFileSync("sokosumi", args, options);
+}
 function cli(args) {
   return JSON.parse(
-    execFileSync("sokosumi", ["--preprod", ...args, "--json"], {
+    runSokosumi(["--preprod", ...args, "--json"], {
       encoding: "utf8",
       timeout: 30000,
       maxBuffer: 4 * 1024 * 1024,
