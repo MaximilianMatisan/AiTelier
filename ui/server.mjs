@@ -17,6 +17,8 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { readOrder } from "../logic/intake.mjs";
 import { runPipeline } from "../logic/lead-agent.mjs";
+import { logger } from "../log.mjs";
+const log = logger("studio");
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const UI_DIR = path.join(ROOT, "ui");
@@ -72,8 +74,10 @@ async function startRun(body) {
   const run = { id, outDir, order: intake.order, startedAt: Date.now(), state: "running" };
   runs.set(id, run);
   active = id;
+  log.info("run started", { run: id, fast: Boolean(body.fast) });
   runPipeline(args, RUN_TIMEOUT_MS, path.join(ROOT, outDir, "pipeline.log")).then((ok) => {
     run.state = ok ? "done" : "failed";
+    log[ok ? "info" : "error"]("run finished", { run: id, state: run.state, seconds: Math.round((Date.now() - run.startedAt) / 1000) });
     run.finishedAt = Date.now();
     active = null;
   });
@@ -145,5 +149,5 @@ const server = createServer(async (req, res) => {
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
   // Person 3 builds image URLs from this, so the boards load from this server.
   process.env.ARTIFACT_BASE_URL = BASE;
-  server.listen(PORT, "127.0.0.1", () => console.log(`AiTelier studio on ${BASE}`));
+  server.listen(PORT, "127.0.0.1", () => log.info("started", { url: BASE }));
 }

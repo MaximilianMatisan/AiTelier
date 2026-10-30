@@ -6,6 +6,8 @@ import {
   assertTaskTarget,
   verifyRuntimeTask,
 } from "./task-target.mjs";
+import { logger } from "./log.mjs";
+const log = logger("comments");
 const target = taskTarget();
 const {
   readRuntimeCredential,
@@ -37,6 +39,7 @@ export async function reply(task) {
       e.comment.trim(),
   )) {
     if (state[event.id]) continue;
+    log.info("comment received", { task: taskId, chars: event.comment.length });
     state[event.id] = "model-pending";
     writeFileSync(p, JSON.stringify(state), { mode: 0o600 });
     const response = await (
@@ -48,8 +51,10 @@ export async function reply(task) {
       response.status === "failed" ||
       response.inputRequests.length ||
       !response.message?.trim()
-    )
+    ) {
+      log.warn("no reply to comment", { task: taskId, status: response.status });
       continue;
+    }
     state[event.id] = "post-pending";
     writeFileSync(p, JSON.stringify(state), { mode: 0o600 });
     await verifyRuntimeTask(runtime, taskId, target);
@@ -60,6 +65,7 @@ export async function reply(task) {
       AbortSignal.timeout(30000),
     );
     state[event.id] = "posted";
+    log.info("reply posted", { task: taskId, chars: response.message.length });
     writeFileSync(p, JSON.stringify(state), { mode: 0o600 });
   }
 }

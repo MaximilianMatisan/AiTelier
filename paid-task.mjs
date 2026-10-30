@@ -8,6 +8,8 @@ import {
   assertTaskTarget,
   verifyRuntimeTask,
 } from "./task-target.mjs";
+import { logger } from "./log.mjs";
+const log = logger("paid");
 const MINUTE = 60 * 1000;
 export const USDM =
   "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d";
@@ -119,15 +121,27 @@ export async function createPaidAdapter({
       body: JSON.stringify(body),
     });
     const data = await response.json();
-    if (!response.ok || data.status !== "success")
+    if (!response.ok || data.status !== "success") {
+      log.error("payment service call failed", { path, status: response.status });
       throw new Error(
         `MPS ${path} failed HTTP ${response.status}. Inspect saved state before retry.`,
       );
+    }
     return data.data;
   }
   async function persist(task, state, paid) {
     const next = { ...state, paid };
     await save(task.id, next);
+    // One line per step of the payment, and per change in what the chain shows.
+    const before = state.paid ?? {};
+    const chain = paid?.observed?.onChainState;
+    if (paid?.stage !== before.stage || chain !== before.observed?.onChainState)
+      log.info(paid?.stage === before.stage ? "chain" : "stage", {
+        task: task.id,
+        from: paid?.stage === before.stage ? undefined : before.stage ?? "new",
+        to: paid?.stage,
+        onChain: chain,
+      });
     return next;
   }
   return {

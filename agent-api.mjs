@@ -10,6 +10,8 @@ import {
 import { answer, client } from "./client.mjs";
 import { inputHash, resultHash, sha256 } from "./standard-hash.mjs";
 import { confirmedState } from "./paid-task.mjs";
+import { logger } from "./log.mjs";
+const log = logger("api");
 const jobsDir = ".local/standard-jobs";
 mkdirSync(jobsDir, { recursive: true, mode: 0o700 });
 const token = process.env.MPS_RUNTIME_TOKEN;
@@ -54,6 +56,15 @@ const respond = (res, status, data) => {
 };
 const port = Number(process.env.AGENT_API_PORT || 21950);
 createServer(async (req, res) => {
+  const started = Date.now();
+  res.on("finish", () =>
+    log[res.statusCode >= 500 ? "error" : "info"]("request", {
+      method: req.method,
+      path: new URL(req.url, "http://127.0.0.1").pathname,
+      status: res.statusCode,
+      ms: Date.now() - started,
+    }),
+  );
   try {
     const url = new URL(req.url, "http://127.0.0.1");
     if (req.method === "GET" && url.pathname === "/availability")
@@ -168,11 +179,14 @@ createServer(async (req, res) => {
     save(job);
     return respond(res, 200, job.response);
   } catch (e) {
+    log.error("request failed", { error: e.message });
     respond(res, 500, {
       error: "Request failed. Inspect the saved job state before retrying.",
     });
   }
-}).listen(port, "127.0.0.1", () => console.log("Agent API running", port));
+}).listen(port, "127.0.0.1", () =>
+  log.info("started", { port, paymentKey: token ? "loaded" : "missing" }),
+);
 let busy = false;
 setInterval(async () => {
   if (busy) return;
@@ -240,7 +254,7 @@ setInterval(async () => {
         job.phase = "awaiting-result";
         save(job);
       } catch (e) {
-        console.error("Standard job needs inspection", job.id);
+        log.error("standard job needs inspection", { job: job.id, phase: job.phase, error: e.message });
       }
     }
   } finally {

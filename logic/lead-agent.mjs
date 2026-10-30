@@ -21,6 +21,8 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { readOrder, refusal } from "./intake.mjs";
+import { logger } from "../log.mjs";
+const log = logger("lead-agent");
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const VENV_PYTHON = "person3/.venv/bin/python";
@@ -158,7 +160,10 @@ export function formatResult(result) {
 
 export async function pipelineAnswer(input, journal, deadline, { run = runPipeline } = {}) {
   const intake = readOrder(input);
-  if (!intake.ok) return refusal(intake);
+  if (!intake.ok) {
+    log.warn("order refused", { errors: intake.errors.length, first: intake.errors[0] });
+    return refusal(intake);
+  }
 
   const taskId = path.basename(journal).replace(/-session\.json$/, "");
   if (!/^[\w-]+$/.test(taskId)) throw new Error("Journal name does not identify a Task");
@@ -173,16 +178,27 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
   if (timeoutMs <= 0) throw new Error("Result deadline too close to run the pipeline");
   const args = ["logic/run-pipeline.mjs", "--order", orderFile, "--out", outDir];
   if (process.env.AITELIER_SHORTLIST) args.push("--shortlist", process.env.AITELIER_SHORTLIST);
+  log.info("pipeline started", {
+    task: taskId,
+    order: intake.order.brief ? "free-text" : "json",
+    shortlist: process.env.AITELIER_SHORTLIST ? "demo" : "live",
+    timeoutS: Math.round(timeoutMs / 1000),
+  });
+  const started = Date.now();
   const ok = await run(
     args,
     timeoutMs,
     path.join(ROOT, outDir, "pipeline.log"),
   );
-  if (!ok) throw new Error(`Pipeline failed or overran; see ${outDir}/pipeline.log`);
+  if (!ok) {
+    log.error("pipeline failed or overran", { task: taskId, seconds: Math.round((Date.now() - started) / 1000), log: `${outDir}/pipeline.log` });
+    throw new Error(`Pipeline failed or overran; see ${outDir}/pipeline.log`);
+  }
 
   const result = JSON.parse(await readFile(path.join(ROOT, outDir, "person3", "result.json"), "utf8"));
   if (result?.status === "REFUND") {
     const failed = failedGuarantees(result);
+    log.warn("refund: guarantees failed", { task: taskId, failed });
     // Journal it so the refusal is a recorded decision, not a crash: someone
     // has to be able to tell the customer why their money came back.
     writeFileSync(
@@ -193,5 +209,14 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     throw new GuaranteesFailed(failed, outDir);
   }
   writeFileSync(journal, JSON.stringify({ phase: "pipeline-done", outDir, status: result.status }), { mode: 0o600 });
-  return embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
+  const text = await embedImages(formatResult(result), { workDir: path.join(ROOT, outDir) });
+  log.info("pipeline done", {
+    task: taskId,
+    status: result.status,
+    outfits: result.outfits?.length ?? 0,
+    seconds: Math.round((Date.now() - started) / 1000),
+    resultKb: Math.round(text.length / 1024),
+    images: (text.match(/\]\(data:image/g) ?? []).length,
+  });
+  return text;
 }
