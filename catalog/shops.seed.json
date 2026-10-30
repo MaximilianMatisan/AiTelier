@@ -1,0 +1,122 @@
+[
+  {
+    "id": "norseprojects",
+    "name": "Norse Projects",
+    "domain": "www.norseprojects.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "lambswool knitwear, oxford shirts, chinos, coats - core old_money source"
+  },
+  {
+    "id": "colorfulstandard",
+    "name": "Colorful Standard",
+    "domain": "colorfulstandard.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "merino knitwear, overshirts, organic basics - affordable old_money layers"
+  },
+  {
+    "id": "mfpen",
+    "name": "Mfpen",
+    "domain": "mfpen.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "tailored trousers, oxford shirts, wool - old_money, higher price band"
+  },
+  {
+    "id": "libertine",
+    "name": "Libertine-Libertine",
+    "domain": "libertine-libertine.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "shirts, trousers, knitwear - mixed old_money and casual"
+  },
+  {
+    "id": "soulland",
+    "name": "Soulland",
+    "domain": "soulland.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "knitwear, trousers, outerwear - casual and streetwear"
+  },
+  {
+    "id": "organicbasics",
+    "name": "Organic Basics",
+    "domain": "organicbasics.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "tees, knit basics - cheap filler layers, many non-apparel items to skip"
+  },
+  {
+    "id": "arteantwerp",
+    "name": "Arte Antwerp",
+    "domain": "arte-antwerp.com",
+    "country": "BE",
+    "currency": "EUR",
+    "default_delivery_days": 4,
+    "products_json_ok": true,
+    "notes": "knitwear, trousers, jackets - casual and streetwear"
+  },
+  {
+    "id": "overkill",
+    "name": "Overkill",
+    "domain": "www.overkillshop.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "multi-brand streetwear, sneakers in EU sizes"
+  },
+  {
+    "id": "asphaltgold",
+    "name": "Asphaltgold",
+    "domain": "www.asphaltgold.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 2,
+    "products_json_ok": true,
+    "notes": "sneaker specialist, EU sizes incl. 43 - main shoe source"
+  },
+  {
+    "id": "afew",
+    "name": "Afew Store",
+    "domain": "en.afew-store.com",
+    "country": "DE",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "sneakers and apparel, EU sizes"
+  },
+  {
+    "id": "eytys",
+    "name": "Eytys",
+    "domain": "www.eytys.com",
+    "country": "SE",
+    "currency": "EUR",
+    "default_delivery_days": 5,
+    "products_json_ok": true,
+    "notes": "boots, loafers, denim - shoes in EU sizes"
+  },
+  {
+    "id": "rains",
+    "name": "Rains",
+    "domain": "www.rains.com",
+    "country": "DK",
+    "currency": "EUR",
+    "default_delivery_days": 3,
+    "products_json_ok": true,
+    "notes": "rain coats and jackets - outer layer, many non-apparel items to skip"
+  }
+]

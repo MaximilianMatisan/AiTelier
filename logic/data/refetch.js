@@ -1,0 +1,96 @@
+// Fresh state for one item, for the final check (guarantees 2 and 4).
+// Live first, raw cache as the fallback, so the demo survives a dead network.
+//
+//   node logic/data/refetch.js <item-id>
+//   OFFLINE=1 node logic/data/refetch.js <item-id>
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
+import { normalizeSize, sizeIndexOf } from "./normalize.js";
+import { fetchJson } from "./collect.js";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
+
+let shopsById = null;
+async function shopFor(shopId) {
+  shopsById ??= Object.fromEntries(
+    JSON.parse(await readFile(path.join(ROOT, "catalog/shops.seed.json"), "utf8")).map((s) => [s.id, s])
+  );
+  const shop = shopsById[shopId];
+  if (!shop) throw new Error(`unknown shop ${shopId}`);
+  return shop;
+}
+
+/** Collapse variants into { stock, price } for one product shape. `toEur` differs per endpoint. */
+function readVariants(options, variants, toEur) {
+  const idx = sizeIndexOf(options);
+  const stock = {};
+  const prices = [];
+  for (const v of variants ?? []) {
+    const size = idx === -1 ? "ONE" : normalizeSize(v[`option${idx + 1}`] ?? v.options?.[idx]);
+    stock[size] ??= 0;
+    if (!v.available) continue;
+    stock[size] = 1;
+    const price = toEur(v.price);
+    if (Number.isFinite(price)) prices.push(price);
+  }
+  return { stock, price_eur: prices.length ? Math.min(...prices) : null };
+}
+
+// /products/{handle}.js reports prices in cents; /products.json reports decimal strings.
+const fromCents = (p) => Number(p) / 100;
+const fromDecimal = (p) => Number(p);
+
+async function fromStorefront(item, shop) {
+  const p = await fetchJson(`https://${shop.domain}/products/${item.source.handle}.js`);
+  return { ...readVariants(p.options, p.variants, fromCents), url_ok: true };
+}
+
+async function fromProductsJson(item, shop) {
+  for (let page = 1; page <= 2; page++) {
+    const body = await fetchJson(`https://${shop.domain}/products.json?limit=250&page=${page}`);
+    const list = body.products ?? [];
+    const p = list.find((x) => x.handle === item.source.handle);
+    if (p) return { ...readVariants(p.options, p.variants, fromDecimal), url_ok: true };
+    if (list.length < 250) break;
+  }
+  throw new Error(`handle ${item.source.handle} not found in /products.json`);
+}
+
+async function fromCache(item) {
+  const raw = JSON.parse(await readFile(path.join(ROOT, `catalog/cache/raw/${item.shop_id}.json`), "utf8"));
+  const p = (raw.products ?? []).find((x) => x.handle === item.source.handle);
+  if (!p) throw new Error(`handle ${item.source.handle} not in raw cache`);
+  return { ...readVariants(p.options, p.variants, fromDecimal), url_ok: true };
+}
+
+/**
+ * Fresh availability and price for one catalogue item.
+ * `url_ok` false means the product no longer resolves at all - guarantee 4 must fail then.
+ */
+export async function refetch(item) {
+  const shop = await shopFor(item.shop_id);
+  const base = { id: item.id, fetched_at: new Date().toISOString() };
+
+  if (process.env.OFFLINE !== "1") {
+    for (const attempt of [fromStorefront, fromProductsJson]) {
+      try {
+        return { ...base, ...(await attempt(item, shop)), source: "live" };
+      } catch { /* fall through to the next strategy */ }
+    }
+  }
+  try {
+    return { ...base, ...(await fromCache(item)), source: "cache" };
+  } catch {
+    return { ...base, url_ok: false, price_eur: null, stock: {}, source: "cache" };
+  }
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const id = process.argv[2];
+  if (!id) throw new Error("usage: node logic/data/refetch.js <item-id>");
+  const items = JSON.parse(await readFile(path.join(ROOT, "catalog/cache/products.json"), "utf8"));
+  const item = items.find((i) => i.id === id);
+  if (!item) throw new Error(`no item ${id} in catalog/cache/products.json`);
+  console.log(JSON.stringify(await refetch(item), null, 2));
+}
