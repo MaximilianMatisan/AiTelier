@@ -1,7 +1,8 @@
-# Kontext für Claude Design: eine Komponente für das AiTelier Studio
+# Kontext für Claude Design: das Design der AiTelier-Studio-Website
 
-Diesen Text als Kontext an Claude Design geben. Die Komponente, um die es geht, unten unter
-**„Auftrag“** eintragen.
+Diesen Text als Kontext an Claude Design geben. Auftrag: **die ganze Website neu gestalten**,
+alle drei Screens, siehe **„Auftrag“** am Ende. Die Seite funktioniert bereits; gesucht ist
+das Design, nicht neue Funktionen.
 
 ## Produkt in einem Absatz
 
@@ -158,25 +159,71 @@ Ein Outfit besteht aus etwa 47 Komponenten. Zusätzlich sendet der Agent per
   „look-1 budget: 373.88 EUR <= 300.00 EUR“.
 - 1 bis 10 Outfits mit je 3 bis 5 Teilen (base, mid, outer, bottom, shoes).
 
+## Was beim Redesign gleich bleiben muss
+
+Die Seitenlogik in `ui/index.html` und der Server hängen an diesen Stellen. Aussehen,
+Reihenfolge und Markup drumherum sind frei; diese Haken nicht.
+
+- **Screens**: drei `<section>` mit den IDs `order`, `progress` und `result`. Es ist immer
+  genau einer sichtbar; die Logik schaltet über das Attribut `hidden` um.
+- **Formular** `#form` mit Absende-Button `#submit` und Fehlerbox `#form-errors`. Die
+  Feldnamen gehen 1:1 an den Server:
+
+  | `name` | Typ | Werte |
+  |---|---|---|
+  | `budget_eur` | Zahl | 1–10000, Euro |
+  | `outfits` | Zahl | 1–10 |
+  | `theme` | genau eine Auswahl | `old_money`, `casual`, `streetwear` |
+  | `season` | Auswahl | `autumn`, `winter`, `spring`, `summer` |
+  | `gender` | Auswahl | `men`, `women` |
+  | `fit`, `climate` | Text, optional | frei, kurz |
+  | `top` | Auswahl | `XS`, `S`, `M`, `L`, `XL`, `XXL` |
+  | `waist` | Zahl | 24–50, Zoll |
+  | `shoe_eu` | Zahl | 34–50, halbe Größen erlaubt |
+  | `avoid` | Text, optional | kommagetrennt |
+  | `fast` | Checkbox | an = Demo-Shortlist, etwa 30 s |
+
+- **Warten**: Liste `#steps` und Zähler `#elapsed`. Die Logik baut die Einträge selbst, als
+  `<li class="done|running|pending">` mit `<span class="dot">` und darin `<strong>`
+  (Titel) und `<small>` (Erklärung). Das Aussehen dieser Klassen ist frei. Fehlerfall:
+  `#run-error` mit `#run-log`.
+- **Ergebnis**: `#badge` bekommt die Klasse `badge APPROVED` oder `badge REFUND`,
+  `#refund-note` erscheint nur bei Refund, `#surface` ist der Container, in den der
+  A2UI-Renderer zeichnet, `#raw` zeigt die rohen A2UI-Nachrichten.
+- Buttons mit dem Attribut `data-restart` führen zurück zum Formular.
+
 ## Auftrag
 
-**Komponente:** _hier eintragen_
+**Gestalte die ganze Website des AiTelier Studios neu**: Bestellung, Warten, Ergebnis,
+dazu Kopf- und Fußbereich. Ziel ist eine Demo, die in den ersten fünf Sekunden „hochwertiges
+Atelier“ ausstrahlt und gleichzeitig zeigt, dass hier geprüft und auf Cardano bezahlt wird.
 
-Kandidaten, falls noch offen. Der erste hat am meisten Wirkung in der Demo:
+Pro Screen:
 
-1. **Outfit-Karte** (Ergebnis-Screen): alle Teile auf einen Blick statt hinter Tabs,
-   Gesamtpreis, Palette, fünf Garantien kompakt.
-2. **Garantie-Leiste** (Ergebnis-Screen): fünf Häkchen als eine Zeile mit Details beim
-   Aufklappen; macht „Code prüft“ sichtbar.
-3. **Fortschritts-Stepper** (Warte-Screen): die 30 Sekunden Wartezeit als Erlebnis, z. B.
-   was gerade geprüft wird und wie viele Produkte übrig sind.
-4. **Stil-Auswahl** (Bestell-Screen): visuelle Karten statt Text-Chips für Old money,
-   Lässig, Streetwear.
+1. **Bestellung**: soll sich wie ein Gespräch mit einem Schneider anfühlen, nicht wie ein
+   Behördenformular. Stilwahl visuell statt als Text-Chips. Größen klar gruppiert. Der
+   Schalter „Fast demo mode“ bleibt sichtbar, darf aber zurücktreten. Fehler vom Server
+   erscheinen gesammelt.
+2. **Warten**: 25–40 Sekunden, die sich lohnen. Die fünf Stufen sollen zeigen, was gerade
+   passiert („Removing sizes you cannot buy“) und dass Code prüft. Kein Fake-Fortschritt:
+   der Zustand kommt nur aus den Klassen `done`, `running` und `pending`.
+3. **Ergebnis**: gestalte alle A2UI-Basic-Catalog-Komponenten aus der Tabelle oben als
+   zusammenhängendes Designsystem (Variante 1, nur CSS). Das ist der Pflichtteil.
+   Wenn ein besseres Ergebnis nur mit neuer Struktur geht, etwa eine Outfit-Karte mit
+   allen Teilen auf einen Blick statt hinter Tabs, liefere das als Vorschlag mit dem
+   A2UI-JSON, das der Agent dafür senden müsste (Variante 2 oder 3). Status `APPROVED` und
+   `REFUND` müssen klar unterscheidbar sein; der Refund-Fall ist ein Schutz, kein Fehler.
+
+Die Tokens oben sind der Ausgangspunkt, kein Zwang; ein eigenes, besseres System ist
+willkommen, solange Text auf Hintergrund mindestens WCAG AA erreicht.
 
 **Erwartetes Ergebnis von Claude Design:**
 
-- Die Komponente als HTML und CSS mit den Tokens oben, plus JavaScript nur wenn nötig.
-- Für Ergebnis-Komponenten: welche der drei A2UI-Varianten (Gestaltung, Zusammensetzung,
-  eigene Komponente) gewählt wurde, und bei Variante 2 oder 3 das A2UI-JSON, das der Agent
-  dafür senden muss.
-- Zustände: normal, lange Texte, fehlendes Bild, `REFUND`, mobil (375px).
+- Eine vollständige `index.html` mit allen drei Screens und eingebettetem CSS, die die
+  Haken aus „Was beim Redesign gleich bleiben muss“ unverändert enthält. Den
+  `<script type="module">`-Block der bestehenden Datei darf sie übernehmen, statt ihn
+  neu zu schreiben.
+- CSS für alle `a2ui-*`-Klassen aus der Komponententabelle.
+- Optional: Vorschläge für neue A2UI-Strukturen mit Beispiel-JSON.
+- Zustände: leeres Formular, Formular mit Fehlern, jede Wartestufe, `APPROVED` mit
+  1 und mit 3 Outfits, `REFUND`, fehlendes Bild, sehr langer Produkttitel, mobil (375px).
