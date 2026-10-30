@@ -5,6 +5,9 @@ import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
 import { createPaidAdapter, isPaidReady } from "./paid-task.mjs";
 import { taskTarget, isTaskForTarget } from "./task-target.mjs";
+import { pipelineAnswer } from "./logic/lead-agent.mjs";
+// Tasks run through the team pipeline; AITELIER_PIPELINE=false restores the plain LLM.
+const respond = process.env.AITELIER_PIPELINE === "false" ? answer : pipelineAnswer;
 const target = taskTarget();
 const id = target.coworkerId;
 const releaseLock = acquireWorkerLock();
@@ -37,7 +40,7 @@ function cli(args) {
 await client.health();
 const paid = await createPaidAdapter({
   target,
-  answer,
+  answer: respond,
   save: async (taskId, state) =>
     writeFileSync(`.local/${taskId}.json`, JSON.stringify(state), {
       mode: 0o600,
@@ -92,7 +95,7 @@ while (true) {
             JSON.stringify({ ...state, phase: "model-pending" }),
             { mode: 0o600 },
           );
-          const result = await answer(
+          const result = await respond(
             state.input,
             `.local/${t.id}-session.json`,
           );
