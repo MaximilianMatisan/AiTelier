@@ -187,6 +187,11 @@ async function main() {
       return { ok: true };
     })) &&
     (await stage(
+      "3b/4 drop sizes the customer cannot buy",
+      "Check that the envelope and customer.json from steps 2 and 3 exist.",
+      () => run("node", ["logic/buyable.mjs", "--envelope", envelope, "--customer", customer])
+    )) &&
+    (await stage(
       "4/4 stylist (Person 3)",
       `Needs Person 3's Python environment. Point at it with\n` +
         `  PYTHON=person3/.venv/bin/python node logic/run-pipeline.mjs\n` +
