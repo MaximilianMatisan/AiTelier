@@ -122,6 +122,33 @@ export function sizeLabels(raw) {
 }
 
 /**
+ * Men's waist in inches against the letter size the same trouser carries in
+ * shops that label by letter. Bottoms split almost evenly between the two
+ * systems - 894 waist-sized against 713 letter-sized - so a customer who
+ * states a waist reaches only a third of the trousers without this.
+ *
+ * It is an inference and it varies by brand, so it never enters the catalogue:
+ * `stock` keeps the labels the shop published. It translates what the
+ * *customer* asked for into the label the shops in front of them use, which is
+ * what a person does when they shop.
+ */
+export const WAIST_TO_LETTER = {
+  28: "XS", 29: "XS", 30: "S", 31: "S", 32: "M", 33: "M",
+  34: "L", 35: "L", 36: "XL", 37: "XL", 38: "XXL", 40: "XXL",
+};
+
+/** Every label that means the same size as `label`, the label itself first. */
+export function equivalentSizes(label) {
+  const size = normalizeSize(label);
+  const letter = WAIST_TO_LETTER[Number(size)];
+  if (letter) return [size, letter];
+  const waists = Object.entries(WAIST_TO_LETTER)
+    .filter(([, value]) => value === size)
+    .map(([waist]) => waist);
+  return waists.length ? [size, ...waists] : [size];
+}
+
+/**
  * What the shop itself calls the product. Themes and seasons use only this -
  * shops mix customs and logistics junk into tags, and asphaltgold tags every
  * jersey tee "knitted or crocheted" (an HS code), which made Nike t-shirts read

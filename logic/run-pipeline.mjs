@@ -18,6 +18,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { readOrder, refusal } from "./intake.mjs";
+import { equivalentSizes } from "./data/normalize.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -131,6 +132,68 @@ export function modelKeyReport(env = process.env) {
   };
 }
 
+const LAYER_CATEGORY = { base: "top", mid: "top", outer: "outerwear", bottom: "bottom", shoes: "shoes" };
+
+/**
+ * State the customer's size in the label the shops in front of them use.
+ *
+ * Person 3 keeps one label per slot (`customer.sizes: dict[str, str]`) and
+ * matches it exactly, so a waist 32 brief reaches only the waist-sized
+ * trousers - 3 of 28 in the demo shortlist. Bottoms are split almost evenly
+ * between waist and letter sizing, so the same person is turned away from half
+ * the catalogue over a labelling convention.
+ *
+ * We keep the stated label unless an equivalent one keeps a cheaper garment
+ * reachable, and we print every swap. Cheapest, not most: picking the label
+ * with the most items once traded three waist-sized trousers for fourteen
+ * letter-sized ones and lost the 59.98 EUR pair in the process, which put the
+ * only affordable outfit out of budget. Guarantee 1 is what this slot decides.
+ *
+ * The catalogue is never touched: `stock` keeps what the shop published, so
+ * guarantee 2 still rests on the shop's own data.
+ */
+export function fitSizesToCatalogue(sizes, envelope) {
+  const items = envelope.items ?? [];
+  const adjusted = { ...sizes };
+  const swaps = [];
+  for (const [layer, label] of Object.entries(sizes)) {
+    if (!label) continue;
+    const pool = items.filter((i) => i.category === LAYER_CATEGORY[layer]);
+    const buyable = (want) =>
+      pool.filter((i) =>
+        (i.sizes ?? []).some(
+          (s) => String(s.label).toLowerCase() === String(want).toLowerCase() && s.in_stock !== false
+        )
+      );
+    // Lower is better; a label that reaches nothing scores Infinity.
+    const score = (want) => {
+      const reachable = buyable(want);
+      return reachable.length
+        ? Math.min(...reachable.map((i) => i.price?.amount ?? Infinity))
+        : Infinity;
+    };
+    const stated = score(label);
+    let best = label;
+    let bestScore = stated;
+    for (const alternative of equivalentSizes(label).slice(1)) {
+      const value = score(alternative);
+      if (value < bestScore) {
+        best = alternative;
+        bestScore = value;
+      }
+    }
+    adjusted[layer] = best;
+    if (best !== label) {
+      const from = Number.isFinite(stated) ? `${stated} EUR` : "nothing";
+      swaps.push(
+        `${layer} ${label} -> ${best}: cheapest reachable ${from} -> ${bestScore} EUR` +
+          ` (${buyable(label).length} -> ${buyable(best).length} items)`
+      );
+    }
+  }
+  return { sizes: adjusted, swaps };
+}
+
 const stages = [];
 async function stage(name, hint, fn) {
   const started = Date.now();
@@ -218,10 +281,12 @@ async function main() {
       }
     )) &&
     (await stage("3/4 customer envelope (Person 1)", "", async () => {
-      await writeFile(
-        path.resolve(ROOT, customer),
-        JSON.stringify(orderToCustomer(order), null, 2) + "\n"
-      );
+      const brief = orderToCustomer(order);
+      const shortlisted = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
+      const { sizes, swaps } = fitSizesToCatalogue(brief.customer.sizes, shortlisted);
+      brief.customer.sizes = sizes;
+      for (const swap of swaps) console.log(`size: ${swap}`);
+      await writeFile(path.resolve(ROOT, customer), JSON.stringify(brief, null, 2) + "\n");
       console.log(`wrote ${customer}`);
       return { ok: true };
     })) &&

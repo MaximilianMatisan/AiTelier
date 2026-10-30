@@ -259,3 +259,38 @@ test("sharing one key between the two LLM steps is reported", async () => {
   assert.equal(none.filter, null);
   assert.equal(none.shared, false);
 });
+
+// --- size systems --------------------------------------------------------
+test("a stated waist also means its letter size", async () => {
+  // Bottoms split almost evenly between waist and letter sizing, so a waist 32
+  // brief reaches a third of the trousers on a labelling convention alone.
+  const { equivalentSizes } = await import("./logic/data/normalize.js");
+  assert.deepEqual(equivalentSizes("32"), ["32", "M"]);
+  assert.deepEqual(equivalentSizes("M"), ["M", "32", "33"]);
+  assert.deepEqual(equivalentSizes("43"), ["43"], "shoe sizes have no letter twin");
+  assert.deepEqual(equivalentSizes("ONE"), ["ONE"]);
+});
+
+test("the size swap follows the cheapest garment, not the biggest pile", async () => {
+  // Picking the label with the most items once traded three waist-sized
+  // trousers for fourteen letter-sized ones and lost the only affordable pair.
+  const { fitSizesToCatalogue } = await import("./logic/run-pipeline.mjs");
+  const envelope = {
+    items: [
+      { category: "bottom", price: { amount: 59.98 }, sizes: [{ label: "32", in_stock: true }] },
+      { category: "bottom", price: { amount: 90 }, sizes: [{ label: "M", in_stock: true }] },
+      { category: "bottom", price: { amount: 95 }, sizes: [{ label: "M", in_stock: true }] },
+      { category: "bottom", price: { amount: 99 }, sizes: [{ label: "M", in_stock: true }] },
+    ],
+  };
+  const kept = fitSizesToCatalogue({ bottom: "32" }, envelope);
+  assert.equal(kept.sizes.bottom, "32", "three dearer items must not outvote one cheap one");
+  assert.deepEqual(kept.swaps, []);
+
+  // With nothing reachable under the stated label, the equivalent wins.
+  const swapped = fitSizesToCatalogue({ bottom: "32" }, {
+    items: [{ category: "bottom", price: { amount: 70 }, sizes: [{ label: "M", in_stock: true }] }],
+  });
+  assert.equal(swapped.sizes.bottom, "M");
+  assert.equal(swapped.swaps.length, 1);
+});
