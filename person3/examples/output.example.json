@@ -1,0 +1,2037 @@
+{
+  "contract_version": "1.0",
+  "task_id": "aitelier-demo-001",
+  "status": "APPROVED",
+  "style_blend": [
+    "old money",
+    "minimal",
+    "quiet luxury",
+    "smart casual",
+    "heritage"
+  ],
+  "budget_label": "1200.00 EUR",
+  "outfits": [
+    {
+      "outfit_id": "look-1",
+      "name": "Old Money composition",
+      "style_blend": [
+        "old money",
+        "minimal",
+        "quiet luxury",
+        "smart casual",
+        "heritage"
+      ],
+      "item_ids": [
+        "base-oxford",
+        "mid-cardigan",
+        "outer-bomber",
+        "bottom-chinos",
+        "shoes-sneakers"
+      ],
+      "items": [
+        {
+          "item_id": "base-oxford",
+          "title": "Washed Oxford Shirt",
+          "brand": "Atelier",
+          "layer": "base",
+          "layer_label": "Base",
+          "size": "M",
+          "price": {
+            "amount": 89.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://atelier-munich.example/base-oxford",
+          "image_url": "http://127.0.0.1:21951/static/images/shirt.jpg",
+          "description": "Blue washed oxford shirt with a soft collar and a clean, straight hem.",
+          "fit_description": "slim",
+          "colors": [
+            {
+              "name": "blue",
+              "hex": "#6E8CA8"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 3,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "mid-cardigan",
+          "title": "Ribbed Wool Cardigan",
+          "brand": "Nordic",
+          "layer": "mid",
+          "layer_label": "Mid",
+          "size": "M",
+          "price": {
+            "amount": 149.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://nordic-wardrobe.example/mid-cardigan",
+          "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+          "description": "Ribbed wool cardigan with a straight fit and tonal buttons.",
+          "fit_description": "straight",
+          "colors": [
+            {
+              "name": "oat",
+              "hex": "#D6C7B4"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 4,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "outer-bomber",
+          "title": "Check Overshirt",
+          "brand": "Nordic",
+          "layer": "outer",
+          "layer_label": "Outer",
+          "size": "M",
+          "price": {
+            "amount": 199.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://nordic-wardrobe.example/outer-bomber",
+          "image_url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+          "description": "Light technical bomber with a clean front and weather-resistant shell.",
+          "fit_description": "regular",
+          "colors": [
+            {
+              "name": "rust",
+              "hex": "#A66B4F"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 4,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "bottom-chinos",
+          "title": "Pleated Cotton Chinos",
+          "brand": "Nordic",
+          "layer": "bottom",
+          "layer_label": "Bottom",
+          "size": "EU48",
+          "price": {
+            "amount": 109.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://nordic-wardrobe.example/bottom-chinos",
+          "image_url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+          "description": "Pleated cotton chinos with a straight leg and a mid rise.",
+          "fit_description": "straight",
+          "colors": [
+            {
+              "name": "khaki",
+              "hex": "#B4A17E"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 4,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "shoes-sneakers",
+          "title": "Minimal Leather Sneakers",
+          "brand": "Nordic",
+          "layer": "shoes",
+          "layer_label": "Shoes",
+          "size": "EU42",
+          "price": {
+            "amount": 119.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://nordic-wardrobe.example/shoes-sneakers",
+          "image_url": "http://127.0.0.1:21951/static/images/shoes-sneakers.webp",
+          "description": "Off-white leather sneakers with a minimal profile.",
+          "fit_description": "regular",
+          "colors": [
+            {
+              "name": "off-white",
+              "hex": "#EDE8DC"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 4,
+            "regions": [
+              "DE"
+            ]
+          }
+        }
+      ],
+      "layers": [
+        {
+          "layer": "base",
+          "label": "Base",
+          "item_id": "base-oxford",
+          "size": "M"
+        },
+        {
+          "layer": "mid",
+          "label": "Mid",
+          "item_id": "mid-cardigan",
+          "size": "M"
+        },
+        {
+          "layer": "outer",
+          "label": "Outer",
+          "item_id": "outer-bomber",
+          "size": "M"
+        },
+        {
+          "layer": "bottom",
+          "label": "Bottom",
+          "item_id": "bottom-chinos",
+          "size": "EU48"
+        },
+        {
+          "layer": "shoes",
+          "label": "Shoes",
+          "item_id": "shoes-sneakers",
+          "size": "EU42"
+        }
+      ],
+      "totals": {
+        "items": 669.5,
+        "shipping": 9.8,
+        "grand_total": 679.3,
+        "currency": "EUR"
+      },
+      "rationale": "A coherent old money look built from 5 layers, balanced across the requested palette and weather context.",
+      "fit_notes": "Straight fit with a defined waist; structured shoulders; no oversized outerwear.",
+      "confidence": 0.82,
+      "color_palette": [
+        "#6E8CA8",
+        "#D6C7B4",
+        "#A66B4F",
+        "#B4A17E",
+        "#EDE8DC"
+      ],
+      "guarantees": {
+        "ok": true,
+        "checks": {
+          "budget": {
+            "ok": true,
+            "detail": "679.30 EUR <= 1200.00 EUR"
+          },
+          "fit": {
+            "ok": true,
+            "detail": "all selected sizes and measurements are compatible"
+          },
+          "availability": {
+            "ok": true,
+            "detail": "all items live in stock"
+          },
+          "price_integrity": {
+            "ok": true,
+            "detail": "live prices match the catalogue"
+          },
+          "delivery": {
+            "ok": true,
+            "detail": "delivery regions and timing are valid"
+          }
+        }
+      },
+      "images": {
+        "board": "aitelier-demo-001/look-1-board.jpg"
+      }
+    },
+    {
+      "outfit_id": "look-2",
+      "name": "Minimal composition",
+      "style_blend": [
+        "old money",
+        "minimal",
+        "quiet luxury",
+        "smart casual",
+        "heritage"
+      ],
+      "item_ids": [
+        "base-check",
+        "mid-merino",
+        "outer-trench",
+        "bottom-jeans",
+        "shoes-boots"
+      ],
+      "items": [
+        {
+          "item_id": "base-check",
+          "title": "Blue Check Shirt",
+          "brand": "Nordic",
+          "layer": "base",
+          "layer_label": "Base",
+          "size": "M",
+          "price": {
+            "amount": 129.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://nordic-wardrobe.example/base-check",
+          "image_url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+          "description": "Classic blue and black check shirt with a regular collar.",
+          "fit_description": "regular",
+          "colors": [
+            {
+              "name": "blue",
+              "hex": "#4F6D8A"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 4,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "mid-merino",
+          "title": "Merino Crew Neck Sweater",
+          "brand": "Atelier",
+          "layer": "mid",
+          "layer_label": "Mid",
+          "size": "M",
+          "price": {
+            "amount": 129.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://atelier-munich.example/mid-merino",
+          "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+          "description": "Fine merino wool crew neck with a clean, flat knit.",
+          "fit_description": "slim",
+          "colors": [
+            {
+              "name": "cream",
+              "hex": "#E6DED0"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 3,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "outer-trench",
+          "title": "Wool Trench Coat",
+          "brand": "Atelier",
+          "layer": "outer",
+          "layer_label": "Outer",
+          "size": "M",
+          "price": {
+            "amount": 219.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://atelier-munich.example/outer-trench",
+          "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+          "description": "Water-resistant cotton trench with a belted waist and structured shoulders.",
+          "fit_description": "regular",
+          "colors": [
+            {
+              "name": "camel",
+              "hex": "#B38B62"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 3,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "bottom-jeans",
+          "title": "Straight Leg Selvedge Jeans",
+          "brand": "Atelier",
+          "layer": "bottom",
+          "layer_label": "Bottom",
+          "size": "EU48",
+          "price": {
+            "amount": 99.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://atelier-munich.example/bottom-jeans",
+          "image_url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+          "description": "Straight leg selvedge jeans with a mid rise and clean hem.",
+          "fit_description": "straight",
+          "colors": [
+            {
+              "name": "indigo",
+              "hex": "#3C4B5D"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 3,
+            "regions": [
+              "DE"
+            ]
+          }
+        },
+        {
+          "item_id": "shoes-boots",
+          "title": "Leather Chelsea Boots",
+          "brand": "Atelier",
+          "layer": "shoes",
+          "layer_label": "Shoes",
+          "size": "EU42",
+          "price": {
+            "amount": 159.9,
+            "currency": "EUR"
+          },
+          "product_url": "https://atelier-munich.example/shoes-boots",
+          "image_url": "http://127.0.0.1:21951/static/images/boots.jpg",
+          "description": "Brown leather Chelsea boots with a sleek shaft and rubber sole.",
+          "fit_description": "regular",
+          "colors": [
+            {
+              "name": "brown",
+              "hex": "#5E4433"
+            }
+          ],
+          "shipping": {
+            "amount": 4.9,
+            "currency": "EUR",
+            "days": 3,
+            "regions": [
+              "DE"
+            ]
+          }
+        }
+      ],
+      "layers": [
+        {
+          "layer": "base",
+          "label": "Base",
+          "item_id": "base-check",
+          "size": "M"
+        },
+        {
+          "layer": "mid",
+          "label": "Mid",
+          "item_id": "mid-merino",
+          "size": "M"
+        },
+        {
+          "layer": "outer",
+          "label": "Outer",
+          "item_id": "outer-trench",
+          "size": "M"
+        },
+        {
+          "layer": "bottom",
+          "label": "Bottom",
+          "item_id": "bottom-jeans",
+          "size": "EU48"
+        },
+        {
+          "layer": "shoes",
+          "label": "Shoes",
+          "item_id": "shoes-boots",
+          "size": "EU42"
+        }
+      ],
+      "totals": {
+        "items": 739.5,
+        "shipping": 9.8,
+        "grand_total": 749.3,
+        "currency": "EUR"
+      },
+      "rationale": "A coherent minimal look built from 5 layers, balanced across the requested palette and weather context.",
+      "fit_notes": "Straight fit with a defined waist; structured shoulders; no oversized outerwear.",
+      "confidence": 0.82,
+      "color_palette": [
+        "#4F6D8A",
+        "#E6DED0",
+        "#B38B62",
+        "#3C4B5D",
+        "#5E4433"
+      ],
+      "guarantees": {
+        "ok": true,
+        "checks": {
+          "budget": {
+            "ok": true,
+            "detail": "749.30 EUR <= 1200.00 EUR"
+          },
+          "fit": {
+            "ok": true,
+            "detail": "all selected sizes and measurements are compatible"
+          },
+          "availability": {
+            "ok": true,
+            "detail": "all items live in stock"
+          },
+          "price_integrity": {
+            "ok": true,
+            "detail": "live prices match the catalogue"
+          },
+          "delivery": {
+            "ok": true,
+            "detail": "delivery regions and timing are valid"
+          }
+        }
+      },
+      "images": {
+        "board": "aitelier-demo-001/look-2-board.jpg"
+      }
+    }
+  ],
+  "guarantees": {
+    "budget": {
+      "ok": true,
+      "detail": "679.30 EUR <= 1200.00 EUR; 749.30 EUR <= 1200.00 EUR"
+    },
+    "fit": {
+      "ok": true,
+      "detail": "all selected sizes and measurements are compatible; all selected sizes and measurements are compatible"
+    },
+    "availability": {
+      "ok": true,
+      "detail": "all items live in stock; all items live in stock"
+    },
+    "price_integrity": {
+      "ok": true,
+      "detail": "live prices match the catalogue; live prices match the catalogue"
+    },
+    "delivery": {
+      "ok": true,
+      "detail": "delivery regions and timing are valid; delivery regions and timing are valid"
+    }
+  },
+  "decision": {
+    "approved": true,
+    "reason": null
+  },
+  "refund": null,
+  "warnings": [
+    {
+      "code": "MEASUREMENT_UNIT_ASSUMED",
+      "message": "plain measurement values treated as centimetres"
+    }
+  ],
+  "lookbook": "aitelier-demo-001/lookbook.jpg",
+  "artifacts": {
+    "directory": "person3/artifacts/aitelier-demo-001",
+    "lookbook": "aitelier-demo-001/lookbook.jpg"
+  },
+  "markdown": "# AiTelier result — APPROVED\n\nTask: `aitelier-demo-001`\nStyle blend: old money, minimal, quiet luxury, smart casual, heritage\nBudget: 1200.00 EUR\n\n## Old Money composition\nTotal: 679.30 EUR\n\n![Old Money composition board](http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-1-board.jpg)\n\n- **Base**: Atelier Washed Oxford Shirt — size M — 89.90 EUR — [product](https://atelier-munich.example/base-oxford)\n- **Mid**: Nordic Ribbed Wool Cardigan — size M — 149.90 EUR — [product](https://nordic-wardrobe.example/mid-cardigan)\n- **Outer**: Nordic Check Overshirt — size M — 199.90 EUR — [product](https://nordic-wardrobe.example/outer-bomber)\n- **Bottom**: Nordic Pleated Cotton Chinos — size EU48 — 109.90 EUR — [product](https://nordic-wardrobe.example/bottom-chinos)\n- **Shoes**: Nordic Minimal Leather Sneakers — size EU42 — 119.90 EUR — [product](https://nordic-wardrobe.example/shoes-sneakers)\n\n_A coherent old money look built from 5 layers, balanced across the requested palette and weather context._\n\nGuarantees: budget=OK, fit=OK, availability=OK, price_integrity=OK, delivery=OK\n\n## Minimal composition\nTotal: 749.30 EUR\n\n![Minimal composition board](http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-2-board.jpg)\n\n- **Base**: Nordic Blue Check Shirt — size M — 129.90 EUR — [product](https://nordic-wardrobe.example/base-check)\n- **Mid**: Atelier Merino Crew Neck Sweater — size M — 129.90 EUR — [product](https://atelier-munich.example/mid-merino)\n- **Outer**: Atelier Wool Trench Coat — size M — 219.90 EUR — [product](https://atelier-munich.example/outer-trench)\n- **Bottom**: Atelier Straight Leg Selvedge Jeans — size EU48 — 99.90 EUR — [product](https://atelier-munich.example/bottom-jeans)\n- **Shoes**: Atelier Leather Chelsea Boots — size EU42 — 159.90 EUR — [product](https://atelier-munich.example/shoes-boots)\n\n_A coherent minimal look built from 5 layers, balanced across the requested palette and weather context._\n\nGuarantees: budget=OK, fit=OK, availability=OK, price_integrity=OK, delivery=OK\n\nWarnings: MEASUREMENT_UNIT_ASSUMED\n",
+  "a2ui": {
+    "version": "v0.9.1",
+    "surface_id": "aitelier-gallery-aitelier-demo-001",
+    "catalog_id": "https://a2ui.org/specification/v0_9_1/catalogs/basic/catalog.json",
+    "theme": {
+      "primaryColor": "#1F2A44",
+      "agentDisplayName": "AiTelier Stylist"
+    },
+    "messages": [
+      {
+        "version": "v0.9.1",
+        "createSurface": {
+          "surfaceId": "aitelier-gallery-aitelier-demo-001",
+          "catalogId": "https://a2ui.org/specification/v0_9_1/catalogs/basic/catalog.json",
+          "theme": {
+            "primaryColor": "#1F2A44",
+            "agentDisplayName": "AiTelier Stylist"
+          },
+          "sendDataModel": false
+        }
+      },
+      {
+        "version": "v0.9.1",
+        "updateComponents": {
+          "surfaceId": "aitelier-gallery-aitelier-demo-001",
+          "components": [
+            {
+              "id": "header",
+              "component": "Text",
+              "text": "AiTelier — Approved Looks",
+              "variant": "h1"
+            },
+            {
+              "id": "summary",
+              "component": "Text",
+              "text": "Style blend: old money, minimal, quiet luxury, smart casual, heritage · Budget: 1200.00 EUR",
+              "variant": "body"
+            },
+            {
+              "id": "outfit_0",
+              "component": "Card",
+              "child": "outfit_0_body"
+            },
+            {
+              "id": "outfit_0_body_board",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-1-board.jpg",
+              "fit": "cover",
+              "variant": "largeFeature",
+              "description": "Old Money composition product board"
+            },
+            {
+              "id": "outfit_0_body_name",
+              "component": "Text",
+              "text": "Old Money composition",
+              "variant": "h2"
+            },
+            {
+              "id": "outfit_0_body_total",
+              "component": "Text",
+              "text": "Total: 679.30 EUR · 5 layers",
+              "variant": "body"
+            },
+            {
+              "id": "outfit_0_body_rationale",
+              "component": "Text",
+              "text": "A coherent old money look built from 5 layers, balanced across the requested palette and weather context.",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_0_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/shirt.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Washed Oxford Shirt"
+            },
+            {
+              "id": "outfit_0_body_layer_0_title",
+              "component": "Text",
+              "text": "Atelier Washed Oxford Shirt",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_0_body_layer_0_detail",
+              "component": "Text",
+              "text": "Size M · 89.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_0_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_0_body_layer_0_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_0_body_layer_0_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://atelier-munich.example/base-oxford"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_0_body_layer_0",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_layer_0_image",
+                "outfit_0_body_layer_0_title",
+                "outfit_0_body_layer_0_detail",
+                "outfit_0_body_layer_0_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body_layer_1_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Ribbed Wool Cardigan"
+            },
+            {
+              "id": "outfit_0_body_layer_1_title",
+              "component": "Text",
+              "text": "Nordic Ribbed Wool Cardigan",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_0_body_layer_1_detail",
+              "component": "Text",
+              "text": "Size M · 149.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_1_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_0_body_layer_1_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_0_body_layer_1_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://nordic-wardrobe.example/mid-cardigan"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_0_body_layer_1",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_layer_1_image",
+                "outfit_0_body_layer_1_title",
+                "outfit_0_body_layer_1_detail",
+                "outfit_0_body_layer_1_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body_layer_2_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Check Overshirt"
+            },
+            {
+              "id": "outfit_0_body_layer_2_title",
+              "component": "Text",
+              "text": "Nordic Check Overshirt",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_0_body_layer_2_detail",
+              "component": "Text",
+              "text": "Size M · 199.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_2_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_0_body_layer_2_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_0_body_layer_2_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://nordic-wardrobe.example/outer-bomber"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_0_body_layer_2",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_layer_2_image",
+                "outfit_0_body_layer_2_title",
+                "outfit_0_body_layer_2_detail",
+                "outfit_0_body_layer_2_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body_layer_3_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Pleated Cotton Chinos"
+            },
+            {
+              "id": "outfit_0_body_layer_3_title",
+              "component": "Text",
+              "text": "Nordic Pleated Cotton Chinos",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_0_body_layer_3_detail",
+              "component": "Text",
+              "text": "Size EU48 · 109.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_3_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_0_body_layer_3_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_0_body_layer_3_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://nordic-wardrobe.example/bottom-chinos"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_0_body_layer_3",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_layer_3_image",
+                "outfit_0_body_layer_3_title",
+                "outfit_0_body_layer_3_detail",
+                "outfit_0_body_layer_3_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body_layer_4_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/shoes-sneakers.webp",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Minimal Leather Sneakers"
+            },
+            {
+              "id": "outfit_0_body_layer_4_title",
+              "component": "Text",
+              "text": "Nordic Minimal Leather Sneakers",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_0_body_layer_4_detail",
+              "component": "Text",
+              "text": "Size EU42 · 119.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_layer_4_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_0_body_layer_4_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_0_body_layer_4_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://nordic-wardrobe.example/shoes-sneakers"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_0_body_layer_4",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_layer_4_image",
+                "outfit_0_body_layer_4_title",
+                "outfit_0_body_layer_4_detail",
+                "outfit_0_body_layer_4_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body_tabs",
+              "component": "Tabs",
+              "tabs": [
+                {
+                  "title": "Base — Washed Oxford Shirt",
+                  "child": "outfit_0_body_layer_0"
+                },
+                {
+                  "title": "Mid — Ribbed Wool Cardigan",
+                  "child": "outfit_0_body_layer_1"
+                },
+                {
+                  "title": "Outer — Check Overshirt",
+                  "child": "outfit_0_body_layer_2"
+                },
+                {
+                  "title": "Bottom — Pleated Cotton Chinos",
+                  "child": "outfit_0_body_layer_3"
+                },
+                {
+                  "title": "Shoes — Minimal Leather Sneakers",
+                  "child": "outfit_0_body_layer_4"
+                }
+              ]
+            },
+            {
+              "id": "outfit_0_body_guarantees_row_0",
+              "component": "Row",
+              "children": [
+                "outfit_0_body_guarantees_icon_0",
+                "outfit_0_body_guarantees_text_0"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_0_body_guarantees_icon_0",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_0_body_guarantees_text_0",
+              "component": "Text",
+              "text": "Budget: OK — 679.30 EUR <= 1200.00 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_guarantees_row_1",
+              "component": "Row",
+              "children": [
+                "outfit_0_body_guarantees_icon_1",
+                "outfit_0_body_guarantees_text_1"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_0_body_guarantees_icon_1",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_0_body_guarantees_text_1",
+              "component": "Text",
+              "text": "Fit: OK — all selected sizes and measurements are compatible",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_guarantees_row_2",
+              "component": "Row",
+              "children": [
+                "outfit_0_body_guarantees_icon_2",
+                "outfit_0_body_guarantees_text_2"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_0_body_guarantees_icon_2",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_0_body_guarantees_text_2",
+              "component": "Text",
+              "text": "Availability: OK — all items live in stock",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_guarantees_row_3",
+              "component": "Row",
+              "children": [
+                "outfit_0_body_guarantees_icon_3",
+                "outfit_0_body_guarantees_text_3"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_0_body_guarantees_icon_3",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_0_body_guarantees_text_3",
+              "component": "Text",
+              "text": "Price integrity: OK — live prices match the catalogue",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_guarantees_row_4",
+              "component": "Row",
+              "children": [
+                "outfit_0_body_guarantees_icon_4",
+                "outfit_0_body_guarantees_text_4"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_0_body_guarantees_icon_4",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_0_body_guarantees_text_4",
+              "component": "Text",
+              "text": "Delivery: OK — delivery regions and timing are valid",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_0_body_guarantees",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_guarantees_row_0",
+                "outfit_0_body_guarantees_row_1",
+                "outfit_0_body_guarantees_row_2",
+                "outfit_0_body_guarantees_row_3",
+                "outfit_0_body_guarantees_row_4"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_0_body",
+              "component": "Column",
+              "children": [
+                "outfit_0_body_board",
+                "outfit_0_body_name",
+                "outfit_0_body_total",
+                "outfit_0_body_rationale",
+                "outfit_0_body_tabs",
+                "outfit_0_body_guarantees"
+              ],
+              "align": "stretch"
+            },
+            {
+              "id": "outfit_1",
+              "component": "Card",
+              "child": "outfit_1_body"
+            },
+            {
+              "id": "outfit_1_body_board",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-2-board.jpg",
+              "fit": "cover",
+              "variant": "largeFeature",
+              "description": "Minimal composition product board"
+            },
+            {
+              "id": "outfit_1_body_name",
+              "component": "Text",
+              "text": "Minimal composition",
+              "variant": "h2"
+            },
+            {
+              "id": "outfit_1_body_total",
+              "component": "Text",
+              "text": "Total: 749.30 EUR · 5 layers",
+              "variant": "body"
+            },
+            {
+              "id": "outfit_1_body_rationale",
+              "component": "Text",
+              "text": "A coherent minimal look built from 5 layers, balanced across the requested palette and weather context.",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_0_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Blue Check Shirt"
+            },
+            {
+              "id": "outfit_1_body_layer_0_title",
+              "component": "Text",
+              "text": "Nordic Blue Check Shirt",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_1_body_layer_0_detail",
+              "component": "Text",
+              "text": "Size M · 129.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_0_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_1_body_layer_0_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_1_body_layer_0_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://nordic-wardrobe.example/base-check"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_1_body_layer_0",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_layer_0_image",
+                "outfit_1_body_layer_0_title",
+                "outfit_1_body_layer_0_detail",
+                "outfit_1_body_layer_0_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body_layer_1_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Merino Crew Neck Sweater"
+            },
+            {
+              "id": "outfit_1_body_layer_1_title",
+              "component": "Text",
+              "text": "Atelier Merino Crew Neck Sweater",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_1_body_layer_1_detail",
+              "component": "Text",
+              "text": "Size M · 129.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_1_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_1_body_layer_1_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_1_body_layer_1_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://atelier-munich.example/mid-merino"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_1_body_layer_1",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_layer_1_image",
+                "outfit_1_body_layer_1_title",
+                "outfit_1_body_layer_1_detail",
+                "outfit_1_body_layer_1_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body_layer_2_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Wool Trench Coat"
+            },
+            {
+              "id": "outfit_1_body_layer_2_title",
+              "component": "Text",
+              "text": "Atelier Wool Trench Coat",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_1_body_layer_2_detail",
+              "component": "Text",
+              "text": "Size M · 219.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_2_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_1_body_layer_2_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_1_body_layer_2_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://atelier-munich.example/outer-trench"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_1_body_layer_2",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_layer_2_image",
+                "outfit_1_body_layer_2_title",
+                "outfit_1_body_layer_2_detail",
+                "outfit_1_body_layer_2_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body_layer_3_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Straight Leg Selvedge Jeans"
+            },
+            {
+              "id": "outfit_1_body_layer_3_title",
+              "component": "Text",
+              "text": "Atelier Straight Leg Selvedge Jeans",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_1_body_layer_3_detail",
+              "component": "Text",
+              "text": "Size EU48 · 99.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_3_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_1_body_layer_3_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_1_body_layer_3_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://atelier-munich.example/bottom-jeans"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_1_body_layer_3",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_layer_3_image",
+                "outfit_1_body_layer_3_title",
+                "outfit_1_body_layer_3_detail",
+                "outfit_1_body_layer_3_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body_layer_4_image",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/static/images/boots.jpg",
+              "fit": "contain",
+              "variant": "mediumFeature",
+              "description": "Leather Chelsea Boots"
+            },
+            {
+              "id": "outfit_1_body_layer_4_title",
+              "component": "Text",
+              "text": "Atelier Leather Chelsea Boots",
+              "variant": "h3"
+            },
+            {
+              "id": "outfit_1_body_layer_4_detail",
+              "component": "Text",
+              "text": "Size EU42 · 159.90 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_layer_4_link_text",
+              "component": "Text",
+              "text": "Open product page"
+            },
+            {
+              "id": "outfit_1_body_layer_4_link",
+              "component": "Button",
+              "variant": "borderless",
+              "child": "outfit_1_body_layer_4_link_text",
+              "action": {
+                "functionCall": {
+                  "call": "openUrl",
+                  "args": {
+                    "url": "https://atelier-munich.example/shoes-boots"
+                  }
+                }
+              }
+            },
+            {
+              "id": "outfit_1_body_layer_4",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_layer_4_image",
+                "outfit_1_body_layer_4_title",
+                "outfit_1_body_layer_4_detail",
+                "outfit_1_body_layer_4_link"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body_tabs",
+              "component": "Tabs",
+              "tabs": [
+                {
+                  "title": "Base — Blue Check Shirt",
+                  "child": "outfit_1_body_layer_0"
+                },
+                {
+                  "title": "Mid — Merino Crew Neck Sweater",
+                  "child": "outfit_1_body_layer_1"
+                },
+                {
+                  "title": "Outer — Wool Trench Coat",
+                  "child": "outfit_1_body_layer_2"
+                },
+                {
+                  "title": "Bottom — Straight Leg Selvedge Jeans",
+                  "child": "outfit_1_body_layer_3"
+                },
+                {
+                  "title": "Shoes — Leather Chelsea Boots",
+                  "child": "outfit_1_body_layer_4"
+                }
+              ]
+            },
+            {
+              "id": "outfit_1_body_guarantees_row_0",
+              "component": "Row",
+              "children": [
+                "outfit_1_body_guarantees_icon_0",
+                "outfit_1_body_guarantees_text_0"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_1_body_guarantees_icon_0",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_1_body_guarantees_text_0",
+              "component": "Text",
+              "text": "Budget: OK — 749.30 EUR <= 1200.00 EUR",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_guarantees_row_1",
+              "component": "Row",
+              "children": [
+                "outfit_1_body_guarantees_icon_1",
+                "outfit_1_body_guarantees_text_1"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_1_body_guarantees_icon_1",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_1_body_guarantees_text_1",
+              "component": "Text",
+              "text": "Fit: OK — all selected sizes and measurements are compatible",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_guarantees_row_2",
+              "component": "Row",
+              "children": [
+                "outfit_1_body_guarantees_icon_2",
+                "outfit_1_body_guarantees_text_2"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_1_body_guarantees_icon_2",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_1_body_guarantees_text_2",
+              "component": "Text",
+              "text": "Availability: OK — all items live in stock",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_guarantees_row_3",
+              "component": "Row",
+              "children": [
+                "outfit_1_body_guarantees_icon_3",
+                "outfit_1_body_guarantees_text_3"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_1_body_guarantees_icon_3",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_1_body_guarantees_text_3",
+              "component": "Text",
+              "text": "Price integrity: OK — live prices match the catalogue",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_guarantees_row_4",
+              "component": "Row",
+              "children": [
+                "outfit_1_body_guarantees_icon_4",
+                "outfit_1_body_guarantees_text_4"
+              ],
+              "align": "center"
+            },
+            {
+              "id": "outfit_1_body_guarantees_icon_4",
+              "component": "Icon",
+              "name": "check"
+            },
+            {
+              "id": "outfit_1_body_guarantees_text_4",
+              "component": "Text",
+              "text": "Delivery: OK — delivery regions and timing are valid",
+              "variant": "caption"
+            },
+            {
+              "id": "outfit_1_body_guarantees",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_guarantees_row_0",
+                "outfit_1_body_guarantees_row_1",
+                "outfit_1_body_guarantees_row_2",
+                "outfit_1_body_guarantees_row_3",
+                "outfit_1_body_guarantees_row_4"
+              ],
+              "align": "start"
+            },
+            {
+              "id": "outfit_1_body",
+              "component": "Column",
+              "children": [
+                "outfit_1_body_board",
+                "outfit_1_body_name",
+                "outfit_1_body_total",
+                "outfit_1_body_rationale",
+                "outfit_1_body_tabs",
+                "outfit_1_body_guarantees"
+              ],
+              "align": "stretch"
+            },
+            {
+              "id": "gallery",
+              "component": "List",
+              "children": [
+                "outfit_0",
+                "outfit_1"
+              ],
+              "direction": "vertical"
+            },
+            {
+              "id": "lookbook",
+              "component": "Image",
+              "url": "http://127.0.0.1:21951/artifacts/aitelier-demo-001/lookbook.jpg",
+              "fit": "contain",
+              "variant": "largeFeature",
+              "description": "AiTelier lookbook"
+            },
+            {
+              "id": "decision",
+              "component": "Text",
+              "text": "Approved: all five guarantees passed.",
+              "variant": "h3"
+            },
+            {
+              "id": "warnings",
+              "component": "Text",
+              "text": "Warnings: MEASUREMENT_UNIT_ASSUMED",
+              "variant": "caption"
+            },
+            {
+              "id": "root",
+              "component": "Column",
+              "children": [
+                "header",
+                "summary",
+                "gallery",
+                "lookbook",
+                "decision",
+                "warnings"
+              ],
+              "align": "stretch"
+            }
+          ]
+        }
+      },
+      {
+        "version": "v0.9.1",
+        "updateDataModel": {
+          "surfaceId": "aitelier-gallery-aitelier-demo-001",
+          "path": "/",
+          "value": {
+            "task_id": "aitelier-demo-001",
+            "status": "APPROVED",
+            "style_blend": [
+              "old money",
+              "minimal",
+              "quiet luxury",
+              "smart casual",
+              "heritage"
+            ],
+            "outfits": [
+              {
+                "outfit_id": "look-1",
+                "name": "Old Money composition",
+                "style_blend": [
+                  "old money",
+                  "minimal",
+                  "quiet luxury",
+                  "smart casual",
+                  "heritage"
+                ],
+                "item_ids": [
+                  "base-oxford",
+                  "mid-cardigan",
+                  "outer-bomber",
+                  "bottom-chinos",
+                  "shoes-sneakers"
+                ],
+                "items": [
+                  {
+                    "item_id": "base-oxford",
+                    "title": "Washed Oxford Shirt",
+                    "brand": "Atelier",
+                    "layer": "base",
+                    "layer_label": "Base",
+                    "size": "M",
+                    "price": {
+                      "amount": 89.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://atelier-munich.example/base-oxford",
+                    "image_url": "http://127.0.0.1:21951/static/images/shirt.jpg",
+                    "description": "Blue washed oxford shirt with a soft collar and a clean, straight hem.",
+                    "fit_description": "slim",
+                    "colors": [
+                      {
+                        "name": "blue",
+                        "hex": "#6E8CA8"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 3,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "mid-cardigan",
+                    "title": "Ribbed Wool Cardigan",
+                    "brand": "Nordic",
+                    "layer": "mid",
+                    "layer_label": "Mid",
+                    "size": "M",
+                    "price": {
+                      "amount": 149.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://nordic-wardrobe.example/mid-cardigan",
+                    "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+                    "description": "Ribbed wool cardigan with a straight fit and tonal buttons.",
+                    "fit_description": "straight",
+                    "colors": [
+                      {
+                        "name": "oat",
+                        "hex": "#D6C7B4"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 4,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "outer-bomber",
+                    "title": "Check Overshirt",
+                    "brand": "Nordic",
+                    "layer": "outer",
+                    "layer_label": "Outer",
+                    "size": "M",
+                    "price": {
+                      "amount": 199.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://nordic-wardrobe.example/outer-bomber",
+                    "image_url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+                    "description": "Light technical bomber with a clean front and weather-resistant shell.",
+                    "fit_description": "regular",
+                    "colors": [
+                      {
+                        "name": "rust",
+                        "hex": "#A66B4F"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 4,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "bottom-chinos",
+                    "title": "Pleated Cotton Chinos",
+                    "brand": "Nordic",
+                    "layer": "bottom",
+                    "layer_label": "Bottom",
+                    "size": "EU48",
+                    "price": {
+                      "amount": 109.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://nordic-wardrobe.example/bottom-chinos",
+                    "image_url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+                    "description": "Pleated cotton chinos with a straight leg and a mid rise.",
+                    "fit_description": "straight",
+                    "colors": [
+                      {
+                        "name": "khaki",
+                        "hex": "#B4A17E"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 4,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "shoes-sneakers",
+                    "title": "Minimal Leather Sneakers",
+                    "brand": "Nordic",
+                    "layer": "shoes",
+                    "layer_label": "Shoes",
+                    "size": "EU42",
+                    "price": {
+                      "amount": 119.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://nordic-wardrobe.example/shoes-sneakers",
+                    "image_url": "http://127.0.0.1:21951/static/images/shoes-sneakers.webp",
+                    "description": "Off-white leather sneakers with a minimal profile.",
+                    "fit_description": "regular",
+                    "colors": [
+                      {
+                        "name": "off-white",
+                        "hex": "#EDE8DC"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 4,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  }
+                ],
+                "layers": [
+                  {
+                    "layer": "base",
+                    "label": "Base",
+                    "item_id": "base-oxford",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "mid",
+                    "label": "Mid",
+                    "item_id": "mid-cardigan",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "outer",
+                    "label": "Outer",
+                    "item_id": "outer-bomber",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "bottom",
+                    "label": "Bottom",
+                    "item_id": "bottom-chinos",
+                    "size": "EU48"
+                  },
+                  {
+                    "layer": "shoes",
+                    "label": "Shoes",
+                    "item_id": "shoes-sneakers",
+                    "size": "EU42"
+                  }
+                ],
+                "totals": {
+                  "items": 669.5,
+                  "shipping": 9.8,
+                  "grand_total": 679.3,
+                  "currency": "EUR"
+                },
+                "rationale": "A coherent old money look built from 5 layers, balanced across the requested palette and weather context.",
+                "fit_notes": "Straight fit with a defined waist; structured shoulders; no oversized outerwear.",
+                "confidence": 0.82,
+                "color_palette": [
+                  "#6E8CA8",
+                  "#D6C7B4",
+                  "#A66B4F",
+                  "#B4A17E",
+                  "#EDE8DC"
+                ],
+                "guarantees": {
+                  "ok": true,
+                  "checks": {
+                    "budget": {
+                      "ok": true,
+                      "detail": "679.30 EUR <= 1200.00 EUR"
+                    },
+                    "fit": {
+                      "ok": true,
+                      "detail": "all selected sizes and measurements are compatible"
+                    },
+                    "availability": {
+                      "ok": true,
+                      "detail": "all items live in stock"
+                    },
+                    "price_integrity": {
+                      "ok": true,
+                      "detail": "live prices match the catalogue"
+                    },
+                    "delivery": {
+                      "ok": true,
+                      "detail": "delivery regions and timing are valid"
+                    }
+                  }
+                },
+                "images": {
+                  "board": "aitelier-demo-001/look-1-board.jpg"
+                }
+              },
+              {
+                "outfit_id": "look-2",
+                "name": "Minimal composition",
+                "style_blend": [
+                  "old money",
+                  "minimal",
+                  "quiet luxury",
+                  "smart casual",
+                  "heritage"
+                ],
+                "item_ids": [
+                  "base-check",
+                  "mid-merino",
+                  "outer-trench",
+                  "bottom-jeans",
+                  "shoes-boots"
+                ],
+                "items": [
+                  {
+                    "item_id": "base-check",
+                    "title": "Blue Check Shirt",
+                    "brand": "Nordic",
+                    "layer": "base",
+                    "layer_label": "Base",
+                    "size": "M",
+                    "price": {
+                      "amount": 129.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://nordic-wardrobe.example/base-check",
+                    "image_url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp",
+                    "description": "Classic blue and black check shirt with a regular collar.",
+                    "fit_description": "regular",
+                    "colors": [
+                      {
+                        "name": "blue",
+                        "hex": "#4F6D8A"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 4,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "mid-merino",
+                    "title": "Merino Crew Neck Sweater",
+                    "brand": "Atelier",
+                    "layer": "mid",
+                    "layer_label": "Mid",
+                    "size": "M",
+                    "price": {
+                      "amount": 129.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://atelier-munich.example/mid-merino",
+                    "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+                    "description": "Fine merino wool crew neck with a clean, flat knit.",
+                    "fit_description": "slim",
+                    "colors": [
+                      {
+                        "name": "cream",
+                        "hex": "#E6DED0"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 3,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "outer-trench",
+                    "title": "Wool Trench Coat",
+                    "brand": "Atelier",
+                    "layer": "outer",
+                    "layer_label": "Outer",
+                    "size": "M",
+                    "price": {
+                      "amount": 219.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://atelier-munich.example/outer-trench",
+                    "image_url": "http://127.0.0.1:21951/static/images/sweater.jpg",
+                    "description": "Water-resistant cotton trench with a belted waist and structured shoulders.",
+                    "fit_description": "regular",
+                    "colors": [
+                      {
+                        "name": "camel",
+                        "hex": "#B38B62"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 3,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "bottom-jeans",
+                    "title": "Straight Leg Selvedge Jeans",
+                    "brand": "Atelier",
+                    "layer": "bottom",
+                    "layer_label": "Bottom",
+                    "size": "EU48",
+                    "price": {
+                      "amount": 99.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://atelier-munich.example/bottom-jeans",
+                    "image_url": "http://127.0.0.1:21951/static/images/jeans.jpg",
+                    "description": "Straight leg selvedge jeans with a mid rise and clean hem.",
+                    "fit_description": "straight",
+                    "colors": [
+                      {
+                        "name": "indigo",
+                        "hex": "#3C4B5D"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 3,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  },
+                  {
+                    "item_id": "shoes-boots",
+                    "title": "Leather Chelsea Boots",
+                    "brand": "Atelier",
+                    "layer": "shoes",
+                    "layer_label": "Shoes",
+                    "size": "EU42",
+                    "price": {
+                      "amount": 159.9,
+                      "currency": "EUR"
+                    },
+                    "product_url": "https://atelier-munich.example/shoes-boots",
+                    "image_url": "http://127.0.0.1:21951/static/images/boots.jpg",
+                    "description": "Brown leather Chelsea boots with a sleek shaft and rubber sole.",
+                    "fit_description": "regular",
+                    "colors": [
+                      {
+                        "name": "brown",
+                        "hex": "#5E4433"
+                      }
+                    ],
+                    "shipping": {
+                      "amount": 4.9,
+                      "currency": "EUR",
+                      "days": 3,
+                      "regions": [
+                        "DE"
+                      ]
+                    }
+                  }
+                ],
+                "layers": [
+                  {
+                    "layer": "base",
+                    "label": "Base",
+                    "item_id": "base-check",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "mid",
+                    "label": "Mid",
+                    "item_id": "mid-merino",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "outer",
+                    "label": "Outer",
+                    "item_id": "outer-trench",
+                    "size": "M"
+                  },
+                  {
+                    "layer": "bottom",
+                    "label": "Bottom",
+                    "item_id": "bottom-jeans",
+                    "size": "EU48"
+                  },
+                  {
+                    "layer": "shoes",
+                    "label": "Shoes",
+                    "item_id": "shoes-boots",
+                    "size": "EU42"
+                  }
+                ],
+                "totals": {
+                  "items": 739.5,
+                  "shipping": 9.8,
+                  "grand_total": 749.3,
+                  "currency": "EUR"
+                },
+                "rationale": "A coherent minimal look built from 5 layers, balanced across the requested palette and weather context.",
+                "fit_notes": "Straight fit with a defined waist; structured shoulders; no oversized outerwear.",
+                "confidence": 0.82,
+                "color_palette": [
+                  "#4F6D8A",
+                  "#E6DED0",
+                  "#B38B62",
+                  "#3C4B5D",
+                  "#5E4433"
+                ],
+                "guarantees": {
+                  "ok": true,
+                  "checks": {
+                    "budget": {
+                      "ok": true,
+                      "detail": "749.30 EUR <= 1200.00 EUR"
+                    },
+                    "fit": {
+                      "ok": true,
+                      "detail": "all selected sizes and measurements are compatible"
+                    },
+                    "availability": {
+                      "ok": true,
+                      "detail": "all items live in stock"
+                    },
+                    "price_integrity": {
+                      "ok": true,
+                      "detail": "live prices match the catalogue"
+                    },
+                    "delivery": {
+                      "ok": true,
+                      "detail": "delivery regions and timing are valid"
+                    }
+                  }
+                },
+                "images": {
+                  "board": "aitelier-demo-001/look-2-board.jpg"
+                }
+              }
+            ],
+            "guarantees": {
+              "budget": {
+                "ok": true,
+                "detail": "679.30 EUR <= 1200.00 EUR; 749.30 EUR <= 1200.00 EUR"
+              },
+              "fit": {
+                "ok": true,
+                "detail": "all selected sizes and measurements are compatible; all selected sizes and measurements are compatible"
+              },
+              "availability": {
+                "ok": true,
+                "detail": "all items live in stock; all items live in stock"
+              },
+              "price_integrity": {
+                "ok": true,
+                "detail": "live prices match the catalogue; live prices match the catalogue"
+              },
+              "delivery": {
+                "ok": true,
+                "detail": "delivery regions and timing are valid; delivery regions and timing are valid"
+              }
+            },
+            "decision": {
+              "approved": true,
+              "reason": null
+            },
+            "refund": null
+          }
+        }
+      }
+    ],
+    "valid": true,
+    "errors": [],
+    "fallback_markdown": "# AiTelier result — APPROVED\n\nTask: `aitelier-demo-001`\nStyle blend: old money, minimal, quiet luxury, smart casual, heritage\nBudget: 1200.00 EUR\n\n## Old Money composition\nTotal: 679.30 EUR\n\n![Old Money composition board](http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-1-board.jpg)\n\n- **Base**: Atelier Washed Oxford Shirt — size M — 89.90 EUR — [product](https://atelier-munich.example/base-oxford)\n- **Mid**: Nordic Ribbed Wool Cardigan — size M — 149.90 EUR — [product](https://nordic-wardrobe.example/mid-cardigan)\n- **Outer**: Nordic Check Overshirt — size M — 199.90 EUR — [product](https://nordic-wardrobe.example/outer-bomber)\n- **Bottom**: Nordic Pleated Cotton Chinos — size EU48 — 109.90 EUR — [product](https://nordic-wardrobe.example/bottom-chinos)\n- **Shoes**: Nordic Minimal Leather Sneakers — size EU42 — 119.90 EUR — [product](https://nordic-wardrobe.example/shoes-sneakers)\n\n_A coherent old money look built from 5 layers, balanced across the requested palette and weather context._\n\nGuarantees: budget=OK, fit=OK, availability=OK, price_integrity=OK, delivery=OK\n\n## Minimal composition\nTotal: 749.30 EUR\n\n![Minimal composition board](http://127.0.0.1:21951/artifacts/aitelier-demo-001/look-2-board.jpg)\n\n- **Base**: Nordic Blue Check Shirt — size M — 129.90 EUR — [product](https://nordic-wardrobe.example/base-check)\n- **Mid**: Atelier Merino Crew Neck Sweater — size M — 129.90 EUR — [product](https://atelier-munich.example/mid-merino)\n- **Outer**: Atelier Wool Trench Coat — size M — 219.90 EUR — [product](https://atelier-munich.example/outer-trench)\n- **Bottom**: Atelier Straight Leg Selvedge Jeans — size EU48 — 99.90 EUR — [product](https://atelier-munich.example/bottom-jeans)\n- **Shoes**: Atelier Leather Chelsea Boots — size EU42 — 159.90 EUR — [product](https://atelier-munich.example/shoes-boots)\n\n_A coherent minimal look built from 5 layers, balanced across the requested palette and weather context._\n\nGuarantees: budget=OK, fit=OK, availability=OK, price_integrity=OK, delivery=OK\n\nWarnings: MEASUREMENT_UNIT_ASSUMED\n"
+  }
+}

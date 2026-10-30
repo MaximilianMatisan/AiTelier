@@ -1,0 +1,310 @@
+{
+  "contract_version": "1.0",
+  "task_id": "aitelier-demo-001",
+  "currency": "EUR",
+  "locale": "de-DE",
+  "customer": {
+    "budget": {"amount": 1200, "currency": "EUR"},
+    "item_count": 5,
+    "outfit_count": 2,
+    "style": ["old money", "minimal", "quiet luxury", "smart casual", "heritage"],
+    "fit": ["slim", "straight through the leg"],
+    "fit_description": "Straight fit with a defined waist; structured shoulders; no oversized outerwear.",
+    "gender": "men",
+    "season": "winter",
+    "climate": "Munich, cold and wet",
+    "measurements_cm": {
+      "height": 178,
+      "chest": 96,
+      "shoulder": 42,
+      "waist": 82,
+      "inseam": 82
+    },
+    "sizes": {
+      "base": "M",
+      "mid": "M",
+      "outer": "M",
+      "bottom": "EU48",
+      "shoes": "EU42"
+    },
+    "must_have": ["water-resistant outer layer"],
+    "avoid": ["large logos"],
+    "deadline": "2030-12-31",
+    "photo": null
+  },
+  "shops": [
+    {
+      "shop_id": "atelier-munich",
+      "name": "Atelier Munich",
+      "domain": "atelier-munich.example",
+      "base_url": "https://atelier-munich.example/",
+      "guarantee": {
+        "status": "guaranteed",
+        "trust_score": 0.94,
+        "checked_at": "2026-10-30T09:00:00Z",
+        "expires_at": "2026-11-30T09:00:00Z",
+        "evidence": {"source": "person2", "reference": "trust:atelier", "method": "x402"}
+      },
+      "shipping": {
+        "regions": ["DE"],
+        "default_amount": 4.9,
+        "currency": "EUR",
+        "min_days": 2,
+        "max_days": 4
+      }
+    },
+    {
+      "shop_id": "nordic-wardrobe",
+      "name": "Nordic Wardrobe",
+      "domain": "nordic-wardrobe.example",
+      "base_url": "https://nordic-wardrobe.example/",
+      "guarantee": {
+        "status": "trusted",
+        "trust_score": 0.9,
+        "checked_at": "2026-10-30T09:00:00Z",
+        "expires_at": "2026-11-30T09:00:00Z"
+      },
+      "shipping": {
+        "regions": ["DE"],
+        "default_amount": 4.9,
+        "currency": "EUR",
+        "min_days": 2,
+        "max_days": 5
+      }
+    }
+  ],
+  "items": [
+    {
+      "item_id": "base-oxford",
+      "shop_id": "atelier-munich",
+      "title": "Washed Oxford Shirt",
+      "brand": "Atelier",
+      "category": "shirt",
+      "description": "Blue washed oxford shirt with a soft collar and a clean, straight hem.",
+      "style": {
+        "silhouette": "straight",
+        "fit": "slim",
+        "formality": "smart-casual",
+        "pattern": "solid",
+        "style_tags": ["old-money", "minimal", "heritage"]
+      },
+      "materials": ["100% cotton"],
+      "colors": [{"name": "blue", "hex": "#6E8CA8"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 108, "shoulder": 45}}
+      ],
+      "price": {"amount": 89.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 3, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/shirt.jpg", "role": "front"}],
+      "product_url": "https://atelier-munich.example/base-oxford",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:base-oxford"}
+    },
+    {
+      "item_id": "base-check",
+      "shop_id": "nordic-wardrobe",
+      "title": "Blue Check Shirt",
+      "brand": "Nordic",
+      "category": "shirt",
+      "description": "Classic blue and black check shirt with a regular collar.",
+      "style": {"fit": "regular", "pattern": "check", "style_tags": ["smart-casual"]},
+      "materials": ["cotton blend"],
+      "colors": [{"name": "blue", "hex": "#4F6D8A"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 110, "shoulder": 45}}
+      ],
+      "price": {"amount": 129.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 4, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp", "role": "front"}],
+      "product_url": "https://nordic-wardrobe.example/base-check",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:base-check"}
+    },
+    {
+      "item_id": "mid-merino",
+      "shop_id": "atelier-munich",
+      "title": "Merino Crew Neck Sweater",
+      "brand": "Atelier",
+      "category": "sweater",
+      "description": "Fine merino wool crew neck with a clean, flat knit.",
+      "style": {"fit": "slim", "style_tags": ["old-money", "quiet-luxury", "minimal"]},
+      "materials": ["100% merino wool"],
+      "colors": [{"name": "cream", "hex": "#E6DED0"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 108, "shoulder": 45}}
+      ],
+      "price": {"amount": 129.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 3, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/sweater.jpg", "role": "front"}],
+      "product_url": "https://atelier-munich.example/mid-merino",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:mid-merino"}
+    },
+    {
+      "item_id": "mid-cardigan",
+      "shop_id": "nordic-wardrobe",
+      "title": "Ribbed Wool Cardigan",
+      "brand": "Nordic",
+      "category": "cardigan",
+      "description": "Ribbed wool cardigan with a straight fit and tonal buttons.",
+      "style": {"fit": "straight", "style_tags": ["heritage", "quiet-luxury"]},
+      "materials": ["wool"],
+      "colors": [{"name": "oat", "hex": "#D6C7B4"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 109, "shoulder": 45}}
+      ],
+      "price": {"amount": 149.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 4, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/sweater.jpg", "role": "front"}],
+      "product_url": "https://nordic-wardrobe.example/mid-cardigan",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:mid-cardigan"}
+    },
+    {
+      "item_id": "outer-trench",
+      "shop_id": "atelier-munich",
+      "title": "Wool Trench Coat",
+      "brand": "Atelier",
+      "category": "coat",
+      "description": "Water-resistant cotton trench with a belted waist and structured shoulders.",
+      "style": {"fit": "regular", "style_tags": ["old-money", "heritage"]},
+      "materials": ["cotton", "water-repellent finish"],
+      "colors": [{"name": "camel", "hex": "#B38B62"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 112, "shoulder": 44}}
+      ],
+      "price": {"amount": 219.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 3, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/sweater.jpg", "role": "front"}],
+      "product_url": "https://atelier-munich.example/outer-trench",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:outer-trench"}
+    },
+    {
+      "item_id": "outer-bomber",
+      "shop_id": "nordic-wardrobe",
+      "title": "Check Overshirt",
+      "brand": "Nordic",
+      "category": "jacket",
+      "description": "Light technical bomber with a clean front and weather-resistant shell.",
+      "style": {"fit": "regular", "style_tags": ["minimal", "smart-casual"]},
+      "materials": ["recycled nylon"],
+      "colors": [{"name": "rust", "hex": "#A66B4F"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "M", "in_stock": true, "measurements_cm": {"chest": 110, "shoulder": 44}}
+      ],
+      "price": {"amount": 199.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 4, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/base-check-shirt.webp", "role": "front"}],
+      "product_url": "https://nordic-wardrobe.example/outer-bomber",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:outer-bomber"}
+    },
+    {
+      "item_id": "bottom-jeans",
+      "shop_id": "atelier-munich",
+      "title": "Straight Leg Selvedge Jeans",
+      "brand": "Atelier",
+      "category": "jeans",
+      "description": "Straight leg selvedge jeans with a mid rise and clean hem.",
+      "style": {"fit": "straight", "style_tags": ["heritage", "minimal"]},
+      "materials": ["cotton denim"],
+      "colors": [{"name": "indigo", "hex": "#3C4B5D"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "EU48", "in_stock": true, "measurements_cm": {"waist": 84, "inseam": 82}}
+      ],
+      "price": {"amount": 99.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 3, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/jeans.jpg", "role": "front"}],
+      "product_url": "https://atelier-munich.example/bottom-jeans",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:bottom-jeans"}
+    },
+    {
+      "item_id": "bottom-chinos",
+      "shop_id": "nordic-wardrobe",
+      "title": "Pleated Cotton Chinos",
+      "brand": "Nordic",
+      "category": "trousers",
+      "description": "Pleated cotton chinos with a straight leg and a mid rise.",
+      "style": {"fit": "straight", "style_tags": ["old-money", "smart-casual"]},
+      "materials": ["cotton"],
+      "colors": [{"name": "khaki", "hex": "#B4A17E"}],
+      "size_system": "EU",
+      "sizes": [
+        {"label": "EU48", "in_stock": true, "measurements_cm": {"waist": 84, "inseam": 82}}
+      ],
+      "price": {"amount": 109.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 4, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/jeans.jpg", "role": "front"}],
+      "product_url": "https://nordic-wardrobe.example/bottom-chinos",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:bottom-chinos"}
+    },
+    {
+      "item_id": "shoes-boots",
+      "shop_id": "atelier-munich",
+      "title": "Leather Chelsea Boots",
+      "brand": "Atelier",
+      "category": "boots",
+      "description": "Brown leather Chelsea boots with a sleek shaft and rubber sole.",
+      "style": {"fit": "regular", "style_tags": ["heritage", "quiet-luxury"]},
+      "materials": ["leather"],
+      "colors": [{"name": "brown", "hex": "#5E4433"}],
+      "size_system": "EU",
+      "sizes": [{"label": "EU42", "in_stock": true}],
+      "price": {"amount": 159.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 3, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/boots.jpg", "role": "front"}],
+      "product_url": "https://atelier-munich.example/shoes-boots",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:shoes-boots"}
+    },
+    {
+      "item_id": "shoes-sneakers",
+      "shop_id": "nordic-wardrobe",
+      "title": "Minimal Leather Sneakers",
+      "brand": "Nordic",
+      "category": "sneakers",
+      "description": "Off-white leather sneakers with a minimal profile.",
+      "style": {"fit": "regular", "style_tags": ["minimal", "smart-casual"]},
+      "materials": ["leather"],
+      "colors": [{"name": "off-white", "hex": "#EDE8DC"}],
+      "size_system": "EU",
+      "sizes": [{"label": "EU42", "in_stock": true}],
+      "price": {"amount": 119.9, "currency": "EUR"},
+      "shipping": {"amount": 4.9, "currency": "EUR", "days": 4, "regions": ["DE"]},
+      "availability": "in_stock",
+      "images": [{"url": "http://127.0.0.1:21951/static/images/shoes-sneakers.webp", "role": "front"}],
+      "product_url": "https://nordic-wardrobe.example/shoes-sneakers",
+      "collected_at": "2026-10-30T09:00:00Z",
+      "source": {"collector": "person1", "method": "shop_json", "snapshot_hash": "sha256:shoes-sneakers"}
+    }
+  ],
+  "options": {
+    "strict_guarantees": true,
+    "fit_mode": "measurements",
+    "max_selection_retries": 1,
+    "country": "DE"
+  },
+  "metadata": {
+    "fixture_source": "Unsplash + DummyJSON product images",
+    "note": "Product images only; no person is composed into the output board."
+  }
+}

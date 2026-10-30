@@ -1,0 +1,567 @@
+{
+  "$defs": {
+    "Customer": {
+      "properties": {
+        "budget": {
+          "$ref": "#/$defs/Money"
+        },
+        "style": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Style",
+          "type": "array"
+        },
+        "fit": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Fit",
+          "type": "array"
+        },
+        "fit_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fit Description"
+        },
+        "measurements_cm": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Measurements Cm",
+          "type": "object"
+        },
+        "sizes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Sizes",
+          "type": "object"
+        },
+        "item_count": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Item Count"
+        },
+        "outfit_count": {
+          "default": 3,
+          "title": "Outfit Count",
+          "type": "integer"
+        },
+        "gender": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Gender"
+        },
+        "season": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Season"
+        },
+        "climate": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Climate"
+        },
+        "must_have": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Must Have",
+          "type": "array"
+        },
+        "avoid": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Avoid",
+          "type": "array"
+        },
+        "deadline": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deadline"
+        },
+        "photo": {
+          "default": null,
+          "title": "Photo"
+        }
+      },
+      "required": [
+        "budget"
+      ],
+      "title": "Customer",
+      "type": "object"
+    },
+    "Guarantee": {
+      "properties": {
+        "status": {
+          "default": "guaranteed",
+          "title": "Status",
+          "type": "string"
+        },
+        "trust_score": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trust Score"
+        },
+        "checked_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Checked At"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "evidence": {
+          "title": "Evidence",
+          "type": "object"
+        }
+      },
+      "title": "Guarantee",
+      "type": "object"
+    },
+    "ImageRef": {
+      "properties": {
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "role": {
+          "default": "unknown",
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "title": "ImageRef",
+      "type": "object"
+    },
+    "Item": {
+      "properties": {
+        "item_id": {
+          "title": "Item Id",
+          "type": "string"
+        },
+        "shop_id": {
+          "title": "Shop Id",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "brand": {
+          "default": "",
+          "title": "Brand",
+          "type": "string"
+        },
+        "category": {
+          "title": "Category",
+          "type": "string"
+        },
+        "slot": {
+          "default": "other",
+          "enum": [
+            "base",
+            "mid",
+            "outer",
+            "bottom",
+            "shoes",
+            "accessory",
+            "other"
+          ],
+          "title": "Slot",
+          "type": "string"
+        },
+        "description": {
+          "default": "",
+          "title": "Description",
+          "type": "string"
+        },
+        "look_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Look Description"
+        },
+        "fit_description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fit Description"
+        },
+        "style": {
+          "title": "Style",
+          "type": "object"
+        },
+        "materials": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Materials",
+          "type": "array"
+        },
+        "colors": {
+          "items": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "title": "Colors",
+          "type": "array"
+        },
+        "size_system": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Size System"
+        },
+        "sizes": {
+          "items": {
+            "$ref": "#/$defs/SizeOption"
+          },
+          "title": "Sizes",
+          "type": "array"
+        },
+        "price": {
+          "$ref": "#/$defs/Money"
+        },
+        "shipping": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shipping"
+        },
+        "availability": {
+          "default": "unknown",
+          "title": "Availability",
+          "type": "string"
+        },
+        "stock_quantity": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stock Quantity"
+        },
+        "images": {
+          "items": {
+            "$ref": "#/$defs/ImageRef"
+          },
+          "title": "Images",
+          "type": "array"
+        },
+        "product_url": {
+          "title": "Product Url",
+          "type": "string"
+        },
+        "collected_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Collected At"
+        },
+        "source": {
+          "title": "Source",
+          "type": "object"
+        },
+        "raw": {
+          "title": "Raw",
+          "type": "object"
+        }
+      },
+      "required": [
+        "item_id",
+        "shop_id",
+        "title",
+        "category",
+        "price",
+        "product_url"
+      ],
+      "title": "Item",
+      "type": "object"
+    },
+    "Money": {
+      "properties": {
+        "amount": {
+          "title": "Amount",
+          "type": "number"
+        },
+        "currency": {
+          "default": "EUR",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "Shop": {
+      "properties": {
+        "shop_id": {
+          "title": "Shop Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "domain": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Domain"
+        },
+        "base_url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Base Url"
+        },
+        "guarantee": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Guarantee"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "shipping": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shipping"
+        }
+      },
+      "required": [
+        "shop_id",
+        "name"
+      ],
+      "title": "Shop",
+      "type": "object"
+    },
+    "SizeOption": {
+      "properties": {
+        "label": {
+          "title": "Label",
+          "type": "string"
+        },
+        "in_stock": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "In Stock"
+        },
+        "measurements_cm": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "title": "Measurements Cm",
+          "type": "object"
+        }
+      },
+      "required": [
+        "label"
+      ],
+      "title": "SizeOption",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "contract_version": {
+      "default": "1.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "task_id": {
+      "title": "Task Id",
+      "type": "string"
+    },
+    "currency": {
+      "default": "EUR",
+      "title": "Currency",
+      "type": "string"
+    },
+    "locale": {
+      "default": "de-DE",
+      "title": "Locale",
+      "type": "string"
+    },
+    "customer": {
+      "$ref": "#/$defs/Customer"
+    },
+    "shops": {
+      "items": {
+        "$ref": "#/$defs/Shop"
+      },
+      "title": "Shops",
+      "type": "array"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/Item"
+      },
+      "title": "Items",
+      "type": "array"
+    },
+    "options": {
+      "title": "Options",
+      "type": "object"
+    },
+    "metadata": {
+      "title": "Metadata",
+      "type": "object"
+    },
+    "warnings": {
+      "items": {
+        "additionalProperties": {
+          "type": "string"
+        },
+        "type": "object"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "customer",
+    "shops",
+    "items"
+  ],
+  "title": "StylistRequest",
+  "type": "object"
+}

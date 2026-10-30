@@ -134,7 +134,7 @@ The LLM may only select existing `item_id` values. It must never invent product 
   "options": {
     "strict_guarantees": true,
     "fit_mode": "measurements",
-    "required_slots": ["top", "bottom", "shoes"],
+    "required_layers": ["base", "mid", "outer", "bottom", "shoes"],
     "max_selection_retries": 2,
     "max_images_per_item": 3,
     "allow_text_only_items": false,
@@ -230,6 +230,21 @@ No currency conversion is performed. If a currency cannot be resolved, the reque
 Plain-language combinations such as `"straight fit, slim waist"` are valid. The normalized value is a list of strings, and the original text is preserved.
 
 `fit_description` is optional free text describing the desired look or silhouette. It is passed to the LLM and is not validated against an enum.
+
+### 4.2.1 Style blend and layer count
+
+`customer.style` may contain up to five style directions. They are blended into one coherent
+look, not expanded into five separate outfits.
+
+The number of garment layers depends on the season and climate:
+
+- Summer / hot: base, bottom, shoes.
+- Spring / autumn / mild or wet: base, mid, bottom, shoes.
+- Winter / cold / snow: base, mid, outer, bottom, shoes.
+- An accessory is optional.
+
+`options.required_layers` may override this list. A single top layer is valid in summer; five
+layers are valid in winter.
 
 ### 4.3 Measurements
 
@@ -328,7 +343,6 @@ Items mapped to `other` remain available to the stylist but do not satisfy a req
 - Plain string
 - Array of bullet strings
 - Object with `summary`, `details`, `bullets`, `care`
-- HTML (tags are stripped)
 - `null` or empty
 
 Descriptions are normalized to plain text, truncated to 2000 characters, and preserved in `raw`. Missing descriptions produce a `MISSING_DESCRIPTION` warning. They do not reject the item.
@@ -371,7 +385,7 @@ Shipping accepts a number, a formatted string, or an object with `amount`, `curr
 | `customer.sizes` | map, array, single string | canonical slot map | Fit guarantee fails in strict mode |
 | `customer.photo` | URL, data URI, object | image reference | Measurements-only analysis |
 | `shops[].guarantee` | object, boolean aliases, absent | guarantee object | Accepted as guaranteed + warning |
-| `items[].description` | string, array, object, HTML, null | plain text + raw | Title/style/images used + warning |
+| `items[].description` | string, array, object, null | plain text + raw | Title/style/images used + warning |
 | `items[].look_description` | string, null | string | Ignored |
 | `items[].fit_description` | string, null | string | Item `style.fit` used |
 | `items[].images` | URL, array of URLs, array of objects, `image_url` | `{url, role}[]` | Item accepted but may be excluded |
@@ -541,3 +555,16 @@ Person 3 returns a result containing:
 - A refund recommendation when no outfit passes.
 
 The output contract is defined separately in the Person 3 output specification.
+
+## 15. Generating a canonical input
+
+`person3/scripts/generate_input.py` turns a raw Person 1/2 payload and a customer brief into
+the canonical input above:
+
+```text
+python -m scripts.generate_input --raw raw.json --customer customer.json --out input.json
+```
+
+There are no profiles or preset modes. The same normalizer serves every season, budget, and
+style blend. The checked-in demo input is `person3/fixtures/input.json`; tests cover the
+variants in code.

@@ -9,3 +9,6 @@ node_modules/
 dist/
 docs/*.json
 .agents/skills
+person3/artifacts/
+person3/**/__pycache__/
+person3/.pytest_cache/
