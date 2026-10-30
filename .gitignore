@@ -16,3 +16,4 @@ testsperson3/
 trustCache/
 catalog/cache/run/
 person3/.venv/
+person3/*.egg-info/
