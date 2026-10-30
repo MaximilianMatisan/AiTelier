@@ -423,6 +423,17 @@ test("each outfit is its own set: every piece with picture, link and price, and 
   assert.match(html, /All 2 guarantees held/);
 });
 
+test("the page offers a beige light mode and a brown dark mode the customer can switch", async () => {
+  const { renderPage } = await import("./logic/result-page.mjs");
+  const html = renderPage({ result: { status: "APPROVED", guarantees: {}, outfits: [] }, envelope: { items: [], shops: [] }, live: {} });
+  assert.match(html, /<button class="theme" type="button"/);
+  assert.match(html, /:root \{ color-scheme:light; --bg:#f5f0e8/, "light is beige");
+  assert.match(html, /:root\[data-theme="dark"\] \{ color-scheme:dark; --bg:#3a2c22/, "dark is brown");
+  assert.match(html, /:root:not\(\[data-theme="light"\]\)/, "a light choice wins over a dark system");
+  // Private windows and blocked storage throw on access; the page must still render.
+  assert.equal((html.match(/localStorage/g) ?? []).length, (html.match(/try \{[^}]*localStorage/g) ?? []).length);
+});
+
 test("a failed guarantee is shown open, not folded away", async () => {
   const { renderPage } = await import("./logic/result-page.mjs");
   const html = renderPage({

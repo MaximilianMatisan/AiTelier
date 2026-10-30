@@ -191,10 +191,19 @@ export function renderPage({ result, envelope, live }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AiTelier — ${esc(result.status ?? "result")}</title>
 <style>
-  :root { color-scheme: light dark; --bg:#f5f0e8; --card:#ffffff; --cap:#f3ede4; --ink:#2b2622; --soft:#7a6f65;
+  /* Light is beige, dark is brown. The system decides until the customer picks one. */
+  :root { color-scheme:light; --bg:#f5f0e8; --card:#ffffff; --cap:#f3ede4; --ink:#2b2622; --soft:#7a6f65;
           --line:#c8bcae; --dot:#8a7e72; --ok:#3f6b45; --no:#a2392f; --nobg:#f6e3df; }
-  @media (prefers-color-scheme: dark) { :root { --bg:#191613; --card:#23201c; --cap:#2b2723; --ink:#efe8de;
-          --soft:#a99d90; --line:#4a423a; --dot:#8a7e72; --ok:#8fbf8f; --no:#e48b80; --nobg:#33201d; } }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme:dark; --bg:#3a2c22;
+          --card:#46362b; --cap:#4f3e32; --ink:#f3e9dc; --soft:#c9b7a4; --line:#6b5646; --dot:#b49a82;
+          --ok:#a9cf9a; --no:#f0a093; --nobg:#4a2a24; } }
+  :root[data-theme="dark"] { color-scheme:dark; --bg:#3a2c22; --card:#46362b; --cap:#4f3e32; --ink:#f3e9dc;
+          --soft:#c9b7a4; --line:#6b5646; --dot:#b49a82; --ok:#a9cf9a; --no:#f0a093; --nobg:#4a2a24; }
+  body { transition:background-color .25s ease, color .25s ease }
+  .bar { display:flex; align-items:center; gap:10px }
+  .theme { margin-left:auto; font:inherit; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--soft);
+           background:none; border:1px solid var(--line); border-radius:999px; padding:5px 12px; cursor:pointer }
+  .theme:hover { color:var(--ink); border-color:var(--dot) }
   * { box-sizing:border-box }
   body { margin:0; background:var(--bg); color:var(--ink);
          font:15px/1.55 "Helvetica Neue",ui-sans-serif,system-ui,Arial,sans-serif; font-weight:300 }
@@ -202,7 +211,7 @@ export function renderPage({ result, envelope, live }) {
   .wrap { max-width:1000px; margin:0 auto; padding:48px 16px 96px }
   .top { margin-bottom:56px }
   .brand { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--soft) }
-  .status { margin-left:10px; font-size:11px; letter-spacing:.14em; padding:3px 10px; border:1px solid var(--ok);
+  .status { font-size:11px; white-space:nowrap; letter-spacing:.14em; padding:3px 10px; border:1px solid var(--ok);
             border-radius:999px; color:var(--ok); vertical-align:2px }
   .status.no { border-color:var(--no); color:var(--no) }
   .sub { color:var(--soft); font-size:13px; margin-top:10px }
@@ -213,11 +222,12 @@ export function renderPage({ result, envelope, live }) {
   h2 { font-size:clamp(28px,5vw,40px); font-weight:400; letter-spacing:-.01em; line-height:1.15; margin:4px 0 6px }
   h3 { font-size:13px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 14px }
   .checked { margin:0 0 64px; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
-  .checked summary { display:flex; gap:16px; align-items:baseline; padding:14px 0; cursor:pointer; list-style:none; font-size:13px }
+  .checked summary { display:flex; flex-wrap:wrap; gap:4px 16px; align-items:baseline; padding:14px 0; cursor:pointer; list-style:none; font-size:13px }
   .checked summary::-webkit-details-marker { display:none }
   .checked summary::after { content:"+"; margin-left:auto; color:var(--soft) }
   .checked[open] summary::after { content:"−" }
-  .checked h3 { margin:0 }
+  .checked h3 { margin:0; white-space:nowrap }
+  .checked summary span { flex:1 1 auto }
   .checks { list-style:none; margin:0; padding:0; border-top:1px solid var(--line) }
   .checks li:last-child { border-bottom:0 }
   .checks li { display:grid; grid-template-columns:22px 1fr; gap:4px 10px; padding:12px 0; border-bottom:1px solid var(--line) }
@@ -283,9 +293,16 @@ export function renderPage({ result, envelope, live }) {
   }
   @media (prefers-reduced-motion:reduce) { .card { transition:none } .card:hover { transform:none } }
 </style>
+<script>
+  // Before the page paints, so a saved choice never flashes the other theme.
+  try { const saved = localStorage.getItem("aitelier-theme"); if (saved) document.documentElement.dataset.theme = saved; } catch {}
+</script>
 <div class="wrap">
 <header class="top">
-  <span class="brand">AiTelier</span><span class="status ${approved ? "" : "no"}">${esc(result.status ?? "UNKNOWN")}</span>
+  <div class="bar">
+    <span class="brand">AiTelier</span><span class="status ${approved ? "" : "no"}">${esc(result.status ?? "UNKNOWN")}</span>
+    <button class="theme" type="button" aria-label="Switch between light and dark">Dark</button>
+  </div>
   <div class="sub">Style: ${esc((result.style_blend ?? []).join(", ") || "—")} · Budget: ${esc(result.budget_label ?? "—")} · Task <code>${esc(result.task_id ?? "")}</code></div>
   ${index}
 </header>
@@ -309,7 +326,20 @@ ${sets}
     <li>Cart links are built from the shop's own variant ids; open one per shop.</li>
   </ul>
 </footer>
-</div>`;
+</div>
+<script>
+  const root = document.documentElement;
+  const button = document.querySelector(".theme");
+  const isDark = () => (root.dataset.theme ?? (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+  const label = () => { button.textContent = isDark() ? "Light" : "Dark"; };
+  button.addEventListener("click", () => {
+    root.dataset.theme = isDark() ? "light" : "dark";
+    try { localStorage.setItem("aitelier-theme", root.dataset.theme); } catch {}
+    label();
+  });
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", label);
+  label();
+</script>`;
 }
 
 async function main() {
