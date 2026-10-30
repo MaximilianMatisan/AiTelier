@@ -30,6 +30,7 @@ node logic/data/refetch.js <item-id> --person3   # same, as a section 9 final-ch
 node logic/data/to_person3.js --limit 100        # emit Person 3's envelope shape
 node logic/data/to_person3.js --in shortlist.json
 node logic/data/refresh-service.mjs --port 8787   # live re-check for the final check
+node logic/result-page.mjs --run catalog/cache/run   # the page the customer reads
 ```
 
 Politeness: one request at a time per shop, 500 ms between pages, 10 s timeout,
@@ -310,6 +311,24 @@ Measured with the demo shortlist and a 500 EUR budget: 50 records, all
 `source: person1_refresh` and `stale: false`, result APPROVED with two outfits
 and all five guarantees passing. The same run in snapshot mode takes 1 second
 instead of 15, which is the difference between asking the shops and not.
+
+## The result page
+
+`logic/result-page.mjs` turns a finished run into one self-contained HTML file,
+and run-pipeline writes it as the last step. It is not a lookbook: the customer
+is about to let money go, so the page leads with what was checked.
+
+Each of the five guarantees shows its own verdict and wording, and the two that
+depend on live data say how many items were re-queried at the shop and when.
+Every garment carries its own line - `checked at the shop 2026-10-30 16:47:42
+UTC · in_stock` - and one cart link per shop builds the Shopify permalink from
+the variant ids kept in `raw`. A REFUND page says nothing was charged and
+offers no cart at all.
+
+It closes with what the numbers rest on: stock is available-or-not and never a
+count, shipping is a deliberately high estimate rather than a quote.
+
+Shop titles are third-party text and are escaped before they reach the page.
 
 ## Open items for the team
 

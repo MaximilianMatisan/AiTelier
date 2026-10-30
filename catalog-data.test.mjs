@@ -340,3 +340,67 @@ test("every catalogue item carries a gender field", () => {
   const bad = items.filter((i) => !allowed.has(i.gender));
   assert.deepEqual(bad.map((i) => i.id), []);
 });
+
+// --- the page the customer reads -----------------------------------------
+test("shop text is escaped before it reaches the page", async () => {
+  // Titles and descriptions come from third-party shops. They are data.
+  const { esc } = await import("./logic/result-page.mjs");
+  assert.equal(esc('<script>alert(1)</script>'), "&lt;script&gt;alert(1)&lt;/script&gt;");
+  assert.equal(esc('a & b "c"'), "a &amp; b &quot;c&quot;");
+  assert.equal(esc(null), "");
+});
+
+test("a hostile product title cannot inject markup into the page", async () => {
+  const { renderPage } = await import("./logic/result-page.mjs");
+  const html = renderPage({
+    result: {
+      status: "APPROVED",
+      guarantees: { budget: { ok: true, detail: "ok" } },
+      outfits: [{
+        name: "Look",
+        items: [{ item_id: "x", title: '<img src=x onerror=alert(1)>', size: "M",
+                  price: { amount: 10, currency: "EUR" }, product_url: "https://s/x" }],
+        totals: { items: 10, shipping: 5, grand_total: 15, currency: "EUR" },
+      }],
+    },
+    envelope: { items: [], shops: [] },
+    live: {},
+  });
+  // The escaped text still contains the characters "onerror=alert"; what must
+  // not exist is an actual tag, so look for the unescaped opening.
+  assert.ok(!html.includes("<img src=x"), "no real tag may be built from shop text");
+  assert.ok(html.includes("&lt;img src=x onerror=alert(1)&gt;"), "it is shown as text instead");
+});
+
+test("one cart link per shop, not per item", async () => {
+  // Shopify takes several variants in one permalink, so the customer opens one
+  // tab per shop instead of one per garment.
+  const { cartLinks } = await import("./logic/result-page.mjs");
+  const outfit = { items: [
+    { item_id: "a", size: "M" }, { item_id: "b", size: "M" }, { item_id: "c", size: "43" },
+  ] };
+  const byItem = new Map([
+    ["a", { shop_id: "s1", raw: { variants: { M: 11 } } }],
+    ["b", { shop_id: "s1", raw: { variants: { M: 22 } } }],
+    ["c", { shop_id: "s2", raw: { variants: { 43: 33 } } }],
+  ]);
+  const shops = new Map([
+    ["s1", { name: "One", domain: "one.example" }],
+    ["s2", { name: "Two", domain: "two.example" }],
+  ]);
+  const links = cartLinks(outfit, byItem, shops);
+  assert.equal(links.length, 2);
+  assert.equal(links[0].url, "https://one.example/cart/11:1,22:1");
+  assert.equal(links[1].url, "https://two.example/cart/33:1");
+});
+
+test("a REFUND page says nothing was charged and offers no cart", async () => {
+  const { renderPage } = await import("./logic/result-page.mjs");
+  const html = renderPage({
+    result: { status: "REFUND", guarantees: { budget: { ok: false, detail: "over" } }, outfits: [] },
+    envelope: { items: [], shops: [] },
+    live: {},
+  });
+  assert.match(html, /Nothing was charged/);
+  assert.ok(!html.includes("/cart/"), "a refused run must not invite a purchase");
+});

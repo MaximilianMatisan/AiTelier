@@ -334,6 +334,14 @@ async function main() {
         )
     ));
 
+  // The customer reads a page, not result.json. Generate it whichever way the
+  // run went: a refusal has to be explainable too.
+  if (ok) {
+    await stage("5/5 result page (Person 1)", "", () =>
+      run("node", ["logic/result-page.mjs", "--run", outDir]),
+    );
+  }
+
   console.log("\n=== summary ===");
   for (const s of stages) {
     console.log(`${s.ok ? "ok  " : "FAIL"} ${s.name.padEnd(34)} ${s.seconds}s`);
