@@ -4,8 +4,9 @@ import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
 import { createPaidAdapter, isPaidReady } from "./paid-task.mjs";
-import { taskTarget, isTaskForTarget } from "./task-target.mjs";
+import { taskTarget, isTaskForTarget, closeTaskWithoutResult } from "./task-target.mjs";
 import { pipelineAnswer } from "./logic/lead-agent.mjs";
+import { reviewOrder } from "./logic/intake.mjs";
 import { logger } from "./log.mjs";
 const log = logger("worker");
 import { loadSokosumiRuntime } from "./sokosumi-runtime.mjs";
@@ -91,9 +92,9 @@ while (true) {
     lastCounts = counts;
     log.debug("poll", { tasks: mine.length });
     for (const t of mine) {
+      const journal = `.local/${t.id}.json`,
+        resultFile = `.local/${t.id}.txt`;
       try {
-        const journal = `.local/${t.id}.json`,
-          resultFile = `.local/${t.id}.txt`;
         let state = existsSync(journal)
           ? JSON.parse(readFileSync(journal, "utf8"))
           : {};
@@ -121,6 +122,34 @@ while (true) {
           state = { phase: "started", input: started.description };
           writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
           log.info("started", { task: t.id, inputChars: state.input?.length ?? 0 });
+        }
+        // Read the order before any money is asked for. A description of
+        // "shopping" used to reach APPROVED on a guessed budget and a guessed
+        // size, and the refusal for a malformed order was submitted as the
+        // result, so the customer paid to be told their order was unusable.
+        // Nothing here touches the escrow: it has not been requested yet.
+        if (state.phase === "started" && !state.checked) {
+          const review = reviewOrder(state.input);
+          if (review.action === "proceed") {
+            state = { ...state, checked: true };
+            writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
+          } else {
+            const closed = await closeTaskWithoutResult(runtime, t.id, review.message, { log });
+            log.info(
+              review.action === "ask" ? "asked for the missing details" : "order refused",
+              { task: t.id, reasons: review.reasons, closed },
+            );
+            writeFileSync(
+              journal,
+              JSON.stringify({
+                ...state,
+                phase: review.action === "ask" ? "asked" : "refused",
+                reasons: review.reasons,
+              }),
+              { mode: 0o600 },
+            );
+            continue;
+          }
         }
         if (state.paid && process.env.PAID_TASKS_ENABLED !== "true") {
           once(t.id, "warn", "paid task skipped: PAID_TASKS_ENABLED is off", {});
@@ -182,9 +211,18 @@ while (true) {
         }
         if (state.phase === "completed") await reply(t);
       } catch (e) {
+        // The customer withdrew the Task. Recorded as terminal so the loop
+        // stops re-reading it every five seconds, and reported as their
+        // decision rather than as a fault of ours.
+        if (e?.abandoned) {
+          once(t.id, "warn", "task canceled; stopped without submitting", { status: e.status });
+          writeFileSync(journal, JSON.stringify({ phase: "canceled", status: e.status }), {
+            mode: 0o600,
+          });
+        }
         // A refund is a decision the agent made, not a failure to work: say so,
         // or it disappears into the same line as a crash.
-        if (e?.refund)
+        else if (e?.refund)
           once(t.id, "warn", "refund due, no result submitted", { failed: e.failed ?? e.message });
         else once(t.id, "error", "task blocked", { error: e.message });
       }
