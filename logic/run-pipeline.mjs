@@ -42,11 +42,35 @@ const flag = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1];
 };
 
-function run(command, args, options = {}) {
+/**
+ * Each stage gets its own clock. Without one, a model call or a shop that never
+ * answered held the whole run open until the escrow's deadline, and the Task
+ * sat in RUNNING with nothing to show. SIGTERM first, SIGKILL for a child that
+ * ignores it.
+ */
+const STAGE_TIMEOUT_MS = Number(process.env.AITELIER_STAGE_TIMEOUT_MS) || 3 * 60_000;
+
+function run(command, args, options = {}, timeoutMs = STAGE_TIMEOUT_MS) {
   return new Promise((resolve) => {
     const child = spawn(command, args, { cwd: ROOT, stdio: "inherit", ...options });
-    child.on("error", (err) => resolve({ ok: false, reason: err.message }));
-    child.on("close", (code) => resolve({ ok: code === 0, reason: `exit code ${code}` }));
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+      setTimeout(() => child.kill("SIGKILL"), 5_000).unref();
+    }, timeoutMs);
+    child.on("error", (err) => {
+      clearTimeout(timer);
+      resolve({ ok: false, reason: err.message });
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      resolve(
+        timedOut
+          ? { ok: false, reason: `no answer within ${Math.round(timeoutMs / 1000)}s` }
+          : { ok: code === 0, reason: `exit code ${code}` },
+      );
+    });
   });
 }
 

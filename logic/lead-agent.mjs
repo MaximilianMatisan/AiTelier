@@ -30,6 +30,15 @@ const VENV_PYTHON = "person3/.venv/bin/python";
 // Leave room to write, hash and submit the result after the pipeline ends.
 const SUBMIT_MARGIN_MS = 60_000;
 const DEFAULT_TIMEOUT_MS = 10 * 60_000;
+/**
+ * The whole run gets at most this long, whatever the escrow would allow. The
+ * escrow's own deadline is twenty minutes out, so a pipeline that hung held
+ * the Task in RUNNING for the full twenty with nothing to show. Live runs that
+ * finished took 23 to 37 seconds, so a run still going after eight minutes is
+ * stuck rather than slow, and stopping early leaves time to say so.
+ */
+const PIPELINE_BUDGET_MS =
+  Number(process.env.AITELIER_PIPELINE_BUDGET_MS) || 8 * 60_000;
 
 /** Runs the pipeline as its own process; resolves true on exit code 0. */
 export function runPipeline(args, timeoutMs, logFile) {
@@ -175,8 +184,10 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
   await writeFile(path.join(ROOT, orderFile), JSON.stringify(intake.order, null, 2) + "\n");
   writeFileSync(journal, JSON.stringify({ phase: "pipeline", outDir }), { mode: 0o600 });
 
-  const timeoutMs = deadline === undefined ? DEFAULT_TIMEOUT_MS : deadline - Date.now() - SUBMIT_MARGIN_MS;
-  if (timeoutMs <= 0) throw new Error("Result deadline too close to run the pipeline");
+  const untilDeadline =
+    deadline === undefined ? DEFAULT_TIMEOUT_MS : deadline - Date.now() - SUBMIT_MARGIN_MS;
+  if (untilDeadline <= 0) throw new Error("Result deadline too close to run the pipeline");
+  const timeoutMs = Math.min(untilDeadline, PIPELINE_BUDGET_MS);
   const args = ["logic/run-pipeline.mjs", "--order", orderFile, "--out", outDir];
   if (process.env.AITELIER_SHORTLIST) args.push("--shortlist", process.env.AITELIER_SHORTLIST);
   log.info("pipeline started", {
