@@ -236,3 +236,26 @@ test("a cached answer from the service is marked stale", async () => {
     else process.env.OFFLINE = previous;
   }
 });
+
+// --- model keys ----------------------------------------------------------
+test("sharing one key between the two LLM steps is reported", async () => {
+  // Two steps on one key means one quota: a single run spends it twice and
+  // both come back 429. The run has to say so instead of looking healthy.
+  const { modelKeyReport } = await import("./logic/run-pipeline.mjs");
+
+  const same = modelKeyReport({ ZAI_API_KEY: "k1", GEMINI_API_KEY: "k1" });
+  assert.equal(same.shared, true);
+
+  const split = modelKeyReport({ ZAI_API_KEY: "k1", GEMINI_API_KEY: "k2" });
+  assert.equal(split.shared, false);
+  assert.equal(split.stylist, "GEMINI_API_KEY");
+
+  // No stylist key at all still shares, because config.py falls back to ZAI.
+  const fallback = modelKeyReport({ ZAI_API_KEY: "k1" });
+  assert.equal(fallback.shared, true);
+  assert.match(fallback.stylist, /fallback/);
+
+  const none = modelKeyReport({});
+  assert.equal(none.filter, null);
+  assert.equal(none.shared, false);
+});

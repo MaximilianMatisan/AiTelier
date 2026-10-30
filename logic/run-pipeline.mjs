@@ -114,6 +114,23 @@ export function missingSlots(items, required = ["top", "bottom", "shoes"]) {
   return required.filter((slot) => !present.has(slot));
 }
 
+/**
+ * Which key each LLM step will use. The filter and the stylist are separate
+ * steps but nothing stops them sharing one key, and then they share one quota:
+ * a single run spends it twice and both come back 429. Reports which variable
+ * each step reads and whether the values are identical - never the values.
+ */
+export function modelKeyReport(env = process.env) {
+  const filter = env.ZAI_API_KEY?.trim() || "";
+  const gemini = env.GEMINI_API_KEY?.trim() || "";
+  const stylist = gemini || filter;
+  return {
+    filter: filter ? "ZAI_API_KEY" : null,
+    stylist: stylist ? (gemini ? "GEMINI_API_KEY" : "ZAI_API_KEY (fallback)") : null,
+    shared: Boolean(filter && stylist && filter === stylist),
+  };
+}
+
 const stages = [];
 async function stage(name, hint, fn) {
   const started = Date.now();
@@ -150,6 +167,18 @@ async function main() {
   console.log(`order:  ${orderPath}`);
   console.log(`brief:  ${orderToBrief(order)}`);
   console.log(`out:    ${outDir}`);
+
+  const keys = modelKeyReport();
+  console.log(
+    `keys:   filter ${keys.filter ?? "MISSING"}  ·  stylist ${keys.stylist ?? "MISSING"}`
+  );
+  if (keys.shared) {
+    console.log(
+      `\nWARNING: both LLM steps use the same key, so they share one quota.\n` +
+        `  One run spends it twice and both come back 429 Too Many Requests.\n` +
+        `  Set GEMINI_API_KEY to a key on a different account; see .env.example.\n`
+    );
+  }
 
   const ok =
     (await stage(
