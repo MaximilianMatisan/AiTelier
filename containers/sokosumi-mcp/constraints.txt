@@ -1,0 +1,6 @@
+# The upstream requirements are intentionally loose (`mcp>=1.2.0`).
+# mcp 2.x renamed FastMCP and is not compatible with the pinned server code.
+# Keep the MCP SDK and its web stack on the 1.x line for this image.
+mcp==1.30.0
+starlette<1
+uvicorn<1

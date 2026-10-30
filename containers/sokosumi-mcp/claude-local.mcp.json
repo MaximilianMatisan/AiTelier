@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "sokosumi-local": {
+      "type": "stdio",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "scripts/run-sokosumi-mcp.ps1"
+      ]
+    }
+  }
+}

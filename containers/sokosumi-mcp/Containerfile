@@ -1,0 +1,42 @@
+# syntax=docker/dockerfile:1
+
+# Build the upstream Sokosumi MCP server at a pinned commit.
+# We do not vendor the source into this repo; the commit is the pin.
+FROM python:3.12-slim AS source
+
+ARG SOKOSUMI_MCP_REPO=https://github.com/masumi-network/Sokosumi-MCP.git
+ARG SOKOSUMI_MCP_REF=6b710a0f5aa34dbd18275091c082ac15f5255bda
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN git clone "$SOKOSUMI_MCP_REPO" /src \
+    && git -C /src checkout "$SOKOSUMI_MCP_REF" \
+    && rm -rf /src/.git
+
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    SOKOSUMI_NETWORK=preprod \
+    SOKOSUMI_OAUTH_NETWORK=preprod
+
+WORKDIR /app
+
+COPY --from=source /src/requirements.txt ./requirements.txt
+COPY constraints.txt ./constraints.txt
+RUN pip install --no-cache-dir -r requirements.txt -c constraints.txt
+
+COPY --from=source /src/ ./
+
+RUN useradd --create-home --uid 10001 mcp \
+    && chown -R mcp:mcp /app
+
+USER mcp
+
+# The server uses stdio by default. Set PORT to switch to Streamable HTTP.
+EXPOSE 8000
+
+ENTRYPOINT ["python", "server.py"]

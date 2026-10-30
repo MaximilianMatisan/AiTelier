@@ -1,0 +1,46 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // These docs are loaded alongside AGENTS.md at session start.
+  "instructions": [
+    "docs/masumi-sokosumi.md",
+    "docs/tum-hackathon.md",
+    "docs/tum-quickstart-readme.md",
+    "docs/mcp-podman.md"
+  ],
+
+  "mcp": {
+    "servers": {
+      // Primary hackathon server: local Preprod MCP in Podman.
+      // Build the image first with scripts/build-sokosumi-mcp.ps1.
+      // The container reads SOKOSUMI_API_KEY from .env at startup, so reconnect
+      // this server after changing the key (or the old environment stays live).
+      "sokosumi": {
+        "type": "local",
+        "command": [
+          "powershell",
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/run-sokosumi-mcp.ps1"
+        ],
+        "timeout": {
+          "startup": 60000,
+          "catalog": 60000
+        }
+      },
+
+      // Optional hosted mainnet server. Disabled to prevent accidental mainnet
+      // actions during the hackathon. Enable only for intentional mainnet use.
+      "sokosumi-mainnet": {
+        "type": "remote",
+        "url": "https://mcp.sokosumi.com/mcp",
+        "oauth": {
+          "client_id": "sokosumi-opencode"
+        },
+        "disabled": true
+      }
+    }
+  }
+}
