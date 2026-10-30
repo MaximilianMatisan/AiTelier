@@ -9,6 +9,12 @@ Adapt `agent/instructions.md` to build your own agent.
 Use the [full agent brief](https://www.masumi.network/tum-hackathon/agent) for your coding agent.
 Before handing in your project, follow the [submission checklist](https://www.masumi.network/tum-hackathon/submission).
 
+## Catalogue data
+
+Real products from real EU shops live in `catalog/`, collected by `logic/data/`.
+See [catalog/README.md](catalog/README.md) for the item schema, the commands, the known limits
+that the five guarantees depend on, and the open decisions for the team.
+
 ## Start the local agent
 
 Use Node.js 24 or newer for the agent and CLI.
