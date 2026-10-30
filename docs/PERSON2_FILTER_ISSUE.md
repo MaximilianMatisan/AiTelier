@@ -61,23 +61,103 @@ Same catalogue, same brief:
 The cap is not stable between runs, but the shoe slot is empty in all of them,
 including at 75 EUR.
 
-## Suggestions
+## Three problems, not one
 
-Your call, these are only the shapes that fit the data:
+Reading `candidateFilter.mjs` through, the empty shoe slot is the visible
+symptom of three separate things.
 
-- **Cap per slot, not per item.** Shoes and outerwear need a much higher ceiling
-  than tops. Even a rough split (shoes 40 %, bottom 30 %, top 15 %) keeps every
-  slot populated.
-- **Or drop the price cap at the filter stage.** The filter's job is narrowing
-  8725 items to at most 100 while keeping every required slot represented. The
-  stylist does the budget arithmetic over a whole outfit, and the final check
-  enforces guarantee 1. A cap here only removes options the stylist needs.
-- **Either way, keep slot coverage as an invariant.** A shortlist missing a
-  required slot cannot produce a result, so it is worth failing loudly inside
-  the filter rather than passing it on.
+**1. The per-item cap is instructed, not hallucinated.** `SYSTEM_PROMPT` says it
+twice:
 
-`logic/run-pipeline.mjs` already warns at the handoff when a required slot is
-missing, so this at least shows up at step 1 from now on.
+```
+- priceEur: {...}. maxAmount is the price for one item
+- Respect the budget: maxAmount per item.
+```
+
+`matches()` then applies it as a hard filter on every candidate:
+
+```js
+if (maxAmount !== null && !(candidate.price_eur <= maxAmount)) return false;
+```
+
+The model is doing exactly what it was told. The instruction is the bug.
+
+**2. `categoryCounts` is computed and then ignored.** The model is asked for it,
+`reconcile` normalises it, and `applySelection` reports it back as `wanted` —
+but the only code that would act on it is commented out:
+
+```js
+//   if (
+//     Object.keys(selection.categoryCounts).length &&
+//     !(candidate.category in selection.categoryCounts)
+//   )
+//     return false;
+```
+
+So nothing in the filter ever checks that a wanted slot produced any items.
+That is why the shoe slot can empty out silently instead of failing.
+
+**3. The Person 3 caps are passed but dropped.** `filterCandidates` calls
+
+```js
+applySelection(candidates, facets, selection, capsOf(options))
+```
+
+while the function is declared as
+
+```js
+export function applySelection(candidates, facets, selection) {
+```
+
+The fourth argument is discarded, `truncated` is hardcoded `false`, and the
+`--max-items` flag has no effect. One run returned 98 items, which was luck: a
+looser brief returns thousands, and Person 3's contract rejects anything over
+100 items or 30 shops.
+
+## A fix that holds up against the catalogue
+
+Replace the per-item price cap with a slot quota. Instead of asking "is this
+item cheap enough", ask "has every slot the customer needs got candidates".
+
+1. Filter on theme, season and size as today. Keep a price bound, but at the
+   **total budget**, not the budget divided by item count: no single garment may
+   cost more than the whole brief.
+2. Split the 100-item cap across the wanted categories in proportion to
+   `categoryCounts`, with a floor of about 4 per slot, and take the cheapest of
+   each slot.
+3. Apply the shop cap, and fail loudly if a wanted slot ends up empty.
+
+Simulated on the current catalogue with the demo brief and
+`{top: 2, bottom: 2, shoes: 2, outer: 1}`:
+
+```
+after theme/season/size: 837 items
+  top     quota  28   available  690
+  bottom  quota  28   available   58
+  shoes   quota  28   available   28
+  outer   quota  14   available   61
+
+items 98/100   shops 21/30
+slots: top 28, bottom 28, shoes 28, outer 14   -> every wanted slot present
+
+cheapest single outfit     171.88 EUR
+two outfits, shared pieces 206.78 EUR
+plus an outer layer        287.68 EUR   (budget 300)
+```
+
+The shortlist stays inside both contract caps, every slot is populated, and the
+budget still works out. The price cap was never doing useful work: the stylist
+does the budget arithmetic across a whole outfit and the final check enforces
+guarantee 1.
+
+One more thing the quota needs: for autumn, Person 3 requires the layers
+`base, mid, outer, bottom, shoes`. The model currently asks for
+`{top, bottom, shoes}` and never requests outerwear. Our `top` covers both
+`base` and `mid`, but `outer` has to be in `categoryCounts` or the outer layer
+has no candidates.
+
+`logic/run-pipeline.mjs` warns at the handoff when a required slot is missing,
+so this shows up at step 1 from now on either way.
 
 ## The separate flakiness
 
