@@ -5,7 +5,7 @@ Everything is fetched from the shops' public Shopify product feed — nothing is
 
 **8725 items across 36 shops.** Tops 4405, bottoms 1844, shoes 1285, outerwear 1191.
 Themes: casual 6007, old\_money 1513, streetwear 1281. Prices 5.50–1995 EUR.
-Every item carries an image and is in stock in at least one size.
+Every item carries an image and is in stock in at least one size; 8305 carry a description.
 
 ## Files
 
@@ -52,6 +52,7 @@ A real entry, shortened only in the image URL:
   "shop_id": "knowledgecotton",
   "name": "Bora wide corduroy pant - Burgundy",
   "vendor": "KnowledgeCotton Apparel - WMN",
+  "description": "These corduroy pants combine timeless design with a relaxed silhouette, ...",
   "category": "bottom",
   "themes": ["old_money"],
   "seasons": ["autumn", "winter"],
@@ -70,6 +71,8 @@ A real entry, shortened only in the image URL:
 ```
 
 - `category` is one of `top | bottom | shoes | outer`.
+- `description` is `body_html` stripped to plain text, kept at full length and `null` when the
+  shop wrote none (420 of 8725). Consumers cap it: the Person 3 adapter cuts at 2000.
 - `stock` covers every size; `variants` only the buyable ones, so `variants[size]` exists
   exactly when `stock[size] === 1`.
 - `variants[size]` is the Shopify variant id — the cart permalink is
@@ -165,8 +168,8 @@ Frame 16 shape**, because Person 2 consumes that. Nothing was renamed in place.
 | `source.fetched_at` | `collected_at` |
 | `variants`, `seasons`, `stock_kind` | kept under `raw` (preserved, never sent to the LLM) |
 
-Descriptions come from `body_html` in the raw cache (8305 of 8725 items) and are stripped to
-plain text, so `products.json` keeps its agreed shape.
+Descriptions ride along in `products.json` as `description`, so the filter step reads them
+without opening the raw cache. The adapter only caps them at the contract's 2000 characters.
 
 The adapter emits **our half** of the envelope — `contract_version`, `currency`, `shops`,
 `items`. Person 3 adds `task_id`, `customer` and `options`.

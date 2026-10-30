@@ -140,6 +140,26 @@ export function sizeIndexOf(options) {
 }
 
 /**
+ * Shopify body_html -> plain text. The catalogue keeps the full text; each
+ * consumer caps it to whatever its own contract allows.
+ */
+export function plainText(html) {
+  if (!html) return null;
+  const text = String(html)
+    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&(?:quot|#34);/g, '"')
+    .replace(/&(?:#39|apos);/g, "'")
+    .replace(/\s+/g, " ")
+    .trim();
+  return text || null;
+}
+
+/**
  * One Shopify product -> one item, or null when it is not clothing we can use.
  * Items with no buyable variant are dropped: every item in the cache is in stock
  * in at least one size, so guarantee 2 can only fail on the customer's size.
@@ -178,6 +198,7 @@ export function normalizeProduct(product, shop, fetchedAt = new Date().toISOStri
     shop_id: shop.id,
     name: String(product.title ?? "").trim(),
     vendor: product.vendor ?? shop.name,
+    description: plainText(product.body_html),
     category,
     themes: themesOf(style),
     seasons: seasonsOf(style),

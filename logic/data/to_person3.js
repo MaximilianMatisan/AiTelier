@@ -7,7 +7,7 @@
 //   node logic/data/to_person3.js --limit 100          sample 100, spread across shops
 //   node logic/data/to_person3.js --in filtered.json   Person 2's shortlist
 //   node logic/data/to_person3.js --out envelope.json  somewhere else
-//   node logic/data/to_person3.js --no-descriptions    skip reading the raw cache
+//   node logic/data/to_person3.js --no-descriptions    omit descriptions from the envelope
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -23,32 +23,10 @@ const MAX_DESCRIPTION = 2000; // contract section 6.2
 const SLOT = { top: "top", bottom: "bottom", shoes: "shoes", outer: "outerwear" };
 const STYLE_TAG = { old_money: "old-money", streetwear: "streetwear", casual: "casual" };
 
-/** body_html -> plain text, as section 6.2 expects it to arrive. */
-function plainText(html) {
-  if (!html) return null;
-  const text = String(html)
-    .replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&(?:quot|#34);/g, '"')
-    .replace(/&(?:#39|apos);/g, "'")
-    .replace(/\s+/g, " ")
-    .trim();
+/** The catalogue carries the full text; section 6.2 caps what we send. */
+function capped(text) {
   if (!text) return null;
   return text.length > MAX_DESCRIPTION ? `${text.slice(0, MAX_DESCRIPTION - 1)}…` : text;
-}
-
-/** handle -> description, read from the raw cache so products.json keeps its agreed shape. */
-async function descriptionsFor(shopId) {
-  try {
-    const raw = JSON.parse(await readFile(path.join(ROOT, `catalog/cache/raw/${shopId}.json`), "utf8"));
-    return new Map((raw.products ?? []).map((p) => [p.handle, plainText(p.body_html)]));
-  } catch {
-    return new Map();
-  }
 }
 
 export function toPerson3Shop(shop) {
@@ -76,7 +54,7 @@ export function toPerson3Shop(shop) {
   };
 }
 
-export function toPerson3Item(item, description = null) {
+export function toPerson3Item(item, withDescription = true) {
   const sizes = Object.entries(item.stock).map(([label, inStock]) => ({
     label,
     in_stock: inStock === 1,
@@ -88,7 +66,7 @@ export function toPerson3Item(item, description = null) {
     title: item.name,
     brand: item.vendor,
     category: SLOT[item.category] ?? "other",
-    description,
+    description: withDescription ? capped(item.description) : null,
     style: { style_tags: item.themes.map((t) => STYLE_TAG[t] ?? t) },
     size_system: "EU",
     sizes,
@@ -146,18 +124,11 @@ export async function toPerson3(items, seed, { withDescriptions = true } = {}) {
   const shopsById = Object.fromEntries(seed.map((s) => [s.id, s]));
   const usedShopIds = [...new Set(items.map((i) => i.shop_id))];
 
-  const descriptions = new Map();
-  if (withDescriptions) {
-    for (const shopId of usedShopIds) descriptions.set(shopId, await descriptionsFor(shopId));
-  }
-
   return {
     contract_version: CONTRACT_VERSION,
     currency: "EUR",
     shops: usedShopIds.map((id) => toPerson3Shop(shopsById[id])),
-    items: items.map((i) =>
-      toPerson3Item(i, descriptions.get(i.shop_id)?.get(i.source.handle) ?? null)
-    ),
+    items: items.map((i) => toPerson3Item(i, withDescriptions)),
   };
 }
 
