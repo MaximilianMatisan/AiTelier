@@ -74,12 +74,12 @@ The detailed pipeline runs one process per stage and writes its output under the
 
 ```mermaid
 flowchart TD
-  S0["0 Pinterest style profile"] ==> S1["1 Candidate filter over cached catalogue"]
-  S1 ==> S2["2 Shortlist to Person 3 input"]
-  S2 ==> S3["3 Customer profile from order or brief"]
-  S3 ==> S3B["3b Drop sizes the customer cannot buy"]
-  S3B ==> S4["4 Stylist builds outfits and five guarantees are checked"]
-  S4 ==> S4B["4b Shop trust check"]
+  S0["0 Pinterest style"] ==> S1["1 Candidate filter"]
+  S1 ==> S2["2 Person 3 input"]
+  S2 ==> S3["3 Customer profile"]
+  S3 ==> S3B["3b Buyable sizes"]
+  S3B ==> S4["4 Stylist and checks"]
+  S4 ==> S4B["4b Shop trust"]
   S4B ==> S5["5 Result page"]
 ```
 
