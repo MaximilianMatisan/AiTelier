@@ -74,6 +74,22 @@ export const REFUND_OFFER = [
   "amount to you on chain.",
 ].join("\n");
 
+/**
+ * What the customer reads when they ask for a refund and the escrow has no
+ * request from them to authorize. Promising the money back here would be a
+ * lie: the seller cannot return it alone.
+ */
+export const REFUND_NEEDS_REQUEST = [
+  "I have your message, and I am not going to argue about it.",
+  "",
+  "I cannot hand this payment back on my own, though. The escrow only accepts a",
+  "refund that **you** raise from your side; my side can then authorize it, and",
+  "I have not found a request from you yet.",
+  "",
+  "Ask for a refund on this payment and I authorize it the moment it appears -",
+  "nothing else is needed from you, and I will not contest it.",
+].join("\n");
+
 /** What the customer reads once their money is on the way back. */
 export function refundAuthorizedNotice(reason) {
   return [
@@ -312,10 +328,26 @@ export async function createPaidAdapter({
     if (TERMINAL_STAGES.has(p.stage)) return state;
     if (!p.payment?.blockchainIdentifier)
       throw new Error("There is no escrow on this Task to refund");
-    await mps("/api/v1/payment/authorize-refund", {
-      network: "Preprod",
-      blockchainIdentifier: p.payment.blockchainIdentifier,
-    });
+    try {
+      await mps("/api/v1/payment/authorize-refund", {
+        network: "Preprod",
+        blockchainIdentifier: p.payment.blockchainIdentifier,
+      });
+    } catch (error) {
+      // A 404 here is not a missing route - that answers "Can not POST". This
+      // one answers "Payment not found or in invalid state", because
+      // authorize-refund authorizes a refund the buyer has already requested,
+      // and until one exists there is nothing to authorize. We hold the
+      // payment, not the purchase (our purchase list is empty), so we cannot
+      // raise the request on their behalf either. Told apart from a real
+      // failure so the caller can say so instead of claiming a refund.
+      if (/HTTP 404/.test(error.message)) {
+        const pending = new Error("No refund request to authorize yet");
+        pending.needsBuyerRequest = true;
+        throw pending;
+      }
+      throw error;
+    }
     log.info("refund authorized", { task: task.id, from: p.stage ?? "new" });
     const client = await verifyRuntimeTask(await getCore(), task.id, target);
     await postTaskComment(client, task.id, refundAuthorizedNotice(reason));

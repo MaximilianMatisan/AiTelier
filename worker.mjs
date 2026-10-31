@@ -3,7 +3,13 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
-import { createPaidAdapter, paidMode, unpaidFailure, REFUND_WORD } from "./paid-task.mjs";
+import {
+  createPaidAdapter,
+  paidMode,
+  unpaidFailure,
+  REFUND_WORD,
+  REFUND_NEEDS_REQUEST,
+} from "./paid-task.mjs";
 import {
   taskTarget,
   isTaskForTarget,
@@ -76,7 +82,28 @@ async function refundIfAsked(task, state) {
     // Marked before the money moves, so a crash cannot authorize it twice.
     seen[event.id] = "refunding";
     writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
-    const next = await paid.refund(task, state, event.comment);
+    let next;
+    try {
+      next = await paid.refund(task, state, event.comment);
+    } catch (error) {
+      if (!error?.needsBuyerRequest) {
+        // A real failure: leave it unmarked so the next poll tries again,
+        // rather than swallowing the customer's request for good.
+        delete seen[event.id];
+        writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+        throw error;
+      }
+      // We cannot refund alone. Say so once - the chat must not answer this
+      // with "I did not catch a change there" - and leave it to the on-chain
+      // watcher, which authorizes the moment a request appears.
+      await postTaskComment(runtime, task.id, REFUND_NEEDS_REQUEST);
+      seen[event.id] = "told-how-to-ask";
+      writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+      log.warn("refund asked for, but the escrow has no request to authorize", {
+        task: task.id,
+      });
+      return state;
+    }
     seen[event.id] = "refunded";
     writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
     log.info("refund asked for in a comment", { task: task.id });
