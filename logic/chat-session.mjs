@@ -13,6 +13,7 @@ import path from "node:path";
 import { newConversation, nextTurn, presentOutfits, recordCheckout, mergeSlots } from "./conversation.mjs";
 import { payForOutfit } from "./checkout.mjs";
 import { runPipeline } from "./lead-agent.mjs";
+import { publishPage } from "./publish.mjs";
 import { logger } from "../log.mjs";
 const log = logger("chat");
 
@@ -75,7 +76,7 @@ export async function seedFromRun(state, { taskId, root = ROOT } = {}) {
 }
 
 /** Runs the pipeline for one conversation turn and returns Person 3's result. */
-export async function runPipelineForChat(order, { id, root = ROOT, run = runPipeline, timeoutMs = RUN_TIMEOUT_MS } = {}) {
+export async function runPipelineForChat(order, { id, root = ROOT, run = runPipeline, publish = publishPage, timeoutMs = RUN_TIMEOUT_MS } = {}) {
   const outDir = path.join("catalog", "cache", "run", `${id}-${Date.now().toString(36)}`);
   await mkdir(path.join(root, outDir, "person3"), { recursive: true });
   await writeFile(path.join(root, outDir, "order.json"), JSON.stringify(order, null, 2) + "\n");
@@ -88,7 +89,10 @@ export async function runPipelineForChat(order, { id, root = ROOT, run = runPipe
     return { ok: false, outDir, result: null };
   }
   const result = JSON.parse(await readFile(path.join(root, outDir, "person3", "result.json"), "utf8"));
-  return { ok: true, outDir, result };
+  // The same page the Task result links to: the chat shows the looks as text,
+  // the page carries the boards and every check behind them.
+  const page = await publish(outDir);
+  return { ok: true, outDir, result, page };
 }
 
 /**
@@ -108,13 +112,13 @@ export async function runTurn(state, text, { ask = null, pay, env = process.env,
   let next = turn.state;
 
   if (turn.action.type === "run_pipeline" && runStyling) {
-    const { ok, result } = await runStyling(turn.action.order);
+    const { ok, result, page } = await runStyling(turn.action.order);
     if (!ok) {
       next = { ...next, status: "ready", run: null };
       posts.push("The styling run stopped before it finished, so there is nothing to show and nothing was charged. Shall I try again?");
       return { state: next, posts, action: { type: "none" } };
     }
-    const presented = presentOutfits(next, result);
+    const presented = presentOutfits(next, result, { page });
     next = presented.state;
     posts.push(presented.reply);
     return { state: next, posts, action: { type: "none" } };

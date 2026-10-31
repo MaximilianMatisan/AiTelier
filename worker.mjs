@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
-import { createPaidAdapter, isPaidReady, unpaidFailure } from "./paid-task.mjs";
+import { createPaidAdapter, paidMode, unpaidFailure } from "./paid-task.mjs";
 import {
   taskTarget,
   isTaskForTarget,
@@ -57,12 +57,18 @@ const paid = await createPaidAdapter({
       mode: 0o600,
     }),
 });
+// Decided once at start. A payment service that is not running used to send
+// every new Task into the paid flow, where it failed at "terms-pending" and
+// was closed: the customer got a refusal instead of their outfits.
+const paidFlow = await paidMode();
 log.info("started", {
   pid: process.pid,
   workspace: process.env.SOKOSUMI_ORGANIZATION_SLUG || "personal",
   pipeline: respond === pipelineAnswer ? "team" : "plain-llm",
-  paid: process.env.PAID_TASKS_ENABLED === "true" ? (isPaidReady() ? "on" : "on-but-no-key") : "off",
+  paid: paidFlow,
 });
+if (paidFlow === "on-but-unreachable")
+  log.warn("payment service not reachable; new Tasks run unpaid", { url: process.env.MPS_URL });
 // Said once per change, not on every 5-second poll.
 let lastCounts = "";
 const lastNote = new Map();
@@ -126,7 +132,19 @@ while (true) {
           });
         if (t.status === "READY" && !state.phase) {
           log.info("picked up", { task: t.id, name: t.name });
-          writeFileSync(journal, JSON.stringify({ phase: "starting" }), {
+          // The greeting goes up before the Task is started, so it is the first
+          // thing AiTelier says in the thread rather than the line after
+          // "changed status to Running". If Core will not take a comment on a
+          // READY Task, the block below greets right after the start instead.
+          let greeted = false;
+          try {
+            await postTaskComment(runtime, t.id, welcome());
+            greeted = true;
+            log.info("greeted", { task: t.id, before: "start" });
+          } catch (e) {
+            log.warn("greeting before start refused; greeting after it", { task: t.id, error: e.message });
+          }
+          writeFileSync(journal, JSON.stringify({ phase: "starting", greeted }), {
             mode: 0o600,
           });
           const started = cli([
@@ -137,7 +155,7 @@ while (true) {
             "--coworker-id",
             id,
           ]);
-          state = { phase: "started", input: started.description };
+          state = { phase: "started", input: started.description, greeted };
           writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
           log.info("started", { task: t.id, inputChars: state.input?.length ?? 0 });
         }
@@ -186,23 +204,18 @@ while (true) {
           await reply(t);
           continue;
         }
-        if (state.paid && process.env.PAID_TASKS_ENABLED !== "true") {
-          once(t.id, "warn", "paid task skipped: PAID_TASKS_ENABLED is off", {});
+        if (state.paid && paidFlow !== "on") {
+          once(t.id, "warn", "paid task skipped: paid flow not available", { paid: paidFlow });
           continue;
         }
-        if (
-          state.paid ||
-          (state.phase === "started" &&
-            process.env.PAID_TASKS_ENABLED === "true" &&
-            isPaidReady())
-        ) {
+        if (state.paid || (state.phase === "started" && paidFlow === "on")) {
           if (!state.paid) log.info("paid flow", { task: t.id });
           state = await paid.advance(t, state);
           if (state.phase === "completed") await reply(t);
           continue;
         }
         if (state.phase === "started") {
-          log.info("running unpaid", { task: t.id, reason: process.env.PAID_TASKS_ENABLED === "true" ? "no payment key" : "paid tasks off" });
+          log.info("running unpaid", { task: t.id, reason: paidFlow });
           writeFileSync(
             journal,
             JSON.stringify({ ...state, phase: "model-pending" }),

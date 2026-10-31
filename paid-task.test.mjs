@@ -7,6 +7,8 @@ import {
   confirmedState,
   unpaidFailure,
   USDM,
+  paymentServiceReachable,
+  paidMode,
 } from "./paid-task.mjs";
 const registration = {
   walletId: "seller-wallet",
@@ -446,4 +448,21 @@ test("a finished Task is not read back from the API on every poll", async () => 
   for (const stage of ["settled", "refunded", "stalled"])
     await adapter.advance(task, { input: "abc", paid: { stage, payment } });
   assert.equal(reads, 0, "a worker left running must not poll Tasks that are done");
+});
+
+test("a payment service that does not answer keeps new Tasks out of the paid flow", async () => {
+  const down = async () => {
+    throw new TypeError("fetch failed");
+  };
+  const up = async () => new Response("", { status: 404 });
+  assert.equal(await paymentServiceReachable({ env: {}, fetchImpl: up }), false);
+  assert.equal(await paymentServiceReachable({ env: { MPS_URL: "http://127.0.0.1:1" }, fetchImpl: down }), false);
+  // Any HTTP answer means it is running, even one that refuses this request.
+  assert.equal(await paymentServiceReachable({ env: { MPS_URL: "http://127.0.0.1:1" }, fetchImpl: up }), true);
+
+  const ready = () => true;
+  assert.equal(await paidMode({ env: {}, ready, reachable: async () => true }), "off");
+  assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready: () => false, reachable: async () => true }), "on-but-no-key");
+  assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready, reachable: async () => false }), "on-but-unreachable");
+  assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready, reachable: async () => true }), "on");
 });

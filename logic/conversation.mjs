@@ -390,7 +390,7 @@ function money(amount, currency) {
 }
 
 /** What the customer reads when the looks are ready. Written by code only. */
-export function presentText(outfits) {
+export function presentText(outfits, { page = null } = {}) {
   const one = outfits.length === 1;
   const lines = [`I found ${one ? "one look" : `${outfits.length} looks`} that ${one ? "passes" : "pass"} every check:`, ""];
   for (const outfit of outfits) {
@@ -399,6 +399,7 @@ export function presentText(outfits) {
     if (outfit.rationale) lines.push(`   _${outfit.rationale}_`);
     lines.push("");
   }
+  if (page) lines.push(`**Your AiTelier page:** [every look with its boards and checks](${page})`, "");
   lines.push(
     one
       ? "Shall I buy it? Say **outfit 1** — or tell me what to change and I will restyle."
@@ -412,8 +413,8 @@ export function presentText(outfits) {
  * customer to choose; `status` becomes presented, or collecting when a run
  * produced nothing to buy.
  */
-export function presentOutfits(state, result) {
-  const next = { ...state, run: null };
+export function presentOutfits(state, result, { page = null } = {}) {
+  const next = { ...state, run: null, page: page ?? null };
   // Numbered after the filter: the numbers a customer picks from have to be the
   // numbers they can see, so a dropped look leaves no gap. outfit_id keeps
   // Person 3's own identity for the result page and the purchase.
@@ -430,7 +431,7 @@ export function presentOutfits(state, result) {
   next.status = "presented";
   next.outfits = outfits;
   next.selection = null;
-  const reply = presentText(outfits);
+  const reply = presentText(outfits, { page });
   return { state: say(next, "agent", reply), reply };
 }
 
@@ -582,7 +583,7 @@ export async function nextTurn(state, text, { ask = null } = {}) {
         next.selection = next.outfits.indexOf(outfit);
         return reply(confirmText(outfit), "selected");
       }
-      if (intent.kind === "show") return reply(presentText(next.outfits));
+      if (intent.kind === "show") return reply(presentText(next.outfits, { page: next.page }));
       // Anything else is treated as a change to the brief: restyle on a go-ahead.
       const changed = await updateDraft(next, input, ask);
       next.draft = changed.draft;

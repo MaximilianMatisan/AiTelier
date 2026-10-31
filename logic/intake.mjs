@@ -230,7 +230,7 @@ export function readOrder(description, { today = new Date() } = {}) {
  */
 export const ORDER_EXAMPLE = [
   "Two autumn outfits, old money style.",
-  "Budget 400 EUR in total.",
+  "Budget 400 EUR per outfit.",
   "Top M, waist 32, shoes EU 43.",
   "I already own black slim jeans. Avoid neon.",
 ].join("\n");
@@ -247,27 +247,24 @@ export const HOW_TO_ORDER =
  * the shape of an order they can copy.
  */
 export function welcome() {
+  // The order to copy comes first: someone facing an empty thread needs a
+  // sentence to paste, not a paragraph to read.
   return [
     "## AiTelier",
     "",
-    "I build complete outfits out of garments that are really in stock in European shops,",
-    "and I check every one of them before you are asked for anything.",
-    "",
-    "**You pay only if all five guarantees hold:** it fits your budget, it comes in your",
-    "size, the shop still has it, the price matches the quote, and it arrives in time.",
-    "If any one of them fails I submit no result at all, and the escrow returns your money.",
-    "",
-    "### How to write your order",
-    "",
-    HOW_TO_ORDER,
-    "",
-    "Copy this and change the values:",
+    "**To order, copy this, change the values and send it:**",
     "",
     "```",
     ORDER_EXAMPLE,
     "```",
     "",
-    "A structured JSON order works too: send the same facts as an object.",
+    HOW_TO_ORDER,
+    "",
+    "**You pay only if all five guarantees hold:** it fits your budget, it comes in your",
+    "size, the shop still has it, the price matches the quote, and it arrives in time.",
+    "If any one of them fails I submit no result at all, and the escrow returns your money.",
+    "",
+    'When the looks arrive, answer right here: pick one with "outfit 2", or tell me what to change.',
   ].join("\n");
 }
 

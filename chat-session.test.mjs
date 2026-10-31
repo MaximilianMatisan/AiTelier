@@ -146,3 +146,23 @@ test("the pipeline is run in its own folder, with the order written for it", asy
   assert.deepEqual(JSON.parse(readFileSync(path.join(root, outDir, "order.json"), "utf8")), { budget_eur: 400 });
   assert.equal(got.outfits.length, 1);
 });
+
+test("a chat styling run publishes the result page and links it", async (t) => {
+  const root = temp(t);
+  let published;
+  const styled = await runPipelineForChat({ budget_eur: 400 }, {
+    id: "chat-10",
+    root,
+    run: async (given) => (writeFileSync(path.join(root, given.at(-1), "person3", "result.json"), JSON.stringify(result)), true),
+    publish: async (outDir) => ((published = outDir), "https://aitelier.pages.dev/runs/x/"),
+  });
+  assert.equal(published, styled.outDir);
+  assert.equal(styled.page, "https://aitelier.pages.dev/runs/x/");
+
+  const { posts } = await runTurn(
+    { ...newConversation("chat-10"), status: "ready", draft: { budget_eur: 400, outfits: 1, theme: "casual", season: "autumn", sizes: { top: "M", waist: "32", shoe_eu: "43" } } },
+    "ja",
+    { runStyling: async () => styled },
+  );
+  assert.match(posts.at(-1), /Your AiTelier page.*aitelier\.pages\.dev\/runs\/x/);
+});

@@ -145,6 +145,33 @@ export function isPaidReady() {
     r.registration?.state === "RegistrationConfirmed"
   );
 }
+/**
+ * Whether the Masumi Payment Service answers at all. Any HTTP answer counts:
+ * this asks "is it running", not "is this request valid". A paid Task that
+ * starts while it is down fails at its first step and is closed as stalled,
+ * so the worker checks once before it lets any Task into the paid flow.
+ */
+export async function paymentServiceReachable({ env = process.env, fetchImpl = fetch, timeoutMs = 3000 } = {}) {
+  if (!env.MPS_URL?.trim()) return false;
+  try {
+    await fetchImpl(env.MPS_URL, { method: "GET", redirect: "manual", signal: AbortSignal.timeout(timeoutMs) });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * "on", or why the paid flow is not used: "off", "on-but-no-key" or
+ * "on-but-unreachable". Anything but "on" sends new Tasks down the unpaid path.
+ */
+export async function paidMode({ env = process.env, ready = isPaidReady, reachable = paymentServiceReachable } = {}) {
+  if (env.PAID_TASKS_ENABLED !== "true") return "off";
+  if (!ready()) return "on-but-no-key";
+  if (!(await reachable({ env }))) return "on-but-unreachable";
+  return "on";
+}
+
 export async function createPaidAdapter({
   save,
   answer,

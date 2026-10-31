@@ -274,3 +274,17 @@ test("an outfit without totals still carries a payable sum", () => {
   assert.equal(outfit.currency, "EUR");
   assert.equal(outfit.number, 1);
 });
+
+test("the looks carry the link to the result page, also when shown again", async () => {
+  const page = "https://aitelier.pages.dev/runs/abc/";
+  const { state, reply } = presentOutfits(newConversation(), result, { page });
+  assert.match(reply, /\*\*Your AiTelier page:\*\* \[every look with its boards and checks\]\(https:\/\/aitelier\.pages\.dev\/runs\/abc\/\)/);
+  const again = await nextTurn(state, "zeig sie nochmal");
+  assert.match(again.reply, /aitelier\.pages\.dev\/runs\/abc/);
+});
+
+test("without a published page the looks are still shown", () => {
+  const { reply } = presentOutfits(newConversation(), result);
+  assert.doesNotMatch(reply, /Your AiTelier page/);
+  assert.match(reply, /Rainy Munich Classic/);
+});
