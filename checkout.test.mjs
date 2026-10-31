@@ -32,7 +32,7 @@ test("a purchase carries what a payment module needs, and nothing else", () => {
   assert.equal(purchase.currency, "EUR");
   assert.equal(purchase.budget_eur, 400);
   assert.equal(purchase.confirmed_at, "2026-10-31T12:00:00.000Z");
-  assert.deepEqual(Object.keys(purchase.items[0]), ["item_id", "title", "brand", "size", "price", "currency", "product_url"]);
+  assert.deepEqual(Object.keys(purchase.items[0]), ["item_id", "title", "brand", "size", "price", "currency", "product_url", "image_url"]);
 });
 
 test("the same outfit confirmed twice is the same purchase id", () => {

@@ -191,6 +191,21 @@ test("a paid purchase ends in a receipt, a failed one keeps the outfit on the ta
   assert.match(failed.reply, /No payment provider/);
 });
 
+test("the receipt shows the amount actually charged and the payment detail", async () => {
+  const state = await conversationAt("selected");
+  const paying = (await nextTurn(state, "ja")).state;
+  const { reply } = recordCheckout(paying, {
+    status: "paid",
+    txHash: "pi_test_123",
+    paidAmount: 9.6,
+    paidCurrency: "EUR",
+    detail: "Stripe test payment pi_test_123; order shop_order_1; real checkout reached payment.",
+  });
+  assert.match(reply, /Paid: \*\*Quiet Weekend\*\*, 9\.60 EUR/);
+  assert.match(reply, /Stripe test payment pi_test_123/);
+  assert.match(reply, /real checkout reached payment/);
+});
+
 test("a mock payment says that no money moved", async () => {
   const state = await conversationAt("selected");
   const paying = (await nextTurn(state, "ja")).state;
