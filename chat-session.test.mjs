@@ -166,3 +166,15 @@ test("a chat styling run publishes the result page and links it", async (t) => {
   );
   assert.match(posts.at(-1), /Your AiTelier page.*aitelier\.pages\.dev\/runs\/x/);
 });
+
+test("a free-text order whose run failed is ready to try again on a yes", async (t) => {
+  const root = temp(t);
+  const dir = path.join(root, "catalog", "cache", "run", "task-11");
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(path.join(dir, "order.json"), JSON.stringify({ brief: "Two autumn outfits, old money style. Budget 400 EUR per outfit. Top M, waist 32, shoes EU 43." }));
+  const seeded = await seedFromRun(newConversation("task-11"), { taskId: "task-11", root });
+  assert.equal(seeded.status, "ready");
+  assert.equal(seeded.draft.budget_eur, 400);
+  const turn = await runTurn(seeded, "yes");
+  assert.equal(turn.action.type, "run_pipeline");
+});

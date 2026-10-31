@@ -16,7 +16,7 @@
 // `submitResultTime` lapses and the buyer gets their money back, which is the
 // promise the product is sold on.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, openSync, closeSync, writeFileSync } from "node:fs";
+import { existsSync, openSync, closeSync, writeFileSync, readFileSync, statSync } from "node:fs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -61,6 +61,30 @@ export function runPipeline(args, timeoutMs, logFile) {
     child.on("error", () => done(false));
     child.on("close", (code) => done(code === 0));
   });
+}
+
+// What a model provider says when it is down or out of quota. A run that
+// stopped on one of these is worth repeating; one that stopped on anything
+// else (a bad order, a broken stage) fails the same way twice.
+const TRANSIENT = /Service Unavailable|Too Many Requests|\b429\b|\b50[234]\b|overloaded|ECONNRESET|ETIMEDOUT|fetch failed/i;
+
+/**
+ * runPipeline(), repeated when a run failed on a provider outage. Every
+ * attempt appends to the same log; only the lines one attempt wrote decide
+ * whether it is repeated. Gives up when the next try would not fit in
+ * `timeoutMs`, so the caller still has its margin to submit.
+ */
+export async function runPipelineRetrying(run, args, timeoutMs, logFile, { waits = [15_000, 30_000], sleep = (ms) => new Promise((r) => setTimeout(r, ms)), minRunMs = 90_000 } = {}) {
+  const end = Date.now() + timeoutMs;
+  for (let attempt = 0; ; attempt++) {
+    const from = existsSync(logFile) ? statSync(logFile).size : 0;
+    if (await run(args, end - Date.now(), logFile)) return true;
+    const wrote = existsSync(logFile) ? readFileSync(logFile, "utf8").slice(from) : "";
+    const wait = waits[attempt];
+    if (wait === undefined || !TRANSIENT.test(wrote) || end - Date.now() - wait < minRunMs) return false;
+    log.warn("provider unavailable, running the pipeline again", { attempt: attempt + 2, waitS: wait / 1000 });
+    await sleep(wait);
+  }
 }
 
 /**
@@ -220,7 +244,8 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     timeoutS: Math.round(timeoutMs / 1000),
   });
   const started = Date.now();
-  const ok = await run(
+  const ok = await runPipelineRetrying(
+    run,
     args,
     timeoutMs,
     path.join(ROOT, outDir, "pipeline.log"),

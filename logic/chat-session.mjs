@@ -10,9 +10,9 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { newConversation, nextTurn, presentOutfits, recordCheckout, mergeSlots } from "./conversation.mjs";
+import { newConversation, nextTurn, presentOutfits, recordCheckout, mergeSlots, extractSlots, orderFrom } from "./conversation.mjs";
 import { payForOutfit } from "./checkout.mjs";
-import { runPipeline } from "./lead-agent.mjs";
+import { runPipeline, runPipelineRetrying } from "./lead-agent.mjs";
 import { publishPage } from "./publish.mjs";
 import { logger } from "../log.mjs";
 const log = logger("chat");
@@ -64,12 +64,15 @@ export async function seedFromRun(state, { taskId, root = ROOT } = {}) {
   const result = await read(path.join("person3", "result.json"));
   if (!order && !result) return state;
   let next = { ...state };
-  // A free-text brief carries no slots to merge; the stylist read it directly.
-  if (order && !order.brief) next.draft = mergeSlots(next.draft, order).draft;
+  // A free-text brief is read the way a chat message is, so "yes, try again"
+  // after a failed run does not ask the customer for what they already wrote.
+  if (order) next.draft = mergeSlots(next.draft, order.brief ? extractSlots(order.brief) : order).draft;
   if (result?.outfits?.length) {
     // Silent: the customer has already read these looks as the Task result.
     next = presentOutfits(next, result).state;
     next.messages = state.messages;
+  } else if (orderFrom(next.draft).ok) {
+    next.status = "ready";
   }
   log.info("conversation seeded from the finished run", { conversation: state.id, outfits: next.outfits.length });
   return next;
@@ -83,7 +86,7 @@ export async function runPipelineForChat(order, { id, root = ROOT, run = runPipe
   const args = ["logic/run-pipeline.mjs", "--order", path.join(outDir, "order.json"), "--out", outDir];
   if (process.env.AITELIER_SHORTLIST) args.push("--shortlist", process.env.AITELIER_SHORTLIST);
   log.info("styling for a conversation", { conversation: id, outDir });
-  const ok = await run(args, timeoutMs, path.join(root, outDir, "pipeline.log"));
+  const ok = await runPipelineRetrying(run, args, timeoutMs, path.join(root, outDir, "pipeline.log"));
   if (!ok) {
     log.error("styling failed", { conversation: id, log: `${outDir}/pipeline.log` });
     return { ok: false, outDir, result: null };

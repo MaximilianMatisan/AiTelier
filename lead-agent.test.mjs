@@ -172,3 +172,44 @@ test("a single warning keeps its plain wording", () => {
   assert.equal(collapseWarnings("Warnings: LLM_FALLBACK"), "Warnings: LLM_FALLBACK");
   assert.equal(collapseWarnings("no warnings here"), "no warnings here");
 });
+
+test("a run that failed on a provider outage is repeated, any other failure is not", async (t) => {
+  const { runPipelineRetrying } = await import("./logic/lead-agent.mjs");
+  const dir = path.join(tmpdir(), `retry-${process.pid}`);
+  mkdirSync(dir, { recursive: true });
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const logFile = path.join(dir, "pipeline.log");
+  const noWait = { waits: [1, 1], sleep: async () => {}, minRunMs: 0 };
+
+  let calls = 0;
+  const flaky = async (_args, _ms, file) => {
+    calls++;
+    if (calls === 1) {
+      writeFileSync(file, "Candidate filter failed: AI_APICallError: Service Unavailable\n", { flag: "a" });
+      return false;
+    }
+    return true;
+  };
+  assert.equal(await runPipelineRetrying(flaky, [], 60_000, logFile, noWait), true);
+  assert.equal(calls, 2);
+
+  calls = 0;
+  const broken = async (_args, _ms, file) => {
+    calls++;
+    writeFileSync(file, "TypeError: cannot read properties of undefined\n", { flag: "a" });
+    return false;
+  };
+  assert.equal(await runPipelineRetrying(broken, [], 60_000, logFile, noWait), false);
+  // The outage line from the first test is still in the log: only what this
+  // attempt wrote decides, so a broken stage is not retried on old evidence.
+  assert.equal(calls, 1);
+
+  calls = 0;
+  const down = async (_args, _ms, file) => {
+    calls++;
+    writeFileSync(file, "429 Too Many Requests\n", { flag: "a" });
+    return false;
+  };
+  assert.equal(await runPipelineRetrying(down, [], 60_000, logFile, noWait), false);
+  assert.equal(calls, 3, "two retries, then it gives up");
+});

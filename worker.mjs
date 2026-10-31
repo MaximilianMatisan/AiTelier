@@ -69,6 +69,25 @@ log.info("started", {
 });
 if (paidFlow === "on-but-unreachable")
   log.warn("payment service not reachable; new Tasks run unpaid", { url: process.env.MPS_URL });
+/** What the customer reads when an unpaid run could not finish. */
+function unpaidFailureNotice() {
+  return [
+    "I could not finish styling this order: a service I depend on did not answer, even after retrying.",
+    "Nothing was charged.",
+    "",
+    "Answer here with **yes** and I will try again, or tell me what to change first.",
+  ].join("\n");
+}
+
+/** What the customer reads when no look of an unpaid run passed its checks. */
+function unpaidRefundNotice(failed = []) {
+  return [
+    "No look I could build passed all five checks, so I am not showing you one:",
+    ...failed.slice(0, 6).map((f) => `- ${f}`),
+    "",
+    "Nothing was charged. Tell me what to change here — a higher budget, another style — and I will restyle.",
+  ].join("\n");
+}
 // Said once per change, not on every 5-second poll.
 let lastCounts = "";
 const lastNote = new Map();
@@ -200,7 +219,7 @@ while (true) {
         // a closed conversation: the next comment is usually the order itself.
         // Nothing was charged for it, and nothing is submitted from here — the
         // chat answers on the thread.
-        if (state.phase === "asked" || state.phase === "refused") {
+        if (state.phase === "asked" || state.phase === "refused" || state.phase === "failed") {
           await reply(t);
           continue;
         }
@@ -221,10 +240,31 @@ while (true) {
             JSON.stringify({ ...state, phase: "model-pending" }),
             { mode: 0o600 },
           );
-          const result = await respond(
-            state.input,
-            `.local/${t.id}-session.json`,
-          );
+          let result;
+          try {
+            result = await respond(
+              state.input,
+              `.local/${t.id}-session.json`,
+            );
+          } catch (e) {
+            // Unpaid, nothing is in escrow: a run that broke or a look that
+            // failed its guarantees is said on the thread and the Task closed,
+            // instead of sitting in RUNNING with nobody saying anything. The
+            // chat stays open on it, so the customer can restyle from there.
+            const notice = e?.refund ? unpaidRefundNotice(e.failed) : unpaidFailureNotice();
+            const closed = await closeTaskWithoutResult(runtime, t.id, notice, { log });
+            writeFileSync(
+              journal,
+              JSON.stringify({ ...state, phase: "failed", reason: e?.message ?? String(e) }),
+              { mode: 0o600 },
+            );
+            log.warn(e?.refund ? "no look passed, customer told" : "styling failed, customer told", {
+              task: t.id,
+              closed,
+              error: e?.message,
+            });
+            continue;
+          }
           writeFileSync(resultFile, result, { mode: 0o600 });
           log.info("result saved", { task: t.id, chars: result.length });
           state = { ...state, phase: "result-saved" };
