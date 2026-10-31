@@ -16,6 +16,7 @@ holds.
 | Part | State |
 | --- | --- |
 | Sokosumi worker → pipeline | ✅ Every task, free or paid, runs through the pipeline |
+| Step 0 · conversation | ✅ `logic/conversation.mjs`: several turns to collect the order, show the looks and confirm one; in the studio chat and in Sokosumi task comments |
 | Step 1 · read and check the order | ✅ `logic/intake.mjs`; free text or JSON |
 | Step 2 · real shop catalogue | ✅ 8725 items, 36 Shopify shops, cached in `catalog/cache/` |
 | Step 3 · candidate filter | ✅ `candidateFilter.mjs` (LLM picks filters, code applies them) |
@@ -26,12 +27,13 @@ holds.
 | Step 6 · final check, five guarantees | ✅ Person 3; ⚠️ checks the cached snapshot unless the live re-check service runs |
 | Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; ⚠️ not hosted yet, Sokosumi gets Markdown |
 | Refund path | ✅ A `REFUND` result is not submitted, so the escrow returns the money |
-| Local studio UI | ✅ `npm run ui`: enter an order, watch the stages, see the looks |
+| Step 8 · checkout | ⚠️ `logic/checkout.mjs` builds and checks the purchase; **no payment module wired in yet**, so a confirmed outfit is declined with its shop links |
+| Local studio UI | ✅ `npm run ui`: chat with the stylist or fill the form, watch the stages, see the looks |
 | Masumi payment (escrow, Preprod) | ⏳ Template code present, not set up; quote fixed at 1 test USDM |
 | Trust check as an x402 service | ⏳ Not started |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
-`npm test` passes (142 tests, 2 of them marked todo); Person 3's `pytest` passes 30, skips 1.
+`npm test` passes (200 tests, 2 of them marked todo); Person 3's `pytest` passes 30, skips 1.
 The last measured end-to-end runs ended in `APPROVED` with a 500 EUR budget and in `REFUND`
 with 300 EUR (see [Known limits](#known-limits)).
 
@@ -66,6 +68,63 @@ hold throws `GuaranteesFailed`: the worker logs `Refund due, no result submitted
 is kept in the task journal. On the paid path the pipeline is stopped one minute before the
 escrow's `submitResultTime`.
 
+## Talking to the agent
+
+An order no longer has to arrive complete. The chat collects it over several
+turns, runs the pipeline when nothing is missing, shows the looks it found and
+buys the one the customer confirms:
+
+```text
+collecting ──(order complete)──> ready ──"yes"──> styling ──> presented
+                                   ▲                             │
+            (change the brief) ────┘                      "outfit 2"
+                                                                 ▼
+   paid <──(payment module)── paying <────"yes"──────────── selected
+```
+
+The same dialogue runs on both surfaces, because `logic/conversation.mjs`
+performs no I/O at all: a turn takes a state and a message and answers with the
+new state, the text to show and one action for the surface to carry out.
+
+- **Studio page** · `npm run ui`, tab *Talk to the stylist*. The page starts
+  the run itself so it can show the stages while the pipeline works.
+- **Sokosumi task comments** · every comment on a task is a turn. The task's own
+  result seeds the conversation, so the first comment can be "buy outfit 2".
+  One comment is answered exactly once, and a turn that was interrupted is
+  never repeated — which is what keeps a payment from running twice. A restyle
+  asked for in a comment runs in the worker's own loop, so the worker polls
+  nothing else for the minute or two the pipeline takes.
+
+What is said about products, prices and totals is written by code from Person
+3's result, and a purchase needs a confirmation that `detectIntent()` reads.
+A model is used for two things only: reading an order out of free text, and the
+wording while the order is still being collected. With no model configured, or
+one that is rate-limited, the dialogue carries on with the code reader alone.
+
+### Paying for an outfit
+
+`logic/checkout.mjs` turns the confirmed look into a purchase, checks it (one
+currency, every item linked and priced, the items add up to the total, the total
+inside the budget the customer confirmed, the guarantees held) and hands it to
+the payment module named by `AITELIER_PAYMENT`:
+
+```js
+// logic/pay-cardano.mjs
+export async function payOutfit(purchase, { signal } = {}) {
+  return { status: "paid", txHash: "…", paidAmount: 1, paidCurrency: "USDM" };
+}
+```
+
+```sh
+AITELIER_PAYMENT=./logic/pay-cardano.mjs npm run ui   # the module
+AITELIER_PAYMENT=mock npm run ui                      # demo: says "paid", moves nothing
+npm run ui                                            # unset: declines, shows the links
+```
+
+The file's own header holds the full contract, including the shape of a
+`Purchase` and the three answers a module may give. A purchase that fails a
+check never reaches the module.
+
 ## Repository map
 
 | Path | Owner | What |
@@ -74,6 +133,10 @@ escrow's `submitResultTime`.
 | `paid-task.mjs`, `settlement.mjs`, `payment-registration.mjs`, `agent-api.mjs` | template | Masumi payment, registration and MIP-003 API |
 | `logic/lead-agent.mjs` | lead agent | Connects a Sokosumi task to the pipeline |
 | `logic/intake.mjs` | lead agent | Step 1: order format and checks |
+| `logic/conversation.mjs` | lead agent | Step 0: the dialogue — one state, one turn at a time, no I/O |
+| `logic/chat-session.mjs` | lead agent | Keeps a conversation on disk, runs the pipeline a turn asks for |
+| `logic/checkout.mjs` | lead agent | Step 8: the purchase, its checks and the payment module's contract |
+| `comments.mjs` | lead agent | The chat on a Sokosumi task: one conversation per task thread |
 | `logic/run-pipeline.mjs` | Person 1 | Chains all stages; builds the customer profile |
 | `logic/result-page.mjs` | Person 1 | Step 7: one self-contained HTML result page per run |
 | `logic/data/` | Person 1 | Catalogue collector, normaliser, live refetch and its HTTP service, Person 3 adapter |
@@ -83,7 +146,7 @@ escrow's `submitResultTime`.
 | `logic/buyable.mjs` | Person 2/3 | Drops unbuyable sizes before the stylist |
 | `person3/` | Person 3 | Python stylist and final check — see [person3/README.md](person3/README.md) |
 | `PERSON3_*.md` | Person 3 | Input and output contracts, global context |
-| `ui/` | — | Local studio page: order form, stage progress, A2UI result |
+| `ui/` | — | Local studio page: stylist chat, order form, stage progress, A2UI result |
 | `agent/instructions.md` | — | Instructions for the plain-LLM fallback |
 
 ## Setup
@@ -288,6 +351,8 @@ cd person3 && .venv/bin/pytest -q
 - **Gender is read from shop data.** Tags, vendor and title decide; items marked for the other
   gender are dropped. About 40% of the catalogue says nothing and is kept.
 - **Final check uses the snapshot by default.** See [Live re-checks in step 6](#live-re-checks-in-step-6).
+- **The agent cannot buy yet.** Step 8 checks the purchase and then declines it, because no
+  payment module is wired into `AITELIER_PAYMENT`. The customer gets every shop link instead.
 - **Cart links cannot be verified by a script.** Shops answer 403 on `/cart/`; availability is
   proven by the live product refetch instead. See [catalog/README.md](catalog/README.md).
 - **Themes are keyword heuristics.** Only `casual`, `old_money` and `streetwear` exist; punk,

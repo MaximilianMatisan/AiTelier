@@ -17,18 +17,18 @@ export const THEMES = ["casual", "old_money", "streetwear"];
 export const SEASONS = ["spring", "summer", "autumn", "winter"];
 export const TOP_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
 
-const THEME_ALIASES = {
+export const THEME_ALIASES = {
   casual: "casual", lassig: "casual", laessig: "casual", relaxed: "casual",
   old_money: "old_money", oldmoney: "old_money", preppy: "old_money", classic: "old_money",
   streetwear: "streetwear", street: "streetwear", urban: "streetwear",
 };
-const SEASON_ALIASES = {
+export const SEASON_ALIASES = {
   spring: "spring", fruhling: "spring", fruehling: "spring",
   summer: "summer", sommer: "summer",
   autumn: "autumn", fall: "autumn", herbst: "autumn",
   winter: "winter",
 };
-const GENDER_ALIASES = {
+export const GENDER_ALIASES = {
   men: "men", man: "men", male: "men", m: "men", herren: "men", herr: "men",
   women: "women", woman: "women", female: "women", w: "women", f: "women", damen: "women",
 };
@@ -48,7 +48,7 @@ export const TEMPLATE = {
 };
 
 /** "Old Money", "old-money", "Lässig" -> "old_money", "old_money", "lassig". */
-function key(value) {
+export function key(value) {
   return String(value)
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")

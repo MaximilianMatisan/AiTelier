@@ -68,6 +68,33 @@
   details.raw summary { cursor: pointer; color: var(--ink-soft); }
   details.raw pre { max-height: 360px; overflow: auto; background: #1f2a44; color: #e8e4da; border-radius: 10px; padding: 14px; font-size: 12px; }
 
+  /* tabs */
+  .tabs { display: flex; gap: 8px; justify-content: center; margin: 0 0 18px; }
+  .tab { font: inherit; font-size: 14px; background: #fff; color: var(--ink-soft); border: 1px solid var(--line); border-radius: 999px; padding: 8px 18px; cursor: pointer; }
+  .tab[aria-selected="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+  /* chat */
+  .chat { display: grid; gap: 16px; }
+  .thread { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; max-height: 52vh; overflow-y: auto; }
+  .thread li { display: flex; }
+  .thread li.customer { justify-content: flex-end; }
+  .bubble { max-width: 78%; border-radius: 14px; padding: 12px 14px; border: 1px solid var(--line); background: #fff; overflow-wrap: anywhere; }
+  .thread li.customer .bubble { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .bubble p { margin: 0 0 8px; }
+  .bubble p:last-child { margin: 0; }
+  .bubble ul { margin: 4px 0 8px; padding-left: 18px; }
+  .bubble a { color: inherit; }
+  .bubble code { background: #f3efe7; color: var(--ink); border-radius: 4px; padding: 1px 5px; font-size: 13px; }
+  .chat-status { font-size: 13px; color: var(--ink-soft); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .pill { border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; background: #fff; letter-spacing: .04em; font-size: 12px; text-transform: uppercase; }
+  .quick { display: flex; gap: 8px; flex-wrap: wrap; }
+  .quick button { font: inherit; font-size: 14px; background: #fff; border: 1px solid var(--gold); color: var(--ink); border-radius: 999px; padding: 8px 16px; cursor: pointer; }
+  .quick button.buy { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .chat-form { display: flex; gap: 8px; }
+  .chat-form input { flex: 1 1 auto; }
+  .chat-form button { white-space: nowrap; }
+  .thinking .bubble { color: var(--ink-soft); font-style: italic; }
+
   /* A2UI basic catalog */
   .a2ui { display: grid; gap: 16px; }
   .a2ui-text { margin: 0; }
@@ -110,7 +137,28 @@
 </header>
 <main>
 
-<section id="order" class="panel">
+<nav class="tabs" id="tabs">
+  <button class="tab" type="button" data-view="chat" aria-selected="true">Talk to the stylist</button>
+  <button class="tab" type="button" data-view="order" aria-selected="false">Fill in a form</button>
+</nav>
+
+<section id="chat" class="panel chat">
+  <ol class="thread" id="thread"></ol>
+  <ol class="steps" id="chat-steps" hidden></ol>
+  <div class="quick" id="quick"></div>
+  <div id="chat-errors" class="errors" hidden></div>
+  <form class="chat-form" id="chat-form" novalidate>
+    <input id="chat-text" name="text" autocomplete="off" placeholder="Two autumn outfits, old money, 400 EUR, top M, waist 32, shoes EU 43">
+    <button class="primary" id="chat-send" type="submit">Send</button>
+  </form>
+  <div class="chat-status">
+    <span class="pill" id="chat-state">collecting</span>
+    <label class="toggle"><input type="checkbox" id="chat-fast" checked> Fast demo mode</label>
+    <span id="chat-hint">Tell the stylist what you want. It asks for whatever is missing, styles when the order is complete, and buys only the look you confirm.</span>
+  </div>
+</section>
+
+<section id="order" class="panel" hidden>
   <form id="form" novalidate>
     <fieldset>
       <legend>Your budget</legend>
@@ -192,7 +240,12 @@
 import { renderSurface } from "./a2ui.js";
 
 const $ = (id) => document.getElementById(id);
-const show = (name) => ["order", "progress", "result"].forEach((s) => ($(s).hidden = s !== name));
+const VIEWS = ["chat", "order", "progress", "result"];
+const show = (name) => {
+  VIEWS.forEach((s) => ($(s).hidden = s !== name));
+  $("tabs").hidden = !["chat", "order"].includes(name);
+  document.querySelectorAll(".tab").forEach((tab) => tab.setAttribute("aria-selected", String(tab.dataset.view === name)));
+};
 let poll;
 
 function readForm(form) {
@@ -219,9 +272,9 @@ function showErrors(box, errors) {
   box.hidden = false;
 }
 
-function drawSteps(stages) {
+function drawSteps(stages, target = $("steps")) {
   const all = [{ label: "Order checked", detail: "Budget, sizes, season and style are valid.", state: "done" }, ...stages];
-  $("steps").replaceChildren(...all.map((s) => {
+  target.replaceChildren(...all.map((s) => {
     const li = document.createElement("li");
     li.className = s.state;
     const dot = Object.assign(document.createElement("span"), { className: "dot", textContent: s.state === "done" ? "✓" : "" });
@@ -284,6 +337,142 @@ document.querySelectorAll("[data-restart]").forEach((b) => b.addEventListener("c
   clearTimeout(poll);
   show("order");
 }));
+
+/* ---------------------------------- chat ---------------------------------- */
+
+const chat = { id: null, poll: null };
+
+const esc = (text) => String(text).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+function inline(text) {
+  return esc(text)
+    .replace(/`([^`]+)`/g, "<code>$1</code>")
+    .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+    .replace(/_([^_]+)_/g, "<em>$1</em>")
+    .replace(/(https?:\/\/[^\s<)]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+}
+
+/** The little markdown the agent writes: paragraphs, dashes, bold, links. */
+function markdown(text) {
+  const html = [];
+  let list = null;
+  const flush = () => {
+    if (list) html.push(`<ul>${list.join("")}</ul>`);
+    list = null;
+  };
+  for (const raw of String(text).split("\n")) {
+    const line = raw.trim();
+    if (!line) { flush(); continue; }
+    const item = line.match(/^[-*]\s+(.*)$/);
+    if (item) { (list ??= []).push(`<li>${inline(item[1])}</li>`); continue; }
+    flush();
+    html.push(`<p>${inline(line)}</p>`);
+  }
+  flush();
+  return html.join("");
+}
+
+function bubble(role, text, className = "") {
+  const li = document.createElement("li");
+  li.className = `${role} ${className}`.trim();
+  const body = document.createElement("div");
+  body.className = "bubble";
+  body.innerHTML = markdown(text);
+  li.append(body);
+  return li;
+}
+
+const HINTS = {
+  collecting: "The stylist asks for whatever the order is still missing.",
+  ready: "Your order is complete. Say yes and the pipeline searches the shops.",
+  styling: "Searching real shops and checking five guarantees on every look.",
+  presented: "Pick a look to buy, or say what to change and it restyles.",
+  selected: "Nothing is bought without your explicit yes.",
+  paying: "The payment module has the purchase.",
+  paid: "Paid. The receipt is in the thread.",
+};
+
+function quickButtons(view) {
+  const buttons = [];
+  if (view.status === "ready") buttons.push(["Yes, search now", "yes", "buy"]);
+  if (view.status === "presented")
+    for (const outfit of view.outfits)
+      buttons.push([`Buy outfit ${outfit.number} — ${outfit.total.toFixed(2)} ${outfit.currency}`, `outfit ${outfit.number}`, ""]);
+  if (view.status === "selected") buttons.push(["Yes, buy it", "yes", "buy"], ["No, show the looks", "no", ""]);
+  if (view.status === "paid") buttons.push(["Style another capsule", "I would like another capsule", ""]);
+  $("quick").replaceChildren(...buttons.map(([label, message, className]) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = className;
+    button.textContent = label;
+    button.addEventListener("click", () => send(message));
+    return button;
+  }));
+}
+
+function drawChat(view) {
+  chat.id = view.id;
+  $("thread").replaceChildren(...view.messages.map((m) => bubble(m.role, m.text)));
+  $("thread").scrollTop = $("thread").scrollHeight;
+  $("chat-state").textContent = view.status;
+  $("chat-hint").textContent = HINTS[view.status] ?? "";
+  const styling = view.status === "styling" && view.run;
+  $("chat-steps").hidden = !styling;
+  if (styling) drawSteps(view.run.stages, $("chat-steps"));
+  $("chat-send").disabled = Boolean(styling);
+  quickButtons(view);
+}
+
+async function followChat() {
+  clearTimeout(chat.poll);
+  const res = await fetch(`/api/chat/${chat.id}`);
+  if (!res.ok) return;
+  const view = await res.json();
+  drawChat(view);
+  if (view.status === "styling") chat.poll = setTimeout(followChat, 1500);
+}
+
+async function send(text) {
+  if (!text.trim()) return;
+  $("chat-errors").hidden = true;
+  $("chat-send").disabled = true;
+  $("quick").replaceChildren();
+  $("thread").append(bubble("customer", text), bubble("agent", "…", "thinking"));
+  $("thread").scrollTop = $("thread").scrollHeight;
+  try {
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: chat.id, text, fast: $("chat-fast").checked }),
+    });
+    const view = await res.json();
+    if (!res.ok) return showErrors($("chat-errors"), view.errors ?? ["The stylist did not answer."]);
+    drawChat(view);
+    if (view.status === "styling") followChat();
+  } catch {
+    showErrors($("chat-errors"), ["The AiTelier server is not reachable. Is npm run ui still running?"]);
+  } finally {
+    $("chat-send").disabled = false;
+  }
+}
+
+$("chat-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const text = $("chat-text").value;
+  $("chat-text").value = "";
+  send(text);
+});
+
+document.querySelectorAll(".tab").forEach((tab) => tab.addEventListener("click", () => show(tab.dataset.view)));
+
+drawChat({
+  id: null,
+  status: "collecting",
+  messages: [{ role: "agent", text: "I am the AiTelier stylist. Tell me what you need — style, season, budget and your sizes — and I will put capsule outfits together from real shops. When one of them is right, I buy it for you." }],
+  outfits: [],
+  run: null,
+});
+show("chat");
 </script>
 </body>
 </html>
