@@ -159,7 +159,12 @@ export function extractSlots(text) {
   const gender = word(source, Object.fromEntries(Object.entries(GENDER_ALIASES).filter(([k]) => k.length > 1)));
   if (gender) out.gender = gender;
 
-  const top = source.match(/(?:gr(?:ö|oe|o)(?:ss|ß)e|size|top|oberteil|shirt|tops)\s*:?\s*(XXXL|XXL|XL|XXS|XS|[SML])\b/i);
+  // The \b after the keyword matters: without it "size" matched inside the
+  // word "sizes" and the plural s was read as the size. Every JSON order came
+  // through as top S, whatever the customer had written.
+  const top = source.match(
+    /(?:gr(?:ö|oe|o)(?:ss|ß)e|size|top|oberteil|shirt|tops)\b\W{0,4}(XXXL|XXL|XL|XXS|XS|[SML])\b/i,
+  );
   if (top) out.sizes = { ...out.sizes, top: top[1].toUpperCase() };
 
   const waist = lower.match(/(?:waist|bund|hose|hosen\w*|trousers?|jeans)\D{0,10}(\d{2})\b/) ?? lower.match(/\bw\s?(\d{2})\b/);

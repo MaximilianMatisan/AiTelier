@@ -303,3 +303,20 @@ test("without a published page the looks are still shown", () => {
   assert.doesNotMatch(reply, /Your AiTelier page/);
   assert.match(reply, /Rainy Munich Classic/);
 });
+
+test("a JSON order keeps the size the customer wrote", () => {
+  // "size" matched inside the word "sizes" and the plural s was read as the
+  // size, so every JSON order arrived as top S whatever the customer sent.
+  const order = '{"budget_eur": 400, "outfits": 1, "theme": "old_money", "season": "autumn", "sizes": {"top": "M", "waist": "32", "shoe_eu": "43"}, "gender": "men"}';
+  const slots = extractSlots(order);
+  assert.equal(slots.sizes?.top, "M");
+  assert.equal(slots.sizes?.waist, "32");
+  assert.equal(slots.sizes?.shoe_eu, "43");
+});
+
+test("sizes written in plain words still read", () => {
+  assert.equal(extractSlots("top M, waist 32, shoes EU 43").sizes?.top, "M");
+  assert.equal(extractSlots("Größe L bitte").sizes?.top, "L");
+  assert.equal(extractSlots("shirt xs").sizes?.top, "XS");
+  assert.equal(extractSlots('{"sizes": {"top": "XL"}}').sizes?.top, "XL");
+});

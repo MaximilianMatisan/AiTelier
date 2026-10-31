@@ -231,15 +231,21 @@ while (true) {
               review.action === "ask" ? "asked for the missing details" : "order refused",
               { task: t.id, reasons: review.reasons, closed },
             );
-            writeFileSync(
-              journal,
-              JSON.stringify({
-                ...state,
-                phase: review.action === "ask" ? "asked" : "refused",
-                reasons: review.reasons,
-              }),
-              { mode: 0o600 },
-            );
+            // Updated in memory as well as on disk. Writing only the journal
+            // left this pass still holding phase "started", so the refusal
+            // never took effect: the Task fell straight through to the paid
+            // flow, the escrow was locked, and the refusal itself was
+            // submitted as the result. The customer was charged to be told
+            // their order was unusable, under a message saying nothing was
+            // charged. The paid flow then saved its own state over the
+            // journal, so the next poll refused again - which is why the same
+            // refusal was posted to the thread every few seconds.
+            state = {
+              ...state,
+              phase: review.action === "ask" ? "asked" : "refused",
+              reasons: review.reasons,
+            };
+            writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
           }
         }
         // A Task that was refused, or sent back for the missing details, is not
