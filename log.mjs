@@ -41,7 +41,12 @@ export function fields(data = {}) {
 /** The line as it is printed: time, level, area, short task ID, message, fields. */
 export function format(level, area, message, data = {}, date) {
   const { task, ...rest } = data;
-  const id = task ? ` ${String(task).slice(0, 8)}` : "";
+  // Task IDs are UUIDv7: the first 12 hex characters are the millisecond the
+  // Task was created, so 8 characters are shared by every Task made within the
+  // same ~65 seconds. Several Tasks then logged under one ID and the thread
+  // read as a single Task moving backwards through its stages. 18 characters
+  // keep the millisecond and the random nibble that follows it.
+  const id = task ? ` ${String(task).slice(0, 18)}` : "";
   const extra = fields(rest);
   return `${stamp(date)} ${level.toUpperCase().padEnd(5)} [${area}]${id} ${message}${extra ? " " + extra : ""}`;
 }

@@ -17,8 +17,8 @@ import { spawn } from "node:child_process";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { readOrder, refusal } from "./intake.mjs";
-import { equivalentSizes } from "./data/normalize.js";
+import { reviewOrder, SEASONS } from "./intake.mjs";
+import { equivalentSizes, categoryOf } from "./data/normalize.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -42,11 +42,35 @@ const flag = (name, fallback) => {
   return i === -1 ? fallback : process.argv[i + 1];
 };
 
-function run(command, args, options = {}) {
+/**
+ * Each stage gets its own clock. Without one, a model call or a shop that never
+ * answered held the whole run open until the escrow's deadline, and the Task
+ * sat in RUNNING with nothing to show. SIGTERM first, SIGKILL for a child that
+ * ignores it.
+ */
+const STAGE_TIMEOUT_MS = Number(process.env.AITELIER_STAGE_TIMEOUT_MS) || 3 * 60_000;
+
+function run(command, args, options = {}, timeoutMs = STAGE_TIMEOUT_MS) {
   return new Promise((resolve) => {
     const child = spawn(command, args, { cwd: ROOT, stdio: "inherit", ...options });
-    child.on("error", (err) => resolve({ ok: false, reason: err.message }));
-    child.on("close", (code) => resolve({ ok: code === 0, reason: `exit code ${code}` }));
+    let timedOut = false;
+    const timer = setTimeout(() => {
+      timedOut = true;
+      child.kill("SIGTERM");
+      setTimeout(() => child.kill("SIGKILL"), 5_000).unref();
+    }, timeoutMs);
+    child.on("error", (err) => {
+      clearTimeout(timer);
+      resolve({ ok: false, reason: err.message });
+    });
+    child.on("close", (code) => {
+      clearTimeout(timer);
+      resolve(
+        timedOut
+          ? { ok: false, reason: `no answer within ${Math.round(timeoutMs / 1000)}s` }
+          : { ok: code === 0, reason: `exit code ${code}` },
+      );
+    });
   });
 }
 
@@ -111,6 +135,7 @@ export function orderToCustomer(order, brief = null) {
 // and its result shows the budget it used, so the customer sees the assumption.
 const DEFAULT_BUDGET_EUR = Number(process.env.AITELIER_DEFAULT_BUDGET_EUR) || 500;
 const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const SPELLED_TOP_SIZE = { small: "S", medium: "M", large: "L", "extra large": "XL" };
 const WORD_NUMBERS = { one: 1, two: 2, three: 3, four: 4, five: 5, ein: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5 };
 
 /**
@@ -129,8 +154,37 @@ export function sizesFromLabels(labels = []) {
   return { top, waist: waist && String(waist), shoe_eu: shoe && String(shoe) };
 }
 
+const SEASON_BY_MONTH = [
+  "winter", "winter", "spring", "spring", "spring", "summer",
+  "summer", "summer", "autumn", "autumn", "autumn", "winter",
+];
+
+/**
+ * The season nobody stated. Person 3 needs one to leave shorts out of an
+ * October order; given null it kept every season open and a Munich autumn
+ * brief came back with summer shorts.
+ *
+ * The month decides it - the shops and the delivery country are European, so
+ * northern hemisphere - and a season named in the climate note wins outright.
+ * A stated temperature may only make the answer colder: a cold June is not a
+ * reason to buy a parka, but it is a reason not to buy shorts.
+ */
+export function seasonFromDate(date = new Date(), climate = null) {
+  const text = String(climate ?? "").toLowerCase();
+  const named = SEASONS.find((season) => text.includes(season));
+  if (named) return named;
+  const byMonth = SEASON_BY_MONTH[date.getMonth()];
+  // The hyphen in a range is not a minus sign: "8-15 C" is 15, not -15.
+  const degrees = [...text.matchAll(/(?<!\d)(-?\d{1,2})\s*(?:°|deg)?\s*c\b/g)].map((m) => Number(m[1]));
+  if (!degrees.length) return byMonth;
+  const high = Math.max(...degrees);
+  if (high < 5) return "winter";
+  if (high < 18 && byMonth === "summer") return "autumn";
+  return byMonth;
+}
+
 /** The customer half of Person 3's envelope for a free-text brief. */
-export function briefToCustomer(brief, selection = null) {
+export function briefToCustomer(brief, selection = null, { today = new Date() } = {}) {
   const text = brief.toLowerCase();
   const budgetMatch =
     text.match(/(\d[\d.,]*)\s*(?:€|eur|euro)/) ?? text.match(/(?:budget|max(?:imum)?)\D{0,12}(\d[\d.,]*)/);
@@ -143,23 +197,40 @@ export function briefToCustomer(brief, selection = null) {
   // A size the customer wrote out ("feet 40", "waist 32", "top M") beats the
   // filter's reading, which falls back to a broad range when unsure.
   const said = (re) => text.match(re)?.[1];
+  /**
+   * A brief that only says "Small" states a top size as plainly as "top M"
+   * does, and intake.namesSize treats it as one - so the order passes the gate
+   * before the escrow. Without reading it here nothing downstream knew the
+   * size, and unifySizes went on to pick L for a customer who asked for Small.
+   */
+  const bareTopSize = () => {
+    // "extra large" first, or the alternation would stop at "large".
+    const spelled = text.match(/\b(extra[- ]large|small|medium|large)\b/)?.[1];
+    if (spelled) return SPELLED_TOP_SIZE[spelled.replace("-", " ")];
+    return text.match(/(?:^|[^a-z])(xxs|xs|s|m|l|xl|xxl|xxxl)(?:[^a-z]|$)/)?.[1]?.toUpperCase();
+  };
   const sizes = {
     ...sizesFromLabels(selection?.stock),
     ...Object.fromEntries(
       Object.entries({
-        top: said(/\b(?:top|tops|shirt|oberteil|size|größe)\s*(?:size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl)\b/)?.toUpperCase(),
+        top:
+          said(/\b(?:top|tops|shirt|oberteil|size|größe)\s*(?:size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl)\b/)?.toUpperCase() ??
+          bareTopSize(),
         waist: said(/\b(?:waist|taille|bundweite|w)\s*(\d{2})\b/),
         shoe_eu: said(/\b(?:feet|foot|shoes?|schuhe?|schuhgröße|eu)\s*(?:size\s*|eu\s*)?(\d{2}(?:[.,]5)?)\b/)?.replace(",", "."),
       }).filter(([, v]) => v),
     ),
   };
+  const season = seasons.length === 1 ? seasons[0] : seasonFromDate(today, brief);
   return {
     budgetAssumed: !budget,
+    seasonAssumed: seasons.length !== 1,
+    season,
     envelope: orderToCustomer({
       budget_eur: budget || DEFAULT_BUDGET_EUR,
       outfits: Math.min(Math.max(outfits, 1), 10),
       theme: themes[0] ?? "minimal",
-      season: seasons.length === 1 ? seasons[0] : null,
+      season,
       gender,
       sizes,
       fit: null,
@@ -256,6 +327,122 @@ export function fitSizesToCatalogue(sizes, envelope) {
   return { sizes: adjusted, swaps };
 }
 
+// A knit and a shirt are both "top" to the catalogue's classifier, but Person 3
+// keeps base and mid apart, so the two are separated here.
+const MID_WORDS =
+  /\b(?:sweater|pullover|knit|strick|cardigan|jumper|hoodie|sweatshirt|fleece|roll-?neck|turtleneck|gilet)\b/i;
+
+/**
+ * Which layer a garment the customer already owns fills, or null when it
+ * cannot be placed. Guessing is the one thing not to do here: dropping the
+ * wrong layer buys the customer nothing for that slot.
+ */
+export function layerOwned(text) {
+  const words = String(text ?? "").toLowerCase();
+  const category = categoryOf(words);
+  if (category === "bottom" || category === "shoes" || category === "outer") return category;
+  if (category === "top") return MID_WORDS.test(words) ? "mid" : "base";
+  return null;
+}
+
+/**
+ * The layers Person 3 would ask for.
+ *
+ * MIRRORS `StylistRequest.required_layers` in person3/app/models.py. Person 3
+ * uses `options.required_layers` when we set it and derives the list from the
+ * weather words when we do not, so removing a single layer means supplying the
+ * whole list - there is no way to subtract one. The test pins every branch, so
+ * if Person 3's rule changes the mismatch shows up there rather than in a
+ * customer's result.
+ */
+const LAYERS_BY_WEATHER = [
+  [["summer", "hot", "warm", "tropical"], ["base", "bottom", "shoes"]],
+  [["winter", "cold", "snow", "freezing"], ["base", "mid", "outer", "bottom", "shoes"]],
+  [["autumn", "spring", "mild", "rain", "wet"], ["base", "mid", "bottom", "shoes"]],
+];
+
+export function requiredLayersFor(customer = {}) {
+  const text = [customer.season, customer.climate, customer.fit_description]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  for (const [words, layers] of LAYERS_BY_WEATHER)
+    if (words.some((word) => text.includes(word))) return layers;
+  return ["base", "bottom", "shoes"];
+}
+
+/**
+ * What to ask Person 3 for once the customer's own wardrobe is taken off the
+ * list, or null to leave Person 3's own rule alone.
+ *
+ * Person 3 never reads `customer.owned` (see docs/PERSON3_ISSUES.md), so a
+ * brief saying "I already own black slim jeans" made the model leave the
+ * bottom out - correctly - and then the resolver refused the outfit for a
+ * missing bottom and the whole order was refunded. Naming the layers keeps
+ * that from happening while the stylist is fixed properly.
+ *
+ * Nothing is sent when the customer owns nothing we can place, so this
+ * duplication stays out of the path of every other order.
+ */
+export function layersMinusOwned(customer = {}) {
+  const owned = [...new Set((customer.owned ?? []).map(layerOwned).filter(Boolean))];
+  if (!owned.length) return null;
+  const required = requiredLayersFor(customer);
+  const covered = owned.filter((layer) => required.includes(layer));
+  if (!covered.length) return null;
+  const kept = required.filter((layer) => !covered.includes(layer));
+  // Owning every layer is not an order for clothes; let Person 3 answer as it
+  // would have rather than asking it to build an outfit out of nothing.
+  if (!kept.length) return null;
+  return { required: kept, covered };
+}
+
+/**
+ * Fill the slots the customer left open with one label each.
+ *
+ * Person 3 keeps one size per slot and matches it exactly, so a slot left
+ * empty let it pick any size at all: one result arrived with shoes in both 37
+ * and 43 and trousers in both 31 and 38, which no single person can wear.
+ *
+ * An order that names no size at all is refused before the escrow (see
+ * intake.reviewOrder), so what reaches here is a partly stated one - a top
+ * size but no shoe size. For those we pick the label the shortlist stocks
+ * most often, which is the one most likely to stay in stock, and say that we
+ * assumed it. Guessing one size is wrong; letting every outfit use a
+ * different one is worse.
+ */
+export function unifySizes(sizes, envelope) {
+  const items = envelope.items ?? [];
+  const chosen = { ...sizes };
+  const assumed = [];
+  // The top size the customer did stand behind, if any.
+  const statedTop = sizes.base ?? sizes.mid ?? sizes.outer;
+  for (const [layer, category] of Object.entries(LAYER_CATEGORY)) {
+    if (chosen[layer]) continue;
+    const counts = new Map();
+    for (const item of items.filter((i) => i.category === category))
+      for (const size of item.sizes ?? [])
+        if (size.in_stock !== false && size.label)
+          counts.set(String(size.label), (counts.get(String(size.label)) ?? 0) + 1);
+    if (!counts.size) continue;
+    // A bottom has a known relationship to a stated top size - WAIST_TO_LETTER
+    // maps the two - so it is chosen from the labels that agree with it.
+    // Picking on stock alone gave a customer who asked for Small a pair of XL
+    // trousers, and Person 3 refused to build that outfit at all. Shoes have
+    // no such relationship to a shirt size and are left on stock.
+    const agrees = layer === "bottom" && statedTop ? new Set(equivalentSizes(statedTop)) : null;
+    const narrowed = agrees ? [...counts].filter(([label]) => agrees.has(label)) : [...counts];
+    // Most stocked first; the label itself breaks a tie so a rerun agrees.
+    const [best, stocked] = (narrowed.length ? narrowed : [...counts]).sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    )[0];
+    chosen[layer] = best;
+    const why = agrees && narrowed.length ? `, to match ${statedTop}` : "";
+    assumed.push(`${layer} was not stated, using ${best} (${stocked} items in stock${why})`);
+  }
+  return { sizes: chosen, assumed };
+}
+
 /**
  * Drop what the shop says is for another gender. A men's brief came back with
  * a pleated skirt and women's sneakers, which is the first thing anyone
@@ -288,15 +475,26 @@ async function stage(name, hint, fn) {
 async function main() {
   const orderPath = flag("--order", "catalog/order.json");
   const outDir = flag("--out", "catalog/cache/run");
+  // Person 3 names its artifact folder after the task, so without a real one
+  // every run wrote its look boards to person3/artifacts/aitelier-catalog-demo
+  // and two Tasks running at once overwrote each other's images. It is also
+  // the id the customer reads on the result page.
+  const taskId = flag("--task-id", path.basename(outDir));
+  if (!/^[\w-]+$/.test(taskId))
+    throw new Error(`--task-id must be a plain identifier, got "${taskId}"`);
   await mkdir(path.resolve(ROOT, outDir), { recursive: true });
 
   // Step 1: refuse a bad order here, before the filter spends model calls on it.
-  const intake = readOrder(await readFile(path.resolve(ROOT, orderPath), "utf8"));
-  if (!intake.ok) {
-    console.log(refusal(intake));
+  // The worker asks the same question before the escrow is requested; this is
+  // the same gate for a run started by hand, so "shopping" cannot reach the
+  // filter and spend model calls on an order nobody can fill.
+  const review = reviewOrder(await readFile(path.resolve(ROOT, orderPath), "utf8"));
+  if (review.action !== "proceed") {
+    console.log(review.message);
     process.exitCode = 1;
     return;
   }
+  const intake = review.intake;
   for (const w of intake.warnings) console.log(`warning: ${w}`);
   const order = intake.order;
   const prepared = flag("--shortlist", null);
@@ -370,6 +568,8 @@ async function main() {
         brief = fromBrief.envelope;
         if (fromBrief.budgetAssumed)
           console.log(`warning: the brief names no budget; using ${brief.customer.budget.amount} EUR`);
+        if (fromBrief.seasonAssumed)
+          console.log(`warning: the brief names no season; reading ${fromBrief.season} from the date`);
         console.log(`from brief: ${JSON.stringify(brief.customer.sizes)} · ${brief.customer.style} · ${brief.customer.season}`);
       }
       const loaded = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
@@ -379,8 +579,26 @@ async function main() {
         await writeFile(path.resolve(ROOT, envelope), JSON.stringify(shortlisted, null, 2) + "\n");
       }
       const { sizes, swaps } = fitSizesToCatalogue(brief.customer.sizes, shortlisted);
-      brief.customer.sizes = sizes;
       for (const swap of swaps) console.log(`size: ${swap}`);
+      // Any slot still open would let the stylist mix sizes inside one result.
+      const { sizes: settled, assumed } = unifySizes(sizes, shortlisted);
+      brief.customer.sizes = settled;
+      for (const note of assumed) console.log(`size: ${note}`);
+      // Person 3 does not read customer.owned, so the layers it must still
+      // buy are named for it. Without this a brief that mentions a garment the
+      // customer owns was refunded for a layer the model rightly left out.
+      const wardrobe = layersMinusOwned(brief.customer);
+      if (wardrobe) {
+        brief.options = { ...brief.options, required_layers: wardrobe.required };
+        console.log(
+          `owned: ${wardrobe.covered.join(", ")} already owned; asking Person 3 for ${wardrobe.required.join(", ")}`,
+        );
+      } else if ((brief.customer.owned ?? []).length) {
+        console.log(`owned: ${brief.customer.owned.length} item(s) could not be placed in a layer`);
+      }
+      // run_catalog.py copies every top-level key but `customer` into its own
+      // input, so this is what names the run and its artifact folder.
+      brief.task_id = taskId;
       await writeFile(path.resolve(ROOT, customer), JSON.stringify(brief, null, 2) + "\n");
       console.log(`wrote ${customer}`);
       return { ok: true };

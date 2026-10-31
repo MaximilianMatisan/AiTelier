@@ -69,7 +69,44 @@ test("signed fields preserved and unsupported signed override rejected", () => {
     /differs/,
   );
 });
-test("uncertain purchase never reposted", async () => {
+test("uncertain purchase is never reposted, and the Task is closed instead", async () => {
+  // Reposting the payment request could charge twice, so it must never happen.
+  // Leaving the Task untouched is not the alternative: it then sat in RUNNING
+  // for ever with no result coming, which is what the customer complained of.
+  const bodies = [];
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => {
+      throw Error("unexpected model");
+    },
+    core: {
+      ...core,
+      post: async (path, body) => {
+        bodies.push(body);
+        return { data: { id: "event" } };
+      },
+    },
+  });
+  const next = await adapter.advance(task, {
+    input: "abc",
+    paid: { stage: "purchase-pending" },
+  });
+  assert.equal(
+    bodies.filter((b) => b.masumiPayment).length,
+    0,
+    "the signed payment request must never be posted a second time",
+  );
+  assert.equal(next.paid.stage, "stalled");
+  assert.equal(next.paid.stalledAt, "purchase-pending");
+  assert.equal(next.phase, "failed");
+  assert.match(bodies.at(-1).comment, /not charged/);
+});
+
+test("an uncertain submit is left for a person, not closed by the worker", async () => {
+  // Past submit-result the money may already be moving. Nothing here may
+  // guess: a person has to read what happened first.
   let posts = 0;
   const adapter = await createPaidAdapter({
     target,
@@ -82,19 +119,15 @@ test("uncertain purchase never reposted", async () => {
       ...core,
       post: async () => {
         posts++;
-        throw Error("timeout");
+        return { data: { id: "event" } };
       },
     },
   });
   await assert.rejects(
-    () =>
-      adapter.advance(task, {
-        input: "abc",
-        paid: { stage: "purchase-pending" },
-      }),
+    () => adapter.advance(task, { input: "abc", paid: { stage: "submit-pending" } }),
     /automatic retry disabled/,
   );
-  assert.equal(posts, 0);
+  assert.equal(posts, 0, "nothing is said about a Task whose payment state is unknown");
 });
 test("unconfirmed escrow does not invoke model", async () => {
   let sends = 0;
@@ -254,4 +287,142 @@ test("paid execution rejects another Workspace or Coworker before any saved stat
       /configured Coworker and Workspace/,
     );
   assert.equal(writes, 0);
+});
+
+const lockedEscrow = {
+  onChainState: "FundsLocked",
+  CurrentTransaction: { status: "Confirmed", newOnChainState: "FundsLocked" },
+};
+
+test("a refund closes the Task and submits nothing", async () => {
+  // The stage used to stay at "model-pending" after the throw, and every later
+  // poll refused to touch it, so the Task ran in Sokosumi for ever. Submitting
+  // is also what charges the customer, so the result must stay unsubmitted.
+  const bodies = [];
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => {
+      const error = new Error("Guarantees failed");
+      error.refund = true;
+      error.failed = ["budget: no outfit passed", "fit: no outfit passed"];
+      throw error;
+    },
+    mps: async (path) => {
+      if (path.includes("resolve-blockchain-identifier")) return lockedEscrow;
+      throw new Error(`the escrow must not be touched: ${path}`);
+    },
+    core: {
+      ...core,
+      post: async (path, body) => {
+        bodies.push(body);
+        return { data: { id: "event" } };
+      },
+    },
+  });
+  const next = await adapter.advance(task, {
+    input: "abc",
+    paid: { stage: "awaiting-escrow", payment },
+  });
+  assert.equal(next.paid.stage, "refunded", "the stage is terminal, not left pending");
+  assert.equal(next.phase, "refunded");
+  assert.deepEqual(next.paid.failed, ["budget: no outfit passed", "fit: no outfit passed"]);
+  assert.equal(
+    bodies.filter((b) => b.status === "COMPLETED").length,
+    0,
+    "a refund must never complete the Task",
+  );
+  assert.equal(bodies.at(-1).status, "FAILED");
+  assert.match(bodies.at(-1).comment, /returns your money/);
+});
+
+test("a Task canceled before the result is submitted is not submitted", async () => {
+  let submits = 0;
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    mps: async (path) => {
+      if (path.includes("submit-result")) submits++;
+      return {};
+    },
+    core: { get: async () => ({ data: { ...task, status: "CANCELED" } }), post: async () => ({ data: {} }) },
+  });
+  await assert.rejects(
+    () =>
+      adapter.advance(task, {
+        input: "abc",
+        paid: { stage: "result-saved", payment, result: "r", resultHash: "h" },
+      }),
+    /CANCELED/,
+  );
+  assert.equal(submits, 0, "the escrow must not be told a result exists for a canceled Task");
+});
+
+test("a Task canceled before completion is not completed", async () => {
+  let posts = 0;
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    core: {
+      get: async () => ({ data: { ...task, status: "CANCELED" } }),
+      post: async () => {
+        posts++;
+        return { data: { id: "event" } };
+      },
+    },
+  });
+  await assert.rejects(
+    () =>
+      adapter.advance(task, {
+        input: "abc",
+        paid: { stage: "complete-ready", payment, result: "r", resultHash: "h" },
+      }),
+    /CANCELED/,
+  );
+  assert.equal(posts, 0, "a canceled Task must not be reported COMPLETED");
+});
+
+test("a canceled Task is not styled at all", async () => {
+  let ran = 0;
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => {
+      ran++;
+      return "result";
+    },
+    mps: async () => lockedEscrow,
+    core: { get: async () => ({ data: { ...task, status: "CANCELED" } }), post: async () => ({ data: {} }) },
+  });
+  await assert.rejects(
+    () => adapter.advance(task, { input: "abc", paid: { stage: "awaiting-escrow", payment } }),
+    /CANCELED/,
+  );
+  assert.equal(ran, 0, "styling a withdrawn order wastes the run");
+});
+
+test("a finished Task is not read back from the API on every poll", async () => {
+  let reads = 0;
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    core: {
+      get: async () => {
+        reads++;
+        return { data: task };
+      },
+      post: async () => ({ data: {} }),
+    },
+  });
+  for (const stage of ["settled", "refunded", "stalled"])
+    await adapter.advance(task, { input: "abc", paid: { stage, payment } });
+  assert.equal(reads, 0, "a worker left running must not poll Tasks that are done");
 });

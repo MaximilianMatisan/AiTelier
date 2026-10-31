@@ -352,13 +352,14 @@ test("doTrustCheck checks again once the cache is older than 24 hours", async ()
   assert.equal(classified, true);
 });
 
+// A fresh checkout has no trustCache/: the folder is git-ignored.
 test(
   "doTrustCheck works before trustCache/ exists",
-  { todo: "writeFileSync throws ENOENT on a fresh checkout; the folder is git-ignored" },
   async () => {
     process.chdir(mkdtempSync(join(tmpdir(), "trustcheck-fresh-")));
     const { fetchImpl } = fakeFetch();
     const result = await doTrustCheck("https://muster-mode.de", { fetchImpl, classify: async () => verdict });
     assert.equal(result.verdict, "a");
+    assert.ok(existsSync("trustCache/muster-mode.de.json"), "the result is cached for the next check");
   },
 );

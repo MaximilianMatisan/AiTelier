@@ -3,7 +3,13 @@ import assert from "node:assert/strict";
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { pipelineAnswer, formatResult, failedGuarantees, embedImages } from "./logic/lead-agent.mjs";
+import {
+  pipelineAnswer,
+  formatResult,
+  failedGuarantees,
+  embedImages,
+  collapseWarnings,
+} from "./logic/lead-agent.mjs";
 import { TEMPLATE } from "./logic/intake.mjs";
 
 const order = JSON.stringify({ ...TEMPLATE, needed_by: undefined });
@@ -34,7 +40,14 @@ test("a good order runs the pipeline and returns Person 3's result", async (t) =
   });
   assert.equal(text, "# Looks ready");
   // Relative paths: run-pipeline.mjs hands them on to Person 3 from person3/.
-  assert.deepEqual(args, ["logic/run-pipeline.mjs", "--order", `catalog/cache/run/${id}/order.json`, "--out", `catalog/cache/run/${id}`]);
+  // --task-id names the run and keeps each Task's look boards apart; without
+  // it Person 3 wrote every run's images to one shared folder.
+  assert.deepEqual(args, [
+    "logic/run-pipeline.mjs",
+    "--order", `catalog/cache/run/${id}/order.json`,
+    "--out", `catalog/cache/run/${id}`,
+    "--task-id", id,
+  ]);
 });
 
 test("a failed pipeline throws instead of submitting a result", async (t) => {
@@ -127,4 +140,35 @@ test("failedGuarantees names only the checks that did not hold", () => {
   });
   assert.deepEqual(named, ["fit: size M gone", "delivery: failed"]);
   assert.deepEqual(failedGuarantees({}), []);
+});
+
+// Person 3 reports one warning per shop, so an ordinary run listed
+// GUARANTEE_ASSUMED twenty-one times and pushed the outfit off the screen.
+test("a repeated warning is counted, not listed twenty-one times", () => {
+  const collapsed = collapseWarnings(
+    "Warnings: " + Array(21).fill("GUARANTEE_ASSUMED").join("; ") + "; MISSING_DESCRIPTION; LLM_FALLBACK",
+  );
+  assert.equal(collapsed, "Warnings: GUARANTEE_ASSUMED \u00d721, MISSING_DESCRIPTION, LLM_FALLBACK");
+});
+
+test("collapsing warnings leaves the rest of the result alone", () => {
+  const markdown = [
+    "# Look one",
+    "- Coat, size M",
+    "Guarantees: budget=OK, fit=OK",
+    "Warnings: A; A; B",
+    "",
+    "_rationale_",
+  ].join("\n");
+  const collapsed = collapseWarnings(markdown);
+  assert.match(collapsed, /^Warnings: A \u00d72, B$/m);
+  assert.match(collapsed, /^# Look one$/m);
+  assert.match(collapsed, /^- Coat, size M$/m);
+  assert.match(collapsed, /^Guarantees: budget=OK, fit=OK$/m);
+  assert.ok(collapsed.includes("_rationale_"));
+});
+
+test("a single warning keeps its plain wording", () => {
+  assert.equal(collapseWarnings("Warnings: LLM_FALLBACK"), "Warnings: LLM_FALLBACK");
+  assert.equal(collapseWarnings("no warnings here"), "no warnings here");
 });

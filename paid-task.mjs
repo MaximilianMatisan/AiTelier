@@ -7,6 +7,7 @@ import {
   taskTarget,
   assertTaskTarget,
   verifyRuntimeTask,
+  closeTaskWithoutResult,
 } from "./task-target.mjs";
 import { logger } from "./log.mjs";
 const log = logger("paid");
@@ -15,6 +16,50 @@ export const USDM =
   "16a55b2a349361ff88c03788f93e1e966e5d689605d044fef722ddde0014df10745553444d";
 export function taskHash(text) {
   return createHash("sha256").update(text, "utf8").digest("hex");
+}
+
+/**
+ * Stages where nothing irreversible is in flight, so a Task that stopped in
+ * one of them can be closed instead of left RUNNING for ever. `submit-pending`
+ * and `complete-pending` are deliberately absent: the operation before them
+ * may have landed, and only a person should decide what happened.
+ */
+export const RECOVERABLE_PENDING = new Set([
+  "terms-pending",
+  "purchase-pending",
+  "model-pending",
+]);
+
+/**
+ * Stages with nothing left to do. Recognised before the Task is read back, so
+ * a worker left running does not spend two API calls every five seconds on
+ * Tasks that finished hours ago.
+ */
+export const TERMINAL_STAGES = new Set(["settled", "refunded", "stalled"]);
+
+/** What the customer reads when the guarantees did not hold. */
+export function refundNotice(failed = []) {
+  return [
+    "AiTelier did not submit a result for this order, so the escrow returns your money.",
+    "",
+    "Every outfit it could build broke at least one of the five guarantees:",
+    ...failed.map((f) => `- ${f}`),
+    "",
+    "Not submitting a result is what returns the funds to you once the result",
+    "deadline passes. You were not charged for the styling.",
+  ].join("\n");
+}
+
+/** What the customer reads when the run stopped part-way. */
+export function stalledNotice(stage) {
+  return [
+    "AiTelier stopped before it could finish this order, so no result was submitted",
+    "and the escrow returns your money once the result deadline passes.",
+    "",
+    `It stopped at the "${stage}" step. You were not charged for the styling.`,
+    "",
+    "Starting the order again is safe.",
+  ].join("\n");
 }
 export function confirmedState(payment, expected) {
   return (
@@ -144,9 +189,20 @@ export async function createPaidAdapter({
       });
     return next;
   }
+  /**
+   * Tells the customer the Task ended without a result and closes it, so it
+   * does not sit in RUNNING for ever waiting for something that will never
+   * come. It never submits a result: submitting is what moves the escrow
+   * towards paying us, and there is nothing here worth paying for.
+   */
+  async function reportNoResult(task, text) {
+    const client = await verifyRuntimeTask(await getCore(), task.id, target);
+    return closeTaskWithoutResult(client, task.id, text, { log });
+  }
   return {
     async advance(task, state) {
       assertTaskTarget(task, target);
+      if (TERMINAL_STAGES.has(state.paid?.stage)) return state;
       await verifyRuntimeTask(await getCore(), task.id, target);
       let p = state.paid ?? {};
       const r = registration();
@@ -232,14 +288,38 @@ export async function createPaidAdapter({
             return state;
           if (Date.now() >= Number(p.payment.submitResultTime))
             throw new Error("Result deadline expired before model");
+          // A cancellation that landed while the escrow was being watched used
+          // to be ignored; styling a withdrawn order wastes the run and the
+          // result would be submitted against a Task nobody is waiting for.
+          await verifyRuntimeTask(await getCore(), task.id, target, { mustBeLive: true });
           state = await persist(task, state, { ...p, stage: "model-pending" });
           if (Date.now() >= Number(p.payment.submitResultTime))
             throw new Error("Result deadline expired before model send");
-          const result = await answer(
-            state.input,
-            `.local/${task.id}-session.json`,
-            Number(p.payment.submitResultTime),
-          );
+          let result;
+          try {
+            result = await answer(
+              state.input,
+              `.local/${task.id}-session.json`,
+              Number(p.payment.submitResultTime),
+            );
+          } catch (error) {
+            if (!error?.refund) throw error;
+            // The guarantees were checked and did not hold. Saying so closes
+            // the Task; submitting nothing is what returns the money. Left
+            // unsaid, the stage stayed "model-pending" and every later poll
+            // refused to touch it, so the Task ran for ever.
+            const reported = await reportNoResult(task, refundNotice(error.failed));
+            log.warn("refund reported, no result submitted", {
+              task: task.id,
+              reported,
+              failed: error.failed ?? error.message,
+            });
+            return persist(
+              task,
+              { ...state, phase: "refunded" },
+              { ...p, stage: "refunded", failed: error.failed ?? [], reported },
+            );
+          }
           if (typeof result !== "string" || !result.trim())
             throw new Error("Model did not return a result");
           writeFileSync(`.local/${task.id}.txt`, result, { mode: 0o600 });
@@ -280,6 +360,10 @@ export async function createPaidAdapter({
       if (p.stage === "result-saved") {
         if (Date.now() >= Number(p.payment.submitResultTime))
           throw new Error("Result deadline expired before submit");
+        // Submitting the hash is the step that moves the escrow towards paying
+        // us. A Task canceled while the result was being written must not be
+        // charged for it.
+        await verifyRuntimeTask(await getCore(), task.id, target, { mustBeLive: true });
         state = await persist(task, state, { ...p, stage: "submit-pending" });
         await mps("/api/v1/payment/submit-result", {
           network: "Preprod",
@@ -289,10 +373,15 @@ export async function createPaidAdapter({
         return persist(task, state, { ...p, stage: "awaiting-result" });
       }
       if (p.stage === "complete-ready") {
+        // Read the status once more before claiming the Task is done. A
+        // cancellation that arrived while the result was being confirmed on
+        // chain used to be ignored and the Task was completed anyway. Checked
+        // before the stage advances, so stopping here leaves nothing wedged.
+        const live = await verifyRuntimeTask(await getCore(), task.id, target, {
+          mustBeLive: true,
+        });
         state = await persist(task, state, { ...p, stage: "complete-pending" });
-        const response = await (
-          await verifyRuntimeTask(await getCore(), task.id, target)
-        ).post(`/v1/tasks/${encodeURIComponent(task.id)}/events`, {
+        const response = await live.post(`/v1/tasks/${encodeURIComponent(task.id)}/events`, {
           status: "COMPLETED",
           comment: p.result,
         });
@@ -306,10 +395,28 @@ export async function createPaidAdapter({
           },
         );
       }
-      if (p.stage.endsWith("-pending"))
+      if (p.stage.endsWith("-pending")) {
+        // A step that stopped half-way is never retried, because it could then
+        // run twice. Before the escrow and before a submit there is nothing in
+        // flight to double, so the Task is closed and the customer told,
+        // instead of being left in RUNNING with no result coming.
+        if (RECOVERABLE_PENDING.has(p.stage)) {
+          const reported = await reportNoResult(task, stalledNotice(p.stage));
+          log.warn("stalled step closed, no result submitted", {
+            task: task.id,
+            stage: p.stage,
+            reported,
+          });
+          return persist(
+            task,
+            { ...state, phase: "failed" },
+            { ...p, stage: "stalled", stalledAt: p.stage, reported },
+          );
+        }
         throw new Error(
           `Uncertain ${p.stage}. Inspect prior operation before recovery; automatic retry disabled.`,
         );
+      }
       return state;
     },
   };

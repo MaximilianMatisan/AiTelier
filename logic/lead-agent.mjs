@@ -30,6 +30,15 @@ const VENV_PYTHON = "person3/.venv/bin/python";
 // Leave room to write, hash and submit the result after the pipeline ends.
 const SUBMIT_MARGIN_MS = 60_000;
 const DEFAULT_TIMEOUT_MS = 10 * 60_000;
+/**
+ * The whole run gets at most this long, whatever the escrow would allow. The
+ * escrow's own deadline is twenty minutes out, so a pipeline that hung held
+ * the Task in RUNNING for the full twenty with nothing to show. Live runs that
+ * finished took 23 to 37 seconds, so a run still going after eight minutes is
+ * stuck rather than slow, and stopping early leaves time to say so.
+ */
+const PIPELINE_BUDGET_MS =
+  Number(process.env.AITELIER_PIPELINE_BUDGET_MS) || 8 * 60_000;
 
 /** Runs the pipeline as its own process; resolves true on exit code 0. */
 export function runPipeline(args, timeoutMs, logFile) {
@@ -144,9 +153,26 @@ export async function embedImages(markdown, { artifactDir = path.join(ROOT, "per
   });
 }
 
+/**
+ * "Warnings: X; X; X; Y" becomes "Warnings: X ×3, Y". Person 3 reports one
+ * warning per shop, so an ordinary run listed GUARANTEE_ASSUMED twenty-one
+ * times and pushed the outfit itself off the screen. The codes are kept, and
+ * kept in the order they first appeared: the count is the new part.
+ */
+export function collapseWarnings(markdown) {
+  return markdown.replace(/^([ \t]*(?:\*\*)?Warnings:(?:\*\*)?)[ \t]*(.+)$/gim, (whole, label, list) => {
+    const counts = new Map();
+    for (const item of list.split(";").map((part) => part.trim()).filter(Boolean))
+      counts.set(item, (counts.get(item) ?? 0) + 1);
+    if (!counts.size) return whole;
+    return `${label} ${[...counts].map(([item, n]) => (n > 1 ? `${item} ×${n}` : item)).join(", ")}`;
+  });
+}
+
 /** Person 3's own markdown when present, otherwise a plain summary. */
 export function formatResult(result) {
-  if (typeof result?.markdown === "string" && result.markdown.trim()) return result.markdown;
+  if (typeof result?.markdown === "string" && result.markdown.trim())
+    return collapseWarnings(result.markdown);
   const lines = [`# AiTelier result: ${result?.status ?? "UNKNOWN"}`, ""];
   for (const outfit of result?.outfits ?? []) {
     lines.push(`## ${outfit.name}`);
@@ -175,9 +201,17 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
   await writeFile(path.join(ROOT, orderFile), JSON.stringify(intake.order, null, 2) + "\n");
   writeFileSync(journal, JSON.stringify({ phase: "pipeline", outDir }), { mode: 0o600 });
 
-  const timeoutMs = deadline === undefined ? DEFAULT_TIMEOUT_MS : deadline - Date.now() - SUBMIT_MARGIN_MS;
-  if (timeoutMs <= 0) throw new Error("Result deadline too close to run the pipeline");
-  const args = ["logic/run-pipeline.mjs", "--order", orderFile, "--out", outDir];
+  const untilDeadline =
+    deadline === undefined ? DEFAULT_TIMEOUT_MS : deadline - Date.now() - SUBMIT_MARGIN_MS;
+  if (untilDeadline <= 0) throw new Error("Result deadline too close to run the pipeline");
+  const timeoutMs = Math.min(untilDeadline, PIPELINE_BUDGET_MS);
+  const args = [
+    "logic/run-pipeline.mjs",
+    "--order", orderFile,
+    "--out", outDir,
+    // Names the run and keeps each Task's look boards in their own folder.
+    "--task-id", taskId,
+  ];
   if (process.env.AITELIER_SHORTLIST) args.push("--shortlist", process.env.AITELIER_SHORTLIST);
   log.info("pipeline started", {
     task: taskId,
