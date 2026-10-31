@@ -31,6 +31,7 @@ holds.
 | Local studio UI | ✅ `npm run ui`: chat with the stylist or fill the form, watch the stages, see the looks |
 | Masumi payment (escrow, Preprod) | ⏳ Template code present, not set up; quote fixed at 1 test USDM |
 | Trust check as an x402 service | ⏳ Not started |
+| Pinterest board as style input | ✅ `logic/pinterest.mjs` + `logic/style-profile.mjs`: the first 25 pins of a public board, read by a vision model, steer the stylist |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
 `npm test` passes (200 tests, 2 of them marked todo); Person 3's `pytest` passes 30, skips 1.
@@ -50,6 +51,7 @@ logic/lead-agent.mjs   pipelineAnswer(): same signature as client.mjs answer()
   │  1  logic/intake.mjs        check a JSON order, or pass free text on; refuse before anything runs
   ▼
 logic/run-pipeline.mjs  one process per stage, output in catalog/cache/run/<task-id>/
+  │  0  logic/style-profile.mjs only with a Pinterest link: first 25 pins -> style-profile.json
   │  3  candidateFilter.mjs     catalog/cache/products.json -> shortlist.json (≤100 items, ≤30 shops)
   │                             and selection.json (what the model read out of the brief)
   │     logic/data/to_person3.js shortlist -> Person 3 envelope
@@ -137,6 +139,7 @@ check never reaches the module.
 | `logic/chat-session.mjs` | lead agent | Keeps a conversation on disk, runs the pipeline a turn asks for |
 | `logic/checkout.mjs` | lead agent | Step 8: the purchase, its checks and the payment module's contract |
 | `comments.mjs` | lead agent | The chat on a Sokosumi task: one conversation per task thread |
+| `logic/pinterest.mjs`, `logic/style-profile.mjs` | lead agent | Pipeline stage 0: a public Pinterest board -> the customer's style |
 | `logic/run-pipeline.mjs` | Person 1 | Chains all stages; builds the customer profile |
 | `logic/result-page.mjs` | Person 1 | Step 7: one self-contained HTML result page per run |
 | `logic/data/` | Person 1 | Catalogue collector, normaliser, live refetch and its HTTP service, Person 3 adapter |
@@ -305,9 +308,35 @@ run log says so. Only an empty description is refused.
 | `needed_by` | no | `YYYY-MM-DD`, not in the past |
 | `climate` | no | Short text |
 | `owned`, `avoid` | no | Short text lists |
+| `pinterest` | no | Link to a public Pinterest board, see below |
 
 In a JSON order, a theme the catalogue cannot serve is refused here, so the customer is not
 charged for a guaranteed refund later.
+
+### A Pinterest board as style input
+
+Add the link of a public Pinterest board to the order, in free text or as `pinterest` in JSON.
+`www.pinterest.com/name/board/`, the country domains (`de.pinterest.com`, `pinterest.co.uk`)
+and `pin.it` short links work; a profile link reads the profile's latest pins. A link to a
+single pin, a search or another site is refused in step 1, before any payment.
+
+1. `logic/pinterest.mjs` reads the board's public RSS feed: no login, no API key. It takes the
+   first 25 pins and loads their pictures at 736 px. Every request goes to `pinterest.com`,
+   `pin.it` or `i.pinimg.com` only, redirects included, with size and time limits.
+2. `logic/style-profile.mjs` sends the pictures and captions to the model behind `ZAI_*`
+   (a vision model; `gemini-3.5-flash` in our setup). It asks only about the clothing, never
+   about people, and treats captions as untrusted text. Code keeps catalogue themes and short
+   plain terms (colours, pieces, fit) and writes `style-profile.json`.
+3. Step 3a adds the board's themes to the stylist's style directions and its colours, pieces
+   and fit to the stylist's notes. The candidate filter does **not** get them: as hard theme
+   limits they cut the shortlist until no shoes in the customer's size were left.
+4. The result page shows "Your style, read from Pinterest": the summary, themes, colours and
+   pieces. It shows the board's name, never the account and never the pictures, because the
+   page is public to anyone with its link.
+
+A board that is secret, mostly not clothing (fewer than 3 pins) or cannot be read does not
+fail the order: the page says why and the outfits follow the rest of the order. Sizes are
+still required; a board is a style, not a size.
 
 ## The five guarantees
 
@@ -359,6 +388,8 @@ cd person3 && .venv/bin/pytest -q
   sportswear and a fit attribute are not in the catalogue yet.
 - **Runtime.** About 110 s with the live filter, about 25 s with the demo shortlist.
 - **Trust check is not in the pipeline yet.** Shop trust is currently assumed.
+- **Pinterest feed.** Only the newest ~25 pins of a board are in its feed, and Pinterest could
+  change or end the feed. The board step adds about 15–40 s with the live model.
 
 ## Next steps
 
@@ -366,8 +397,10 @@ cd person3 && .venv/bin/pytest -q
 2. Set up Masumi payments on Preprod and complete one paid task with a transaction hash.
 3. Turn on live re-checks in step 6 for paid tasks.
 4. Host the result page per task and link it in the Sokosumi result.
-5. Accept a photo URL and give a per-item reason in the report.
-6. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to the
+5. Give a per-item reason in the report, tied to the Pinterest board where there is one.
+6. Further sources the customer brings themselves: a Zalando or Instagram data export (GDPR),
+   Instagram via its official login.
+7. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to the
    wardrobe.
 
 ## Security

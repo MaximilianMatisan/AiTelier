@@ -126,7 +126,43 @@ function itemDetail(item, byItem, shops, live) {
     </li>`;
 }
 
-export function renderPage({ result, envelope, live }) {
+// A colour name the browser knows ("navy", "light blue" -> lightblue) gets a
+// swatch; the script at the end removes the ones it does not ("cream").
+const swatch = (name) => {
+  const css = String(name).toLowerCase().replace(/\s+/g, "");
+  return /^[a-z]{3,20}$/.test(css) ? `<i data-color="${css}" style="background:${css}"></i>` : "";
+};
+
+/**
+ * What the customer's Pinterest board told the stylist, or why it could not.
+ * Only the derived words are shown, never the board's pictures or its owner:
+ * this page is public to anyone with the link.
+ */
+function boardSection(style) {
+  if (!style) return "";
+  const name = style.source?.board ? ` “${esc(style.source.board.replace(/[-_]+/g, " "))}”` : "";
+  if (!style.ok)
+    return `<section class="board">
+    <h3>Your Pinterest board</h3>
+    <p class="board-note">We could not use your board${name}: ${esc(style.reason)} The outfits follow the rest of your order.</p>
+  </section>`;
+  const chips = (values) => values.map((v) => `<span class="chip">${esc(v)}</span>`).join("");
+  return `<section class="board">
+    <h3>Your style, read from Pinterest</h3>
+    ${style.summary ? `<p class="board-sum">${esc(style.summary)}</p>` : ""}
+    <dl>
+      ${style.themes?.length ? `<dt>Direction</dt><dd>${chips(style.themes.map((t) => t.replace(/_/g, " ")))}</dd>` : ""}
+      ${style.colors?.length ? `<dt>Colours</dt><dd>${style.colors.map((c) => `<span class="chip">${swatch(c)}${esc(c)}</span>`).join("")}</dd>` : ""}
+      ${style.pieces?.length ? `<dt>Pieces</dt><dd>${chips(style.pieces)}</dd>` : ""}
+      ${style.fit ? `<dt>Fit</dt><dd>${esc(style.fit)}</dd>` : ""}
+    </dl>
+    <p class="board-note">Read from ${esc(style.fashionPins)} pins of clothing on your board${name}${
+      style.source?.pins ? `, out of the first ${esc(style.source.pins)}` : ""
+    }. The stylist chose the pieces below with this in mind.</p>
+  </section>`;
+}
+
+export function renderPage({ result, envelope, live, style = null }) {
   const byItem = new Map((envelope.items ?? []).map((i) => [i.item_id, i]));
   const shops = new Map((envelope.shops ?? []).map((s) => [s.shop_id, s]));
   const approved = result.status === "APPROVED";
@@ -221,6 +257,15 @@ export function renderPage({ result, envelope, live }) {
   .index a:hover { color:var(--ink) }
   h2 { font-size:clamp(28px,5vw,40px); font-weight:400; letter-spacing:-.01em; line-height:1.15; margin:4px 0 6px }
   h3 { font-size:13px; font-weight:400; letter-spacing:.14em; text-transform:uppercase; color:var(--soft); margin:0 0 14px }
+  .board { margin:0 0 56px }
+  .board-sum { font-size:clamp(17px,2.2vw,21px); line-height:1.45; margin:0 0 18px; max-width:720px }
+  .board dl { display:grid; grid-template-columns:max-content 1fr; gap:10px 18px; margin:0 0 14px; align-items:baseline }
+  .board dt { font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--soft) }
+  .board dd { margin:0; display:flex; flex-wrap:wrap; gap:6px }
+  .chip { display:inline-flex; align-items:center; gap:6px; border:1px solid var(--line); border-radius:999px;
+          padding:3px 11px; font-size:13px }
+  .chip i { width:10px; height:10px; border-radius:50%; border:1px solid var(--line); display:inline-block }
+  .board-note { color:var(--soft); font-size:13px; margin:0 }
   .checked { margin:0 0 64px; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
   .checked summary { display:flex; flex-wrap:wrap; gap:4px 16px; align-items:baseline; padding:14px 0; cursor:pointer; list-style:none; font-size:13px }
   .checked summary::-webkit-details-marker { display:none }
@@ -307,6 +352,8 @@ export function renderPage({ result, envelope, live }) {
   ${index}
 </header>
 
+${boardSection(style)}
+
 <details class="checked"${held === checks.length ? "" : " open"}>
   <summary><h3>What was checked</h3><span class="${held === checks.length ? "fresh" : "stale"}">${
     held === checks.length ? `All ${checks.length} guarantees held` : `${checks.length - held} of ${checks.length} guarantees failed`
@@ -339,6 +386,8 @@ ${sets}
   });
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", label);
   label();
+  for (const dot of document.querySelectorAll("i[data-color]"))
+    if (!CSS.supports("color", dot.dataset.color)) dot.remove();
 </script>`;
 }
 
@@ -358,9 +407,10 @@ async function main() {
   const result = await read(at("person3", "result.json"));
   const envelope = await read(at("person3.input.json"), { items: [], shops: [] });
   const live = await read(at("person3", "05-live-check.json"), {});
+  const style = await read(at("style-profile.json"), null);
 
   const out = path.resolve(ROOT, flag("--out", path.join(run, "index.html")));
-  await writeFile(out, renderPage({ result, envelope, live }));
+  await writeFile(out, renderPage({ result, envelope, live, style }));
 
   const checked = Object.values(live);
   console.log(`${result.status} · ${(result.outfits ?? []).length} outfits · ${checked.filter((r) => r.stale === false).length}/${checked.length} items confirmed live`);
