@@ -2,8 +2,9 @@
 
 Built for the Cardano track of the TUM Blockchain & AI Hackathon (30–31 October 2026).
 A customer hires the agent on Sokosumi with a short order in plain words or as JSON: budget,
-number of outfits, style, season and sizes. The agent answers with complete outfits made of **real, in-stock products from
-real EU shops**, each with its image, shop link, price and a reason for choosing it. Before an
+number of outfits, style, season and sizes, and optionally a public Pinterest board. The agent
+answers with complete outfits made of **real, in-stock products from real EU shops**: each piece
+with its image, shop link and price, each outfit with the reason it was put together. Before an
 outfit is returned, the agent checks five guarantees on it.
 
 **The LLM decides, the code checks.** The model only chooses which catalogue values fit a brief
@@ -25,7 +26,7 @@ holds.
 | Step 4 · shop trust check | ⚠️ `trustcheck.mjs` works on its own, **not yet in the pipeline** |
 | Step 5 · stylist (LLM) | ✅ Person 3, `person3/`; outfits that misuse shorts are rejected by code |
 | Step 6 · final check, five guarantees | ✅ Person 3; ⚠️ checks the cached snapshot unless the live re-check service runs |
-| Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; ⚠️ not hosted yet, Sokosumi gets Markdown |
+| Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; `logic/publish.mjs` puts it on Cloudflare Pages and the Sokosumi result links it (needs `CLOUDFLARE_ACCOUNT_ID`) |
 | Refund path | ✅ A `REFUND` result is not submitted, so the escrow returns the money |
 | Step 8 · checkout | ⚠️ `logic/checkout.mjs` builds and checks the purchase; **no payment module wired in yet**, so a confirmed outfit is declined with its shop links |
 | Local studio UI | ✅ `npm run ui`: chat with the stylist or fill the form, watch the stages, see the looks |
@@ -34,18 +35,20 @@ holds.
 | Pinterest board as style input | ✅ `logic/pinterest.mjs` + `logic/style-profile.mjs`: the first 25 pins of a public board, read by a vision model, steer the stylist |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
-`npm test` passes (200 tests, 2 of them marked todo); Person 3's `pytest` passes 30, skips 1.
+`npm test` runs 326 tests, 1 of them marked todo. On `4a27faa` six of them fail: four intake
+tests and two Pinterest tests still expect the free-text checks that `7845365` removed (see
+[Known limits](#known-limits)). Person 3's `pytest` passes 30, skips 1.
 The last measured end-to-end runs ended in `APPROVED` with a 500 EUR budget and in `REFUND`
 with 300 EUR (see [Known limits](#known-limits)).
 
 ## How a task flows
 
 ```text
-Sokosumi Task (order as free text or JSON)
+Sokosumi Task (order as free text or JSON) and its comments
   │
   ▼
 worker.mjs ── polls tasks, runtime start / complete, paid flow
-  │
+  │           comments.mjs: each comment is a turn of logic/conversation.mjs (step 0)
   ▼
 logic/lead-agent.mjs   pipelineAnswer(): same signature as client.mjs answer()
   │  1  logic/intake.mjs        check a JSON order, or pass free text on; refuse before anything runs
@@ -60,8 +63,11 @@ logic/run-pipeline.mjs  one process per stage, output in catalog/cache/run/<task
   │  5  person3 scripts.run_catalog   stylist + final check (6) -> person3/result.json
   │  7  logic/result-page.mjs   result.json -> index.html, the page the customer reads
   ▼
-APPROVED: Markdown result -> runtime complete -> Sokosumi
+logic/publish.mjs       index.html -> Cloudflare Pages, /r/<random>, noindex
+  ▼
+APPROVED: Markdown result with the page link -> runtime complete -> Sokosumi
 REFUND:   nothing submitted -> submitResultTime lapses -> escrow refunds the buyer
+No result on an unpaid task: the Task is closed as FAILED with the reason, never left RUNNING
 ```
 
 A refused order returns the reasons from step 1 and starts nothing. A pipeline that fails or
@@ -187,6 +193,12 @@ Use 3.12: the pinned `pydantic` does not build on newer interpreters such as 3.1
 The worker uses `person3/.venv/bin/python` automatically when it exists; `run-pipeline.mjs`
 on its own needs `PYTHON=person3/.venv/bin/python`. Without a model key, the stylist runs in
 deterministic mock mode, which is fine for a dry run.
+
+To publish result pages, set `CLOUDFLARE_ACCOUNT_ID` and either `CLOUDFLARE_API_TOKEN` (a token
+with Account / Cloudflare Pages / Edit) or log in once with
+`node_modules/.bin/wrangler login --scopes account:read user:read pages:write --use-keyring`.
+`AITELIER_PAGES_PROJECT` names the Pages project (default `aitelier-results`). Without these the
+pipeline still runs and the Sokosumi result carries no page link.
 
 Sokosumi account, Vendor, Coworker and runtime key: follow
 [docs/tum-hackathon.md](docs/tum-hackathon.md) (sections 3–4), then set `COWORKER_ID` in `.env`.
@@ -335,8 +347,9 @@ single pin, a search or another site is refused in step 1, before any payment.
    page is public to anyone with its link.
 
 A board that is secret, mostly not clothing (fewer than 3 pins) or cannot be read does not
-fail the order: the page says why and the outfits follow the rest of the order. Sizes are
-still required; a board is a style, not a size.
+fail the order: the page says why and the outfits follow the rest of the order. A board is a
+style, not a size: a JSON order still needs `sizes`, and in free text a size the brief does not
+name is assumed like in any other free-text order.
 
 ## The five guarantees
 
@@ -371,6 +384,11 @@ cd person3 && .venv/bin/pytest -q
 
 ## Known limits
 
+- **Free text is not checked before it runs.** Since `7845365`, step 1 refuses only an empty
+  description. A brief that names no garment ("shopping") or no size runs the whole pipeline;
+  a missing size is filled with the label the shortlist stocks most, and the run log says it
+  was assumed. Six tests still expect the old refusal and question and fail until the team
+  settles which behaviour it wants.
 - **Budget refunds.** With 300 EUR, the demo order ends in `REFUND` because both looks cost
   more than 300 EUR. With 500 EUR it ends in `APPROVED`.
 - **Two size systems for bottoms.** 894 bottoms use waist sizes, 713 letter sizes. Step 3a
@@ -396,11 +414,10 @@ cd person3 && .venv/bin/pytest -q
 1. Put the trust check into the pipeline (cached per shop), then offer it as an x402 service.
 2. Set up Masumi payments on Preprod and complete one paid task with a transaction hash.
 3. Turn on live re-checks in step 6 for paid tasks.
-4. Host the result page per task and link it in the Sokosumi result.
-5. Give a per-item reason in the report, tied to the Pinterest board where there is one.
-6. Further sources the customer brings themselves: a Zalando or Instagram data export (GDPR),
+4. Give a per-item reason in the report, tied to the Pinterest board where there is one.
+5. Further sources the customer brings themselves: a Zalando or Instagram data export (GDPR),
    Instagram via its official login.
-7. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to the
+6. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to the
    wardrobe.
 
 ## Security
