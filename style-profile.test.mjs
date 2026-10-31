@@ -247,3 +247,214 @@ test("an unusable board is explained and the order still stands", () => {
 test("an order without a board shows no board section", () => {
   assert.ok(!page(null).includes('class="board"'));
 });
+
+// --- the model's answer, edge cases ----------------------------------------------
+
+test("the counts and lists in an answer are clamped and capped", () => {
+  assert.equal(reconcileStyle({ fashionPins: -3 }, 10).fashionPins, 0);
+  assert.equal(reconcileStyle({ fashionPins: "7" }, 10).fashionPins, 7, "a number sent as text still counts");
+  assert.equal(reconcileStyle({ fashionPins: 4.6 }, 10).fashionPins, 5);
+  assert.equal(reconcileStyle({ fashionPins: "many" }, 10).fashionPins, 0);
+  const many = (n) => Array.from({ length: n }, (_, i) => `term ${String.fromCharCode(97 + i)}`);
+  const style = reconcileStyle({ colors: many(10), pieces: many(12) }, 10);
+  assert.equal(style.colors.length, 6);
+  assert.equal(style.pieces.length, 8);
+});
+
+test("the snake_case and British spellings a model drifts into are read", () => {
+  const style = reconcileStyle({ fashion_pins: 5, colours: ["navy"], garments: ["loafers"], themes: "streetwear" }, 10);
+  assert.deepEqual([style.fashionPins, style.colors, style.pieces, style.themes], [5, ["navy"], ["loafers"], ["streetwear"]]);
+});
+
+test("garment words in other languages pass, long or wordy terms do not", () => {
+  const style = reconcileStyle(
+    {
+      colors: ["dunkelgrün", "bleu marine", "écru", "a very long colour name here"],
+      pieces: ["Chelsea-Boots", "pull col roulé", "one two three four five"],
+      fit: "x ".repeat(20).trim(),
+    },
+    10,
+  );
+  assert.deepEqual(style.colors, ["dunkelgrün", "bleu marine", "écru"]);
+  assert.deepEqual(style.pieces, ["Chelsea-Boots", "pull col roulé"]);
+  assert.equal(style.fit, "", "a fit phrase of twenty words is dropped");
+});
+
+test("a summary is plain text of at most 300 characters", () => {
+  const style = reconcileStyle({ summary: `Line one.\n\n${"y".repeat(400)}` }, 10);
+  assert.ok(!style.summary.includes("\n"));
+  assert.equal(style.summary.length, 300);
+  assert.equal(reconcileStyle({ summary: 42 }, 10).summary, "42");
+  assert.equal(reconcileStyle({}, 10).summary, "");
+});
+
+test("a style line names only what the board showed", () => {
+  const only = (fields) => styleLine({ ok: true, themes: [], colors: [], pieces: [], fit: "", ...fields });
+  assert.equal(only({ themes: ["streetwear"] }), "Style from the customer's Pinterest board: leans streetwear.");
+  assert.equal(only({ fit: "oversized hoodies" }), "Style from the customer's Pinterest board: fit oversized hoodies.");
+  assert.equal(only({}), "", "an empty profile says nothing rather than an empty sentence");
+  assert.equal(only({ colors: ["warm grey"] }), "", "nothing is left once the weather words go");
+});
+
+// --- the whole step, edge cases --------------------------------------------------
+
+test("the model never sees more than the first 25 pictures", async () => {
+  const { model, seen } = answering(JSON.stringify({ ...goodAnswer, fashionPins: 20 }));
+  const style = await buildStyleProfile(BOARD_LINK, { fetchImpl: boardFetch(30), model });
+  assert.equal(style.ok, true);
+  assert.deepEqual(style.source, { kind: "board", board: "autumn-looks", pins: 25, pictures: 25 });
+  const files = seen.prompt.find((m) => m.role === "user").content.filter((p) => p.type === "file");
+  assert.equal(files.length, 25);
+});
+
+test("pictures that fail to load are counted, and the rest are still used", async () => {
+  const flaky = boardFetch(8);
+  const fetchImpl = async (url) => (/p[0-2]\.jpg$/.test(url) ? new Response("", { status: 500 }) : flaky(url));
+  const { model, seen } = answering(JSON.stringify(goodAnswer));
+  const style = await buildStyleProfile(BOARD_LINK, { fetchImpl, model });
+  assert.equal(style.ok, true);
+  assert.deepEqual([style.source.pins, style.source.pictures], [8, 5]);
+  assert.equal(seen.prompt.find((m) => m.role === "user").content.filter((p) => p.type === "file").length, 5);
+});
+
+test("an answer wrapped in prose is still read", async () => {
+  const { model } = answering(`Sure! Here is the profile:\n${JSON.stringify(goodAnswer)}\nHope this helps.`);
+  const style = await buildStyleProfile(BOARD_LINK, { fetchImpl: boardFetch(6), model });
+  assert.equal(style.ok, true);
+  assert.deepEqual(style.colors, ["navy", "cream", "camel"]);
+});
+
+test("an answer that is not an object is a failed analysis, not a style", async () => {
+  for (const text of ['["old_money"]', "I cannot help with that.", ""]) {
+    const { model } = answering(text);
+    const style = await buildStyleProfile(BOARD_LINK, { fetchImpl: boardFetch(6), model });
+    assert.equal(style.ok, false, JSON.stringify(text));
+    assert.equal(style.reason, "The style analysis is not available right now.");
+  }
+});
+
+test("clothing with nothing the catalogue can follow is not used", async () => {
+  const { model } = answering(JSON.stringify({ fashionPins: 6, themes: ["punk"], colors: [], pieces: [], fit: "", summary: "Punk." }));
+  const style = await buildStyleProfile(BOARD_LINK, { fetchImpl: boardFetch(6), model });
+  assert.equal(style.ok, false);
+  assert.match(style.reason, /did not show a style the catalogue can follow/);
+});
+
+test("exactly the minimum of clothing pins is enough", async () => {
+  const { model } = answering(JSON.stringify({ ...goodAnswer, fashionPins: MIN_FASHION_PINS }));
+  assert.equal((await buildStyleProfile(BOARD_LINK, { fetchImpl: boardFetch(MIN_FASHION_PINS), model })).ok, true);
+});
+
+test("a profile link is read like a board, and no account name is kept", async () => {
+  const profileFeed = "https://www.pinterest.com/anna_b/feed.rss";
+  const board = boardFetch(6);
+  const fetchImpl = (url) => board(url === profileFeed ? FEED : url);
+  const { model } = answering(JSON.stringify(goodAnswer));
+  const style = await buildStyleProfile("https://www.pinterest.com/anna_b/", { fetchImpl, model });
+  assert.equal(style.ok, true);
+  assert.deepEqual(style.source, { kind: "profile", board: null, pins: 6, pictures: 6 });
+});
+
+// --- the command the pipeline runs -------------------------------------------------
+
+test("the command writes its answer and exits 0 even when the board cannot be used", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const { mkdtempSync, readFileSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const out = join(mkdtempSync(join(tmpdir(), "style-")), "style-profile.json");
+  // A pin link fails before any request, so this runs offline.
+  const run = spawnSync(process.execPath, ["logic/style-profile.mjs", "--board", "https://www.pinterest.com/pin/1/", "--out", out], { encoding: "utf8" });
+  assert.equal(run.status, 0, run.stderr);
+  assert.match(run.stdout, /style: not used, This is a link to a single pin/);
+  const written = JSON.parse(readFileSync(out, "utf8"));
+  assert.equal(written.ok, false);
+  assert.match(written.reason, /single pin/);
+});
+
+test("the command without its arguments says how to use it", async () => {
+  const { spawnSync } = await import("node:child_process");
+  const run = spawnSync(process.execPath, ["logic/style-profile.mjs"], { encoding: "utf8" });
+  assert.equal(run.status, 1);
+  assert.match(run.stderr, /Usage: node logic\/style-profile\.mjs --board <link> --out <file>/);
+});
+
+// --- the order, edge cases ---------------------------------------------------------
+
+test("a profile link or a pin.it link in free text is kept with the order", () => {
+  for (const link of ["https://www.pinterest.com/anna_b/", "pin.it/AbC12xy"]) {
+    const read = readOrder(`Two outfits, top M, waist 32, shoes 43, inspo: ${link}`, { today });
+    assert.equal(read.order.pinterest, link);
+  }
+});
+
+test("of two board links, the first is used", () => {
+  const read = readOrder("top M, waist 32, shoes 43: pinterest.com/anna_b/first/ or pinterest.com/anna_b/second/", { today });
+  assert.equal(read.order.pinterest, "pinterest.com/anna_b/first/");
+});
+
+test("a JSON board link is trimmed, and one that is absurdly long is refused", () => {
+  const order = { ...TEMPLATE, needed_by: undefined };
+  assert.equal(readOrder(JSON.stringify({ ...order, pinterest: `  ${BOARD_LINK}  ` }), { today }).order.pinterest, BOARD_LINK);
+  const long = readOrder(JSON.stringify({ ...order, pinterest: `${BOARD_LINK}${"a".repeat(300)}` }), { today });
+  assert.equal(long.ok, false);
+  assert.match(long.errors[0], /link of a public Pinterest board/);
+});
+
+test("a board with a garment named but no size is asked about, not run", () => {
+  const review = reviewOrder(`Two autumn outfits like ${BOARD_LINK}`, { today });
+  assert.equal(review.action, "ask");
+  assert.match(review.message, /top size/);
+});
+
+test("a refused order tells the customer they can add a board", () => {
+  const review = reviewOrder(JSON.stringify({ theme: "punk" }), { today });
+  assert.equal(review.action, "refuse");
+  assert.match(review.message, /public Pinterest board/);
+});
+
+// --- into the stylist, edge cases --------------------------------------------------
+
+test("a theme the customer already named is not added twice, whatever its case", () => {
+  const envelope = orderToCustomer({ ...TEMPLATE });
+  envelope.customer.style = ["Old Money"];
+  assert.deepEqual(applyStyleProfile(envelope, profile).customer.style, ["Old Money", "casual"]);
+});
+
+test("a board without themes still gives the stylist its colours and pieces", () => {
+  const envelope = orderToCustomer({ ...TEMPLATE });
+  const styled = applyStyleProfile(envelope, { ...profile, themes: [] });
+  assert.deepEqual(styled.customer.style, envelope.customer.style);
+  assert.match(styled.customer.fit_description, /colours navy, cream, camel/);
+});
+
+test("a board whose terms are all weather words changes nothing", () => {
+  const envelope = orderToCustomer({ ...TEMPLATE });
+  const weather = { ok: true, themes: [], colors: ["warm grey"], pieces: ["rain jacket"], fit: "summer fit", fashionPins: 5 };
+  assert.equal(applyStyleProfile(envelope, weather), envelope);
+});
+
+// --- the page, edge cases ----------------------------------------------------------
+
+test("an empty part of the profile gets no row on the page", () => {
+  const html = page({ ...profile, themes: [], pieces: [], fit: "" });
+  assert.match(html, /<dt>Colours<\/dt>/);
+  assert.doesNotMatch(html, /<dt>Direction<\/dt>|<dt>Pieces<\/dt>|<dt>Fit<\/dt>/);
+});
+
+test("a profile without a board name reads naturally", () => {
+  const html = page({ ...profile, source: { kind: "profile", board: null, pins: 25, pictures: 25 } });
+  assert.match(html, /Read from 9 pins of clothing on your board, out of the first 25\./);
+});
+
+test("a colour name that is not a plain word gets no swatch and cannot style the page", () => {
+  const html = page({ ...profile, colors: ["navy-blue", "red;position:fixed", "beige"] });
+  assert.doesNotMatch(html, /data-color="navy-blue"|position:fixed"/);
+  assert.match(html, /<i data-color="beige" style="background:beige"><\/i>beige/);
+});
+
+test("a failure reason with markup is shown as text", () => {
+  const html = page({ ok: false, source: null, reason: "<img src=x onerror=alert(1)>" });
+  assert.ok(!html.includes("<img src=x"));
+  assert.match(html, /We could not use your board: &lt;img src=x/);
+});
