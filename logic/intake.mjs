@@ -307,48 +307,7 @@ export function reviewOrder(description, options = {}) {
     return { action: "refuse", message: refusal(intake), reasons: intake.errors, intake };
   if (!intake.order.brief) return { action: "proceed", intake };
   // A link is not words: "pinterest.com/anna/s-looks" names neither a size nor a garment.
-  const brief = intake.order.brief.replace(/\S*(?:https?:\/\/|pinterest\.|pin\.it\/)\S*/gi, " ");
-  // A board is the customer's style in pictures, which is what this check asks for.
-  if (!namesGarment(brief) && !intake.order.pinterest)
-    return {
-      action: "refuse",
-      reasons: ["The description names no garment, style or outfit."],
-      message: [
-        "AiTelier could not start this order. Nothing was charged.",
-        "",
-        `This task asks for "${intake.order.brief.slice(0, 80)}", which does not describe clothing.`,
-        "AiTelier builds outfits from real garments in real shops, so it needs to know",
-        "what to dress you in.",
-        "",
-        'Try: "Two autumn outfits, old money style, budget 400 EUR, top M, waist 32, shoes EU 43."',
-      ].join("\n"),
-      intake,
-    };
-  if (!namesSize(brief))
-    return {
-      action: "ask",
-      reasons: ["The description names no size."],
-      message: [
-        "AiTelier needs your sizes before it can request payment. Nothing was charged.",
-        "",
-        "Guessing a size is the one thing it will not do: the shops sell single",
-        "garments, and a wrong size is a return, not an outfit.",
-        "",
-        "Please add:",
-        "- top size, for example S, M or L",
-        "- waist in inches, for example 32",
-        "- shoe size in EU, for example 43",
-        "",
-        "So the whole order reads like this:",
-        "",
-        "```",
-        ORDER_EXAMPLE,
-        "```",
-        "",
-        "Start the order again with your sizes included and it will run straight through.",
-      ].join("\n"),
-      intake,
-    };
+  
   return { action: "proceed", intake };
 }
 
