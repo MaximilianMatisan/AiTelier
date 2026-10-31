@@ -247,24 +247,26 @@ export const HOW_TO_ORDER =
  * the shape of an order they can copy.
  */
 export function welcome() {
-  // The order to copy comes first: someone facing an empty thread needs a
-  // sentence to paste, not a paragraph to read.
+  // Posted right after the customer's first message — the Task they created —
+  // so it acknowledges the order instead of asking for one. The example is a
+  // help for whoever wants it, not a format: any wording that names the
+  // outfits and the sizes works.
   return [
     "## AiTelier",
     "",
-    "**To order, copy this, change the values and send it:**",
-    "",
-    "```",
-    ORDER_EXAMPLE,
-    "```",
-    "",
-    HOW_TO_ORDER,
+    "Thanks — I am reading your order now.",
     "",
     "**You pay only if all five guarantees hold:** it fits your budget, it comes in your",
     "size, the shop still has it, the price matches the quote, and it arrives in time.",
     "If any one of them fails I submit no result at all, and the escrow returns your money.",
     "",
-    'When the looks arrive, answer right here: pick one with "outfit 2", or tell me what to change.',
+    'You can talk to me right here: pick a look with "outfit 2", ask for another style or budget, or start over.',
+    "",
+    `_${HOW_TO_ORDER} If it helps, an order can look like this — your own words work just as well:_`,
+    "",
+    "```",
+    ORDER_EXAMPLE,
+    "```",
   ].join("\n");
 }
 

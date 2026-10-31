@@ -207,7 +207,7 @@ test("a run that failed on a provider outage is repeated, any other failure is n
   calls = 0;
   const down = async (_args, _ms, file) => {
     calls++;
-    writeFileSync(file, "429 Too Many Requests\n", { flag: "a" });
+    writeFileSync(file, "Candidate filter failed: AI_APICallError: 429 Too Many Requests\n", { flag: "a" });
     return false;
   };
   assert.equal(await runPipelineRetrying(down, [], 60_000, logFile, noWait), false);
@@ -224,7 +224,7 @@ test("a repeated run asks the fallback model, the first one does not", async (t)
   const run = async (_args, _ms, file, env) => {
     seen.push(env);
     if (seen.length === 1) {
-      writeFileSync(file, "503 Service Unavailable\n", { flag: "a" });
+      writeFileSync(file, "Candidate filter failed: AI_APICallError: Service Unavailable\n", { flag: "a" });
       return false;
     }
     return true;
@@ -236,4 +236,19 @@ test("a repeated run asks the fallback model, the first one does not", async (t)
   assert.deepEqual(fallbackModelEnv({}), {});
   // A stylist on another provider keeps its own model.
   assert.deepEqual(fallbackModelEnv({ ...env, GEMINI_BASE_URL: "https://other" }), { ZAI_MODEL: "spare" });
+});
+
+test("a warning that merely mentions 429 does not make a broken run look like an outage", async (t) => {
+  const { runPipelineRetrying } = await import("./logic/lead-agent.mjs");
+  const dir = path.join(tmpdir(), `warn-${process.pid}`);
+  mkdirSync(dir, { recursive: true });
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  let calls = 0;
+  const run = async (_args, _ms, file) => {
+    calls++;
+    writeFileSync(file, "WARNING: both LLM steps use the same key ... both come back 429 Too Many Requests.\nCandidate filter failed: No object generated: response did not match schema.\n", { flag: "a" });
+    return false;
+  };
+  assert.equal(await runPipelineRetrying(run, [], 60_000, path.join(dir, "pipeline.log"), { waits: [1, 1], sleep: async () => {}, minRunMs: 0 }), false);
+  assert.equal(calls, 1);
 });

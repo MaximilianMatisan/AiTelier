@@ -96,8 +96,11 @@ export async function runPipelineRetrying(run, args, timeoutMs, logFile, { waits
     const from = existsSync(logFile) ? statSync(logFile).size : 0;
     if (await run(args, end - Date.now(), logFile, attempt ? fallbackModelEnv(env) : {})) return true;
     const wrote = existsSync(logFile) ? readFileSync(logFile, "utf8").slice(from) : "";
+    // Only the lines that report a failure count: run-pipeline.mjs prints a
+    // warning about "429 Too Many Requests" on every run that shares one key.
+    const errors = wrote.split("\n").filter((line) => /fail|error/i.test(line)).join("\n");
     const wait = waits[attempt];
-    if (wait === undefined || !TRANSIENT.test(wrote) || end - Date.now() - wait < minRunMs) return false;
+    if (wait === undefined || !TRANSIENT.test(errors) || end - Date.now() - wait < minRunMs) return false;
     log.warn("provider unavailable, running the pipeline again", {
       attempt: attempt + 2,
       waitS: wait / 1000,
