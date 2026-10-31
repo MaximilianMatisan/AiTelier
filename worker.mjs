@@ -163,8 +163,15 @@ while (true) {
               }),
               { mode: 0o600 },
             );
-            continue;
           }
+        }
+        // A Task that was refused, or sent back for the missing details, is not
+        // a closed conversation: the next comment is usually the order itself.
+        // Nothing was charged for it, and nothing is submitted from here — the
+        // chat answers on the thread.
+        if (state.phase === "asked" || state.phase === "refused") {
+          await reply(t);
+          continue;
         }
         if (state.paid && process.env.PAID_TASKS_ENABLED !== "true") {
           once(t.id, "warn", "paid task skipped: PAID_TASKS_ENABLED is off", {});
