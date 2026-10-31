@@ -17,7 +17,7 @@ import { spawn } from "node:child_process";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { readOrder, refusal } from "./intake.mjs";
+import { readOrder, refusal, SEASONS } from "./intake.mjs";
 import { equivalentSizes } from "./data/normalize.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -153,8 +153,37 @@ export function sizesFromLabels(labels = []) {
   return { top, waist: waist && String(waist), shoe_eu: shoe && String(shoe) };
 }
 
+const SEASON_BY_MONTH = [
+  "winter", "winter", "spring", "spring", "spring", "summer",
+  "summer", "summer", "autumn", "autumn", "autumn", "winter",
+];
+
+/**
+ * The season nobody stated. Person 3 needs one to leave shorts out of an
+ * October order; given null it kept every season open and a Munich autumn
+ * brief came back with summer shorts.
+ *
+ * The month decides it - the shops and the delivery country are European, so
+ * northern hemisphere - and a season named in the climate note wins outright.
+ * A stated temperature may only make the answer colder: a cold June is not a
+ * reason to buy a parka, but it is a reason not to buy shorts.
+ */
+export function seasonFromDate(date = new Date(), climate = null) {
+  const text = String(climate ?? "").toLowerCase();
+  const named = SEASONS.find((season) => text.includes(season));
+  if (named) return named;
+  const byMonth = SEASON_BY_MONTH[date.getMonth()];
+  // The hyphen in a range is not a minus sign: "8-15 C" is 15, not -15.
+  const degrees = [...text.matchAll(/(?<!\d)(-?\d{1,2})\s*(?:°|deg)?\s*c\b/g)].map((m) => Number(m[1]));
+  if (!degrees.length) return byMonth;
+  const high = Math.max(...degrees);
+  if (high < 5) return "winter";
+  if (high < 18 && byMonth === "summer") return "autumn";
+  return byMonth;
+}
+
 /** The customer half of Person 3's envelope for a free-text brief. */
-export function briefToCustomer(brief, selection = null) {
+export function briefToCustomer(brief, selection = null, { today = new Date() } = {}) {
   const text = brief.toLowerCase();
   const budgetMatch =
     text.match(/(\d[\d.,]*)\s*(?:€|eur|euro)/) ?? text.match(/(?:budget|max(?:imum)?)\D{0,12}(\d[\d.,]*)/);
@@ -177,13 +206,16 @@ export function briefToCustomer(brief, selection = null) {
       }).filter(([, v]) => v),
     ),
   };
+  const season = seasons.length === 1 ? seasons[0] : seasonFromDate(today, brief);
   return {
     budgetAssumed: !budget,
+    seasonAssumed: seasons.length !== 1,
+    season,
     envelope: orderToCustomer({
       budget_eur: budget || DEFAULT_BUDGET_EUR,
       outfits: Math.min(Math.max(outfits, 1), 10),
       theme: themes[0] ?? "minimal",
-      season: seasons.length === 1 ? seasons[0] : null,
+      season,
       gender,
       sizes,
       fit: null,
@@ -281,6 +313,42 @@ export function fitSizesToCatalogue(sizes, envelope) {
 }
 
 /**
+ * Fill the slots the customer left open with one label each.
+ *
+ * Person 3 keeps one size per slot and matches it exactly, so a slot left
+ * empty let it pick any size at all: one result arrived with shoes in both 37
+ * and 43 and trousers in both 31 and 38, which no single person can wear.
+ *
+ * An order that names no size at all is refused before the escrow (see
+ * intake.reviewOrder), so what reaches here is a partly stated one - a top
+ * size but no shoe size. For those we pick the label the shortlist stocks
+ * most often, which is the one most likely to stay in stock, and say that we
+ * assumed it. Guessing one size is wrong; letting every outfit use a
+ * different one is worse.
+ */
+export function unifySizes(sizes, envelope) {
+  const items = envelope.items ?? [];
+  const chosen = { ...sizes };
+  const assumed = [];
+  for (const [layer, category] of Object.entries(LAYER_CATEGORY)) {
+    if (chosen[layer]) continue;
+    const counts = new Map();
+    for (const item of items.filter((i) => i.category === category))
+      for (const size of item.sizes ?? [])
+        if (size.in_stock !== false && size.label)
+          counts.set(String(size.label), (counts.get(String(size.label)) ?? 0) + 1);
+    if (!counts.size) continue;
+    // Most stocked first; the label itself breaks a tie so a rerun agrees.
+    const [best, stocked] = [...counts].sort(
+      (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
+    )[0];
+    chosen[layer] = best;
+    assumed.push(`${layer} was not stated, using ${best} (${stocked} items in stock)`);
+  }
+  return { sizes: chosen, assumed };
+}
+
+/**
  * Drop what the shop says is for another gender. A men's brief came back with
  * a pleated skirt and women's sneakers, which is the first thing anyone
  * notices on the result page.
@@ -312,6 +380,13 @@ async function stage(name, hint, fn) {
 async function main() {
   const orderPath = flag("--order", "catalog/order.json");
   const outDir = flag("--out", "catalog/cache/run");
+  // Person 3 names its artifact folder after the task, so without a real one
+  // every run wrote its look boards to person3/artifacts/aitelier-catalog-demo
+  // and two Tasks running at once overwrote each other's images. It is also
+  // the id the customer reads on the result page.
+  const taskId = flag("--task-id", path.basename(outDir));
+  if (!/^[\w-]+$/.test(taskId))
+    throw new Error(`--task-id must be a plain identifier, got "${taskId}"`);
   await mkdir(path.resolve(ROOT, outDir), { recursive: true });
 
   // Step 1: refuse a bad order here, before the filter spends model calls on it.
@@ -394,6 +469,8 @@ async function main() {
         brief = fromBrief.envelope;
         if (fromBrief.budgetAssumed)
           console.log(`warning: the brief names no budget; using ${brief.customer.budget.amount} EUR`);
+        if (fromBrief.seasonAssumed)
+          console.log(`warning: the brief names no season; reading ${fromBrief.season} from the date`);
         console.log(`from brief: ${JSON.stringify(brief.customer.sizes)} · ${brief.customer.style} · ${brief.customer.season}`);
       }
       const loaded = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
@@ -403,8 +480,14 @@ async function main() {
         await writeFile(path.resolve(ROOT, envelope), JSON.stringify(shortlisted, null, 2) + "\n");
       }
       const { sizes, swaps } = fitSizesToCatalogue(brief.customer.sizes, shortlisted);
-      brief.customer.sizes = sizes;
       for (const swap of swaps) console.log(`size: ${swap}`);
+      // Any slot still open would let the stylist mix sizes inside one result.
+      const { sizes: settled, assumed } = unifySizes(sizes, shortlisted);
+      brief.customer.sizes = settled;
+      for (const note of assumed) console.log(`size: ${note}`);
+      // run_catalog.py copies every top-level key but `customer` into its own
+      // input, so this is what names the run and its artifact folder.
+      brief.task_id = taskId;
       await writeFile(path.resolve(ROOT, customer), JSON.stringify(brief, null, 2) + "\n");
       console.log(`wrote ${customer}`);
       return { ok: true };

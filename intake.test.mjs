@@ -10,7 +10,12 @@ import {
   ORDER_EXAMPLE,
   TEMPLATE,
 } from "./logic/intake.mjs";
-import { briefToCustomer, sizesFromLabels } from "./logic/run-pipeline.mjs";
+import {
+  briefToCustomer,
+  sizesFromLabels,
+  seasonFromDate,
+  unifySizes,
+} from "./logic/run-pipeline.mjs";
 
 const today = new Date("2026-10-30T12:00:00Z");
 const read = (value) => readOrder(typeof value === "string" ? value : JSON.stringify(value), { today });
@@ -166,4 +171,84 @@ test("the form, the greeting and the refusal cannot drift apart", () => {
 test("how to order names every size the pipeline needs", () => {
   for (const needed of [/top/i, /waist/i, /shoes/i, /EUR/])
     assert.match(HOW_TO_ORDER, needed);
+});
+
+// Person 3 needs a season to leave shorts out of an October order. Given null
+// it kept every season open, and a Munich autumn brief came back with shorts.
+test("a season nobody stated is read from the date", () => {
+  assert.equal(seasonFromDate(new Date("2026-10-31T09:00:00Z")), "autumn");
+  assert.equal(seasonFromDate(new Date("2026-07-15T09:00:00Z")), "summer");
+  assert.equal(seasonFromDate(new Date("2026-01-15T09:00:00Z")), "winter");
+  assert.equal(seasonFromDate(new Date("2026-04-15T09:00:00Z")), "spring");
+});
+
+test("a season named in the brief beats the date", () => {
+  assert.equal(seasonFromDate(new Date("2026-07-15T09:00:00Z"), "a winter coat for Munich"), "winter");
+});
+
+test("a stated temperature can only make the season colder", () => {
+  // A cold June is a reason not to buy shorts, not a reason to buy a parka.
+  assert.equal(seasonFromDate(new Date("2026-06-15T09:00:00Z"), "Munich, wet, 5-12 C"), "autumn");
+  assert.equal(seasonFromDate(new Date("2026-06-15T09:00:00Z"), "Munich, 2 C"), "winter");
+  // A warm October stays autumn: nothing here makes it warmer.
+  assert.equal(seasonFromDate(new Date("2026-10-31T09:00:00Z"), "Munich, 24 C"), "autumn");
+});
+
+test("an October Munich brief reaches Person 3 as autumn, and says it was assumed", () => {
+  const read = briefToCustomer("old money outfits, top M, waist 32, shoes EU 43, Munich wet 8-15 C", null, {
+    today: new Date("2026-10-31T09:00:00Z"),
+  });
+  assert.equal(read.envelope.customer.season, "autumn");
+  assert.equal(read.seasonAssumed, true);
+});
+
+test("a season the filter read is used as given", () => {
+  const read = briefToCustomer("summer outfits", { seasons: ["summer"] }, {
+    today: new Date("2026-10-31T09:00:00Z"),
+  });
+  assert.equal(read.envelope.customer.season, "summer");
+  assert.equal(read.seasonAssumed, false);
+});
+
+// Person 3 matches one size per slot exactly, so a slot left open let it pick
+// any: one result had shoes in 37 and 43 and trousers in 31 and 38.
+const stocked = (category, sizes) => ({
+  category,
+  sizes: sizes.map(([label, in_stock]) => ({ label, in_stock })),
+});
+
+test("a slot the customer left open is settled on one size", () => {
+  const envelope = {
+    items: [
+      stocked("shoes", [["43", true], ["43", true], ["37", true]]),
+      stocked("shoes", [["43", true]]),
+      stocked("bottom", [["32", true], ["32", true], ["31", true]]),
+    ],
+  };
+  const { sizes, assumed } = unifySizes({ base: "M", mid: "M", outer: "M" }, envelope);
+  assert.equal(sizes.shoes, "43", "the most stocked label wins");
+  assert.equal(sizes.bottom, "32");
+  assert.equal(sizes.base, "M", "a stated size is never replaced");
+  assert.equal(assumed.length, 2, "both assumptions are reported");
+  assert.match(assumed.join(" "), /was not stated/);
+});
+
+test("sizes out of stock do not win a slot", () => {
+  const envelope = { items: [stocked("shoes", [["37", false], ["37", false], ["43", true]])] };
+  assert.equal(unifySizes({}, envelope).sizes.shoes, "43");
+});
+
+test("a slot with nothing in the shortlist is left alone", () => {
+  const { sizes, assumed } = unifySizes({}, { items: [] });
+  assert.deepEqual(sizes, {});
+  assert.deepEqual(assumed, []);
+});
+
+test("an equal tie is broken the same way every run", () => {
+  // Two labels stocked equally must not depend on object or array order, or
+  // the same order styled twice would come back in different sizes.
+  const envelope = { items: [stocked("shoes", [["43", true], ["37", true]])] };
+  const once = unifySizes({}, envelope).sizes.shoes;
+  const again = unifySizes({}, { items: [stocked("shoes", [["37", true], ["43", true]])] }).sizes.shoes;
+  assert.equal(once, again);
 });
