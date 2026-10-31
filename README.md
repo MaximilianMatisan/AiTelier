@@ -231,7 +231,7 @@ run log says so. Only an empty description is refused.
 
 | Field | Required | Rule |
 | --- | --- | --- |
-| `budget_eur` | yes | Positive, at most 10000; the whole order |
+| `budget_eur` | yes | Positive, at most 10000; each outfit must fit in it |
 | `outfits` | yes | 1–10 |
 | `item_count` | no | 1–40, at least `outfits` |
 | `theme` | yes | `casual`, `old_money` or `streetwear` (aliases like "preppy", "street" accepted) |
