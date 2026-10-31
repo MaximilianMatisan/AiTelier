@@ -14,11 +14,12 @@
 // Person 3 owns the stylist. Each stage is a separate process on purpose: a
 // stage can be fixed or re-run on its own while the others keep working.
 import { spawn } from "node:child_process";
-import { readFile, writeFile, mkdir } from "node:fs/promises";
+import { readFile, writeFile, mkdir, rm } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { reviewOrder, SEASONS } from "./intake.mjs";
 import { equivalentSizes, categoryOf } from "./data/normalize.js";
+import { styleLine } from "./style-profile.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -90,6 +91,34 @@ export function orderToBrief(order) {
   ]
     .filter(Boolean)
     .join(", ");
+}
+
+/**
+ * Draws the board's style into Person 3's customer. The stylist's prompt reads
+ * `style` (at most five directions, the customer's own first) and
+ * `fit_description`, so those are the two places it can go.
+ *
+ * The filter does not get it. Told the board leaned old money and casual, the
+ * filter turned those into hard theme limits, halved the shoes on the
+ * shortlist and left none in the customer's size: a refund for an order that
+ * ran through without the board. The board is a taste, so it goes where the
+ * pieces are chosen, not where the catalogue is cut.
+ */
+export function applyStyleProfile(envelope, profile) {
+  const line = styleLine(profile);
+  if (!line) return envelope;
+  const customer = envelope.customer;
+  const style = [...(customer.style ?? [])];
+  for (const theme of profile.themes.map((t) => t.replace(/_/g, " ")))
+    if (!style.some((s) => s.toLowerCase() === theme)) style.push(theme);
+  return {
+    ...envelope,
+    customer: {
+      ...customer,
+      style: style.slice(0, 5),
+      fit_description: [customer.fit_description, line].filter(Boolean).join(" "),
+    },
+  };
 }
 
 /**
@@ -502,6 +531,7 @@ async function main() {
   const envelope = path.join(outDir, "person3.input.json");
   const customer = path.join(outDir, "customer.json");
   const selectionFile = path.join(outDir, "selection.json");
+  const styleFile = path.join(outDir, "style-profile.json");
   const resultDir = path.join(outDir, "person3");
 
   console.log(`order:  ${orderPath}`);
@@ -518,6 +548,31 @@ async function main() {
         `  One run spends it twice and both come back 429 Too Many Requests.\n` +
         `  Set GEMINI_API_KEY to a key on a different account; see .env.example.\n`
     );
+  }
+
+  // The board is read first, so a dead link is known before the filter runs. A
+  // board that cannot be used is reported on the result page, and the outfits
+  // follow the rest of the order; it is not a reason to refund.
+  let profile = null;
+  if (order.pinterest) {
+    await stage("0/4 Pinterest style (lead agent)", "", async () => {
+      const read = await run("node", [
+        "--env-file-if-exists=.env",
+        "logic/style-profile.mjs",
+        "--board", order.pinterest,
+        "--out", styleFile,
+      ]);
+      profile = read.ok ? await readFile(path.resolve(ROOT, styleFile), "utf8").then(JSON.parse, () => null) : null;
+      if (!profile) {
+        profile = { ok: false, source: null, reason: "The style analysis did not finish." };
+        await writeFile(path.resolve(ROOT, styleFile), JSON.stringify(profile, null, 2) + "\n");
+        console.log(`style: not used, ${read.reason}`);
+      }
+      return { ok: true };
+    });
+  } else {
+    // A rerun into the same folder must not show an earlier order's board.
+    await rm(path.resolve(ROOT, styleFile), { force: true });
   }
 
   const ok =
@@ -571,6 +626,10 @@ async function main() {
         if (fromBrief.seasonAssumed)
           console.log(`warning: the brief names no season; reading ${fromBrief.season} from the date`);
         console.log(`from brief: ${JSON.stringify(brief.customer.sizes)} · ${brief.customer.style} · ${brief.customer.season}`);
+      }
+      if (profile?.ok) {
+        brief = applyStyleProfile(brief, profile);
+        console.log(`from board: ${brief.customer.style.join(", ")}`);
       }
       const loaded = JSON.parse(await readFile(path.resolve(ROOT, envelope), "utf8"));
       const { envelope: shortlisted, dropped } = dropWrongGender(loaded, brief.customer.gender);

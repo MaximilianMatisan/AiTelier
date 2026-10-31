@@ -10,6 +10,7 @@
 // is locked. An order that fails here costs the customer nothing.
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { findPinterestLink, parseBoardLink } from "./pinterest.mjs";
 
 // Only what catalog/cache/products.json actually carries. A theme with no
 // products guarantees a refund three steps later, so it is refused here.
@@ -105,8 +106,12 @@ function strings(value, field, errors, { max = 20, length = 80 } = {}) {
  */
 export function readOrder(description, { today = new Date() } = {}) {
   const raw = extractJson(description);
-  // {"brief": "..."} is a free-text order the Lead-Agent saved for the pipeline.
-  const saved = raw && Object.keys(raw).length === 1 && typeof raw.brief === "string" ? raw.brief : null;
+  // {"brief": "..."} is a free-text order the Lead-Agent saved for the pipeline,
+  // with the board link it found in that text when there was one.
+  const saved =
+    raw && typeof raw.brief === "string" && Object.keys(raw).every((k) => k === "brief" || k === "pinterest")
+      ? raw.brief
+      : null;
   if (!raw || saved !== null) {
     // Free text is a normal order: Person 2's filter reads it directly and picks
     // budget, style, season and sizes out of it. Only an empty brief is refused.
@@ -117,7 +122,11 @@ export function readOrder(description, { today = new Date() } = {}) {
       return { ok: false, errors: ["The task description is empty. Describe the outfits you would like."], warnings: [] };
     if (brief.length > 4000)
       return { ok: false, errors: ["The task description may be at most 4000 characters."], warnings: [] };
-    return { ok: true, order: { brief }, warnings: [] };
+    const link = findPinterestLink(brief);
+    if (!link) return { ok: true, order: { brief }, warnings: [] };
+    const board = parseBoardLink(link);
+    if (board.error) return { ok: false, errors: [board.error], warnings: [] };
+    return { ok: true, order: { brief, pinterest: link }, warnings: [] };
   }
   const errors = [];
   const warnings = [];
@@ -194,12 +203,19 @@ export function readOrder(description, { today = new Date() } = {}) {
     else order.gender = gender;
   }
 
+  if (raw.pinterest != null) {
+    const board = typeof raw.pinterest === "string" && raw.pinterest.length <= 300 ? parseBoardLink(raw.pinterest.trim()) : null;
+    if (!board) errors.push("pinterest must be the link of a public Pinterest board.");
+    else if (board.error) errors.push(`pinterest: ${board.error}`);
+    else order.pinterest = raw.pinterest.trim();
+  }
+
   if (raw.climate != null) {
     if (typeof raw.climate !== "string" || raw.climate.length > 80) errors.push("climate must be a short text, at most 80 characters.");
     else order.climate = raw.climate.trim();
   }
 
-  const known = new Set([...Object.keys(TEMPLATE), "budget", "outfit_count", "item_count"]);
+  const known = new Set([...Object.keys(TEMPLATE), "budget", "outfit_count", "item_count", "pinterest"]);
   const ignored = Object.keys(raw).filter((k) => !known.has(k));
   if (ignored.length) warnings.push(`Ignored unknown fields: ${ignored.join(", ")}.`);
 
@@ -289,16 +305,18 @@ export function reviewOrder(description, options = {}) {
   const intake = readOrder(description, options);
   if (!intake.ok)
     return { action: "refuse", message: refusal(intake), reasons: intake.errors, intake };
-  const brief = intake.order.brief;
-  if (!brief) return { action: "proceed", intake };
-  if (!namesGarment(brief))
+  if (!intake.order.brief) return { action: "proceed", intake };
+  // A link is not words: "pinterest.com/anna/s-looks" names neither a size nor a garment.
+  const brief = intake.order.brief.replace(/\S*(?:https?:\/\/|pinterest\.|pin\.it\/)\S*/gi, " ");
+  // A board is the customer's style in pictures, which is what this check asks for.
+  if (!namesGarment(brief) && !intake.order.pinterest)
     return {
       action: "refuse",
       reasons: ["The description names no garment, style or outfit."],
       message: [
         "AiTelier could not start this order. Nothing was charged.",
         "",
-        `This task asks for "${brief.slice(0, 80)}", which does not describe clothing.`,
+        `This task asks for "${intake.order.brief.slice(0, 80)}", which does not describe clothing.`,
         "AiTelier builds outfits from real garments in real shops, so it needs to know",
         "what to dress you in.",
         "",
@@ -347,6 +365,8 @@ export function refusal({ errors, warnings = [] }) {
     "```",
     ORDER_EXAMPLE,
     "```",
+    "",
+    "Add the link of a public Pinterest board and AiTelier reads your style from its pictures.",
     "",
     "Or send it as JSON:",
     "",
