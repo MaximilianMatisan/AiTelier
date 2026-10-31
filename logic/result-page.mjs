@@ -108,11 +108,18 @@ function itemCard(item, index) {
 }
 
 /** The facts under a set: shop, size and the live check for every piece. */
-function itemDetail(item, byItem, shops, live) {
+const TRUST_NOTE = {
+  trusted: ["fresh", "shop checked"],
+  flagged: ["stale", "shop flagged, see below"],
+  unchecked: ["muted", "shop not checked"],
+};
+
+function itemDetail(item, byItem, shops, live, trustByShop = new Map()) {
   const source = byItem.get(item.item_id);
   const shop = shops.get(source?.shop_id);
   const record = live[item.item_id];
   const fresh = record?.stale === false;
+  const trust = TRUST_NOTE[trustByShop.get(source?.shop_id)?.status];
   return `<li>
       <div class="row">
         <span class="layer">${esc(item.layer_label ?? item.layer ?? "")}</span>
@@ -124,7 +131,7 @@ function itemDetail(item, byItem, shops, live) {
           fresh
             ? `checked at the shop ${esc(clock(record.checked_at))} · ${esc(record.availability)}`
             : "not confirmed live"
-        }</span></div>
+        }</span>${trust ? ` · <span class="${trust[0]}">${trust[1]}</span>` : ""}</div>
     </li>`;
 }
 
@@ -164,7 +171,35 @@ function boardSection(style) {
   </section>`;
 }
 
-export function renderPage({ result, envelope, live, style = null, payment = null }) {
+/**
+ * What the trust check said about each shop. Shown for information: the check
+ * reads third-party pages and asks a model, so it never decided anything above.
+ */
+function shopSection(trust) {
+  if (!trust) return "";
+  const intro = `<h3>The shops</h3>
+    <p class="board-note">Each shop a piece comes from was checked for an imprint, its policies and its domain, and a model judged the evidence. This is shown for your information: it did not change which pieces were chosen.</p>`;
+  if (trust.error || !trust.shops?.length)
+    return `<section class="shops">${intro}<p class="board-note">${trust.error ? "The shop check did not run this time." : "There were no shops to check."}</p></section>`;
+  const row = (shop) => {
+    const [tone, text] =
+      shop.status === "trusted"
+        ? ["fresh", "looks trustworthy"]
+        : shop.status === "flagged"
+          ? ["stale", "flagged as not trustworthy"]
+          : ["muted", "could not be checked"];
+    const percent = shop.confidence == null ? "" : ` · ${esc(Math.round(shop.confidence * 100))}% confidence`;
+    return `<li>
+        <div class="row"><strong>${esc(shop.name)}</strong><span class="${tone}">${text}${shop.status === "unchecked" ? "" : percent}</span></div>
+        ${shop.summary ? `<p class="board-note">${esc(shop.summary)}</p>` : ""}
+        ${shop.redFlags?.length ? `<ul class="flags">${shop.redFlags.map((f) => `<li>${esc(f)}</li>`).join("")}</ul>` : ""}
+      </li>`;
+  };
+  return `<section class="shops">${intro}<ul class="details">${trust.shops.map(row).join("")}</ul></section>`;
+}
+
+export function renderPage({ result, envelope, live, style = null, payment = null, trust = null }) {
+  const trustByShop = new Map((trust?.shops ?? []).map((shop) => [shop.shop_id, shop]));
   const byItem = new Map((envelope.items ?? []).map((i) => [i.item_id, i]));
   const shops = new Map((envelope.shops ?? []).map((s) => [s.shop_id, s]));
   const approved = result.status === "APPROVED";
@@ -190,7 +225,7 @@ export function renderPage({ result, envelope, live, style = null, payment = nul
         <ol class="spine">${items.map(itemCard).join("")}</ol>
         <div class="below">
           ${outfit.rationale ? `<p class="why">${esc(outfit.rationale)}</p>` : ""}
-          <ul class="details">${items.map((i) => itemDetail(i, byItem, shops, live)).join("")}</ul>
+          <ul class="details">${items.map((i) => itemDetail(i, byItem, shops, live, trustByShop)).join("")}</ul>
           <table class="sum">
             <tr><td>Items</td><td>${esc(money(t.items, t.currency))}</td></tr>
             <tr><td>Shipping <span class="est">estimated</span></td><td>${esc(money(t.shipping, t.currency))}</td></tr>
@@ -276,6 +311,13 @@ export function renderPage({ result, envelope, live, style = null, payment = nul
           padding:3px 11px; font-size:13px }
   .chip i { width:10px; height:10px; border-radius:50%; border:1px solid var(--line); display:inline-block }
   .board-note { color:var(--soft); font-size:13px; margin:0 }
+  .shops { max-width:640px; margin:0 auto 24px }
+  .shops .row { justify-content:space-between }
+  .shops .row strong { font-weight:500 }
+  .shops .board-note + .board-note, .shops ul.details .board-note { margin-top:6px }
+  .shops ul.details { margin-top:14px }
+  .flags { margin:6px 0 0; padding-left:18px; color:var(--soft); font-size:12px }
+  .muted { color:var(--soft) }
   .checked { margin:0 0 64px; border-top:1px solid var(--line); border-bottom:1px solid var(--line) }
   .checked summary { display:flex; flex-wrap:wrap; gap:4px 16px; align-items:baseline; padding:14px 0; cursor:pointer; list-style:none; font-size:13px }
   .checked summary::-webkit-details-marker { display:none }
@@ -375,6 +417,7 @@ ${boardSection(style)}
 
 ${refused}
 ${sets}
+${shopSection(trust)}
 
 <footer>
   ${paid}
@@ -421,13 +464,14 @@ async function main() {
   const envelope = await read(at("person3.input.json"), { items: [], shops: [] });
   const live = await read(at("person3", "05-live-check.json"), {});
   const style = await read(at("style-profile.json"), null);
+  const trust = await read(at("trust.json"), null);
 
   const out = path.resolve(ROOT, flag("--out", path.join(run, "index.html")));
   // A hash that cannot be a transaction is not a link the page may show.
   const paymentTx = flag("--payment-tx", null);
   const paymentUrl = paymentTx ? txExplorerUrl(paymentTx) : null;
   const payment = paymentUrl ? { txHash: paymentTx, url: paymentUrl } : null;
-  await writeFile(out, renderPage({ result, envelope, live, style, payment }));
+  await writeFile(out, renderPage({ result, envelope, live, style, payment, trust }));
 
   const checked = Object.values(live);
   console.log(`${result.status} · ${(result.outfits ?? []).length} outfits · ${checked.filter((r) => r.stale === false).length}/${checked.length} items confirmed live`);
