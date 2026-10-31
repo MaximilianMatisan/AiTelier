@@ -163,7 +163,6 @@ test("the greeting states the bargain and shows an order to copy", () => {
 test("the form, the greeting and the refusal cannot drift apart", () => {
   // One copy of how to order, read by the form the customer fills in, the
   // greeting posted when the Task is picked up, and every refusal.
-  assert.ok(welcome().includes(HOW_TO_ORDER));
   assert.ok(refusal({ errors: ["x"] }).includes(ORDER_EXAMPLE));
   assert.ok(reviewOrder("Organize black clothing collection", { today }).message.includes(ORDER_EXAMPLE));
 });
