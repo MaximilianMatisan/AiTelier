@@ -9,6 +9,9 @@ import {
   USDM,
   paymentServiceReachable,
   paidMode,
+  REFUND_OFFER,
+  REFUND_WORD,
+  refundAuthorizedNotice,
 } from "./paid-task.mjs";
 const registration = {
   walletId: "seller-wallet",
@@ -465,4 +468,103 @@ test("a payment service that does not answer keeps new Tasks out of the paid flo
   assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready: () => false, reachable: async () => true }), "on-but-no-key");
   assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready, reachable: async () => false }), "on-but-unreachable");
   assert.equal(await paidMode({ env: { PAID_TASKS_ENABLED: "true" }, ready, reachable: async () => true }), "on");
+});
+
+const escrowAt = (onChainState) => ({
+  onChainState,
+  CurrentTransaction: { status: "Confirmed", newOnChainState: onChainState },
+});
+
+test("a customer who asks for a refund gets the whole payment back", async () => {
+  // Masumi has no partial refund: authorize-refund takes a blockchain
+  // identifier and a network and nothing else, so there is no share to argue
+  // over. The product promises the whole amount instead.
+  const calls = [];
+  const bodies = [];
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    mps: async (path, body) => {
+      calls.push([path, body]);
+      return {};
+    },
+    core: { ...core, post: async (path, body) => (bodies.push(body), { data: { id: "event" } }) },
+  });
+  const next = await adapter.refund(
+    task,
+    { input: "abc", paid: { stage: "awaiting-withdrawal", payment } },
+    "the trousers are the wrong cut",
+  );
+  assert.deepEqual(calls, [
+    ["/api/v1/payment/authorize-refund", { network: "Preprod", blockchainIdentifier: "signed" }],
+  ]);
+  assert.equal(next.paid.stage, "refund-authorized");
+  assert.equal(next.phase, "refunded");
+  assert.match(bodies.at(-1).comment, /refund is authorized/);
+  assert.match(bodies.at(-1).comment, /wrong cut/, "their own words are quoted back");
+});
+
+test("a refund asked for on chain is honoured before anything else", async () => {
+  for (const onChain of ["RefundRequested", "Disputed"]) {
+    const calls = [];
+    const adapter = await createPaidAdapter({
+      target,
+      registration,
+      save: async () => {},
+      answer: async () => {
+        throw Error("a Task being refunded must not be styled");
+      },
+      mps: async (path) => {
+        calls.push(path);
+        return path.includes("resolve") ? escrowAt(onChain) : {};
+      },
+      core: { ...core, post: async () => ({ data: { id: "event" } }) },
+    });
+    const next = await adapter.advance(task, {
+      input: "abc",
+      paid: { stage: "awaiting-result", payment, resultHash: "h" },
+    });
+    assert.equal(next.paid.stage, "refund-authorized", `${onChain} must authorize the refund`);
+    assert.ok(calls.includes("/api/v1/payment/authorize-refund"));
+    assert.ok(!calls.includes("/api/v1/payment/submit-result"), "and must not submit instead");
+  }
+});
+
+test("a refund is never authorized twice, nor without an escrow", async () => {
+  let calls = 0;
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    mps: async () => (calls++, {}),
+    core: { ...core, post: async () => ({ data: { id: "event" } }) },
+  });
+  for (const stage of ["settled", "refund-authorized", "refunded", "stalled"])
+    await adapter.refund(task, { input: "abc", paid: { stage, payment } });
+  assert.equal(calls, 0, "a finished payment is not given back again");
+  await assert.rejects(
+    () => adapter.refund(task, { input: "abc", paid: { stage: "terms-saved" } }),
+    /no escrow/,
+  );
+});
+
+test("the word offered is the word listened for", () => {
+  assert.match(REFUND_OFFER, /REFUND/);
+  assert.ok(REFUND_WORD.test("REFUND"));
+  assert.ok(REFUND_WORD.test("refund please"));
+  assert.ok(REFUND_WORD.test("I want a refund."));
+  // Not a reading of their mood, and not the word in passing: a false
+  // positive here gives away a payment we earned.
+  assert.ok(!REFUND_WORD.test("this is disappointing"));
+  assert.ok(!REFUND_WORD.test("you refunded my other order last week"));
+});
+
+test("the refund notice says the whole amount is coming back", () => {
+  const text = refundAuthorizedNotice("too expensive");
+  assert.match(text, /full amount/);
+  assert.match(text, /too expensive/);
+  assert.doesNotMatch(refundAuthorizedNotice(null), /You told us/);
 });

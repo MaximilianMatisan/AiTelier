@@ -8,6 +8,7 @@ import {
   assertTaskTarget,
   verifyRuntimeTask,
   closeTaskWithoutResult,
+  postTaskComment,
 } from "./task-target.mjs";
 import { logger } from "./log.mjs";
 const log = logger("paid");
@@ -35,7 +36,55 @@ export const RECOVERABLE_PENDING = new Set([
  * a worker left running does not spend two API calls every five seconds on
  * Tasks that finished hours ago.
  */
-export const TERMINAL_STAGES = new Set(["settled", "refunded", "stalled"]);
+export const TERMINAL_STAGES = new Set([
+  "settled",
+  "refunded",
+  "stalled",
+  "refund-authorized",
+]);
+
+/**
+ * What the chain says once the customer has asked for their money back.
+ * `Disputed` is the same request after we had already submitted a result.
+ */
+export const REFUND_ASKED = new Set(["RefundRequested", "Disputed"]);
+
+/**
+ * The word that gets the customer their money back.
+ *
+ * Deliberately one explicit token rather than a reading of how cross they
+ * sound: a false positive gives away a payment we earned, while a false
+ * negative only means they have to say it plainly. It sits beside the offer
+ * below so the word we ask for and the word we listen for cannot drift.
+ */
+export const REFUND_WORD = /(?:^|[^a-z])refunds?(?:[^a-z]|$)/i;
+
+/**
+ * Sent with the result, because that is the moment the customer judges it.
+ *
+ * Masumi has no partial refund to offer: /payment/authorize-refund takes a
+ * blockchain identifier and a network and nothing else, so there is no share
+ * to argue over. The whole amount is a plainer promise anyway.
+ */
+export const REFUND_OFFER = [
+  "---",
+  "",
+  "**Not what you wanted?** Reply with the single word `REFUND`.",
+  "AiTelier gives up its claim to this payment and the escrow returns the full",
+  "amount to you on chain.",
+].join("\n");
+
+/** What the customer reads once their money is on the way back. */
+export function refundAuthorizedNotice(reason) {
+  return [
+    "Your refund is authorized. AiTelier has given up its claim to this payment,",
+    "and the escrow returns the full amount to you on chain.",
+    reason ? `\nYou told us: "${reason.slice(0, 200)}"` : "",
+    "\nNothing further is owed. The outfit page stays where it is if you still want it.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
 
 /** What the customer reads when the guarantees did not hold. */
 export function refundNotice(failed = []) {
@@ -249,7 +298,35 @@ export async function createPaidAdapter({
     const client = await verifyRuntimeTask(await getCore(), task.id, target);
     return closeTaskWithoutResult(client, task.id, text, { log });
   }
+  /**
+   * Gives the customer their money back in full and gives up our claim to it.
+   *
+   * Masumi has no partial refund: /payment/authorize-refund takes a blockchain
+   * identifier and a network and nothing else, so there is no amount to argue
+   * about. Only the payment's creator may authorize, which is us, so an
+   * unhappy customer does not have to win an argument first.
+   */
+  async function authorizeRefund(task, state, reason) {
+    assertTaskTarget(task, target);
+    const p = state.paid ?? {};
+    if (TERMINAL_STAGES.has(p.stage)) return state;
+    if (!p.payment?.blockchainIdentifier)
+      throw new Error("There is no escrow on this Task to refund");
+    await mps("/api/v1/payment/authorize-refund", {
+      network: "Preprod",
+      blockchainIdentifier: p.payment.blockchainIdentifier,
+    });
+    log.info("refund authorized", { task: task.id, from: p.stage ?? "new" });
+    const client = await verifyRuntimeTask(await getCore(), task.id, target);
+    await postTaskComment(client, task.id, refundAuthorizedNotice(reason));
+    return persist(
+      task,
+      { ...state, phase: "refunded" },
+      { ...p, stage: "refund-authorized", refundReason: reason ?? null },
+    );
+  }
   return {
+    refund: authorizeRefund,
     async advance(task, state) {
       assertTaskTarget(task, target);
       if (TERMINAL_STAGES.has(state.paid?.stage)) return state;
@@ -330,6 +407,11 @@ export async function createPaidAdapter({
         );
         p = { ...p, observed };
         state = await persist(task, state, p);
+        // The customer asked for their money back on chain. Honoured before
+        // anything stage-specific, so a request that lands mid-flow is not
+        // raced by a submit or a withdrawal.
+        if (REFUND_ASKED.has(observed.onChainState))
+          return authorizeRefund(task, state, "asked for on chain");
         if (p.stage === "awaiting-escrow") {
           if (
             observed.onChainState !== "FundsLocked" ||
@@ -442,7 +524,7 @@ export async function createPaidAdapter({
         state = await persist(task, state, { ...p, stage: "complete-pending" });
         const response = await live.post(`/v1/tasks/${encodeURIComponent(task.id)}/events`, {
           status: "COMPLETED",
-          comment: p.result,
+          comment: `${p.result}\n\n${REFUND_OFFER}`,
         });
         return persist(
           task,
