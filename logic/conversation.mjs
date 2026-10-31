@@ -41,7 +41,7 @@ const MAX_ASKS = 3;
 
 /** What an order cannot start without, in the order the agent asks for it. */
 export const REQUIRED = [
-  ["budget_eur", "your total budget in euros"],
+  ["budget_eur", "your budget in euros — each outfit has to fit in it"],
   ["outfits", "how many outfits you would like"],
   ["theme", `the style you want: ${THEMES.join(", ")}`],
   ["season", `the season: ${SEASONS.join(", ")}`],
@@ -288,7 +288,7 @@ export function summary(draft) {
   if (draft.outfits) parts.push(`${draft.outfits} outfit${draft.outfits === 1 ? "" : "s"}`);
   if (draft.theme) parts.push(draft.theme.replace("_", " "));
   if (draft.season) parts.push(`for ${draft.season}`);
-  if (draft.budget_eur) parts.push(`budget ${draft.budget_eur} EUR`);
+  if (draft.budget_eur) parts.push(`budget ${draft.budget_eur} EUR per outfit`);
   if (draft.gender) parts.push(`${draft.gender}'s collection`);
   const sizes = [
     draft.sizes?.top && `top ${draft.sizes.top}`,
