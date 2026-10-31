@@ -51,7 +51,7 @@ Showing both paths is what the guarantee is worth. Any agent can show the happy 
 | Step 3 · candidate filter | ✅ `candidateFilter.mjs` (LLM picks filters, code applies them) |
 | Step 3a · customer profile | ✅ `logic/run-pipeline.mjs`: drops garments marked for the other gender, maps a waist size to the letter size shops use when that reaches a cheaper item |
 | Step 3b · drop sizes the customer cannot buy | ✅ `logic/buyable.mjs` |
-| Step 4 · shop trust check | ⚠️ `trustcheck.mjs` works on its own, **not yet in the pipeline** |
+| Step 4 · shop trust check | ✅ `logic/trust-shops.mjs` runs `trustcheck.mjs` on each shop behind the chosen pieces, after the stylist; **shown on the page and logged only, it decides nothing** |
 | Step 5 · stylist (LLM) | ✅ `person3/`; outfits that misuse shorts are rejected by code |
 | Step 6 · final check, five guarantees | ✅ `person3/`; live re-query per item when the refresh service runs, else the cached snapshot |
 | Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; `logic/publish.mjs` puts it on Cloudflare Pages and the Sokosumi result links it |
@@ -63,8 +63,8 @@ Showing both paths is what the guarantee is worth. Any agent can show the happy 
 | Trust check as an x402 service | ⏳ Not started |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
-`npm test` runs **360 tests: 351 pass, 7 fail, 1 skipped, 1 todo** — see
-[Tests](#tests) for what the seven are. Person 3's `pytest` passes 30, skips 1.
+`npm test` runs **382 tests: 373 pass, 7 fail, 1 skipped, 1 todo** — see [Tests](#tests)
+for what the seven are. Person 3's `pytest` passes 30, skips 1.
 
 ## How a task flows
 
@@ -86,7 +86,8 @@ logic/run-pipeline.mjs  one process per stage, output in catalog/cache/run/<task
   │  3a customer envelope        order or brief -> customer.json; drop the other gender, map sizes
   │  3b logic/buyable.mjs       keep only sizes the customer can buy
   │  5  person3 scripts.run_catalog   stylist + final check (6) -> person3/result.json
-  │  7  logic/result-page.mjs   result.json -> index.html, the page the customer reads
+  │  4  logic/trust-shops.mjs   the chosen pieces' shops -> trust.json (shown only, decides nothing)
+  │  7  logic/result-page.mjs   result.json (+ style-profile.json, trust.json) -> index.html
   ▼
 logic/publish.mjs       index.html -> Cloudflare Pages, /r/<random>, noindex
   ▼
@@ -248,6 +249,7 @@ money. The result page says nothing was charged and shows no cart.
 | `catalog/` | Person 1 | Shop seed, cached catalogue, demo order and shortlist — see [catalog/README.md](catalog/README.md) |
 | `candidateFilter.mjs` | Person 2 | Candidate filter |
 | `trustcheck.mjs` | Person 2 | Shop trust check (imprint, policies, domain, LLM verdict) |
+| `logic/trust-shops.mjs` | lead agent | Step 4 in the pipeline: checks the chosen pieces' shops, for the page and the log only |
 | `logic/buyable.mjs` | Person 2/3 | Drops unbuyable sizes before the stylist |
 | `person3/` | Person 3 | Python stylist and final check — see [person3/README.md](person3/README.md) |
 | `PERSON3_*.md` | Person 3 | Input and output contracts, global context |
@@ -433,8 +435,17 @@ Each run writes its order, intermediate files and `pipeline.log` to
 node trustcheck.mjs https://www.knowledgecottonapparel.com
 ```
 
-Results are cached for 24 hours in `trustCache/<host>.json`. This is not yet called by the
-pipeline.
+Results are cached for 24 hours in `trustCache/<host>.json`.
+
+In the pipeline, step 4 runs after the stylist on the shops behind the chosen pieces, one
+shop at a time. Each shop is checked inside its own `try`/`catch` with a 60 s limit, and
+the whole step stops starting new shops after 150 s, so it always ends inside the stage's
+three minutes. A shop that cannot be checked is "not checked". The verdicts go to the run
+log (`trust: <shop> trustworthy, 92%`) and to the result page: a note on every piece and a
+section "The shops" with the verdict, its summary and up to three red flags. **They decide
+nothing:** no piece is dropped, no outfit refused, no refund caused, and the paid flow
+never reads them. The check reads third-party pages and asks a model, so a guarantee the
+customer pays on cannot rest on it.
 
 ## The order format
 
@@ -503,18 +514,22 @@ does not name is assumed like in any other free-text order.
 npm test
 ```
 
-360 tests: 351 pass, **7 fail**, 1 skipped, 1 todo. The failures are known and named
+382 tests: 373 pass, **7 fail**, 1 skipped, 1 todo. The failures are known and named
 rather than hidden:
 
-- **Six** assert the strict free-text intake that commit `7845365` deliberately removed —
-  that a brief naming no garment is refused, that a missing size is asked about rather
-  than guessed. The code now runs such a brief and fills the size from the shortlist. The
-  team has not yet settled which behaviour it wants; until it does, the tests record the
-  disagreement.
+- **Six** — four in `intake.test.mjs`, two in `style-profile.test.mjs` — assert the strict
+  free-text intake that commit `7845365` deliberately removed: that a brief naming no
+  garment is refused, that a missing size is asked about rather than guessed. The code now
+  runs such a brief and fills the size from the shortlist. The team has not yet settled
+  which behaviour it wants; until it does, the tests record the disagreement rather than
+  being deleted.
 - **One** (`a confirmed request starts and completes the checkout`) needs a reachable
   Stripe test service and leaves the conversation in `selected` instead of `paid` without
   one. The adjacent integration test opts out explicitly via
   `AITELIER_RUN_STRIPE_INTEGRATION=1`; this one does not yet.
+
+The one `todo` (`selectFilters still selects when the model drops a field`) is a known
+gap in the filter's nullable schema, marked rather than silently passing.
 
 Person 3's Python tests:
 
@@ -548,24 +563,29 @@ cd person3 && .venv/bin/pytest -q
 - **Themes are keyword heuristics.** Only `casual`, `old_money` and `streetwear` exist;
   punk, sportswear and a fit attribute are not in the catalogue yet.
 - **Runtime.** About 110 s with the live filter, about 25 s with the demo shortlist.
-- **Trust check is not in the pipeline yet.** Shop trust is currently assumed, and
-  `catalog/trust.json` is not produced.
+- **Shop trust is shown, not guaranteed.** Step 4 informs the customer; the five
+  guarantees still assume every shop is honest. The check uses the model behind `ZAI_*`,
+  so on a free-tier key with a daily request limit (20 for Gemini's free tier) it competes
+  with the filter, the stylist and the Pinterest step, and shows "not checked" once the
+  quota is used up.
 - **Pinterest feed.** Only the newest ~25 pins of a board are in its feed, and Pinterest
   could change or end the feed. The board step adds about 15–40 s with the live model.
-- **One model quota, two steps.** The daily limit hangs on the provider's project, not the
-  key, so extra keys do not raise it. Both LLM steps fall back to deterministic logic when
-  the quota is gone.
+- **One model quota, several steps.** The daily limit hangs on the provider's project, not
+  the key, so extra keys do not raise it. Every LLM step falls back to deterministic logic
+  when the quota is gone.
 
 ## Next steps
 
-1. Put the trust check into the pipeline (cached per shop), then offer it as an x402
-   service — an assistant that belongs to one shop has no reason to vet any other shop.
-2. Turn on live re-checks in step 6 for every paid task, not only on request.
-3. Settle the free-text intake question and make the six red tests green either way.
-4. Give a per-item reason in the report, tied to the Pinterest board where there is one.
-5. Further sources the customer brings themselves: a Zalando or Instagram data export
+1. Offer the shop trust check as an x402 service — an assistant that belongs to one shop
+   has no reason to vet any other shop.
+2. Let the trust verdict do something: a flagged shop should be able to cost an outfit its
+   place, which means the guarantee has to be able to rest on it.
+3. Turn on live re-checks in step 6 for every paid task, not only on request.
+4. Settle the free-text intake question and make the red intake tests green either way.
+5. Give a per-item reason in the report, tied to the Pinterest board where there is one.
+6. Further sources the customer brings themselves: a Zalando or Instagram data export
    (GDPR), Instagram via its official login.
-6. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to
+7. Ask for the customer's frequent activities and add dedicated sets (running, hiking) to
    the wardrobe.
 
 ## Security

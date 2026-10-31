@@ -1,6 +1,6 @@
 import { pathToFileURL } from "node:url";
 import { resolve } from "node:path";
-import { generateObject } from "ai";
+import { generateObject, jsonSchema, zodSchema } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { z } from "zod";
 // import fs:
@@ -1125,11 +1125,24 @@ export async function repairJson({ text }) {
  * @param {Awaited<ReturnType<typeof collectStoreEvidence>>} evidence
  * @param {{ model?: unknown, timeoutMs?: number, maxRetries?: number }} [options]
  */
+/**
+ * The verdict schema as the model sees it, with a check that asks only for an
+ * object carrying a verdict. A strict check threw away answers that merely
+ * sent confidence as text or left out a list; normaliseVerdict cleans those.
+ * An answer without "a" or "b" still fails: it must never read as "b".
+ */
+export const lenientVerdictSchema = jsonSchema(zodSchema(trustVerdictSchema).jsonSchema, {
+  validate: (value) =>
+    value && typeof value === "object" && !Array.isArray(value) && (value.verdict === "a" || value.verdict === "b")
+      ? { success: true, value }
+      : { success: false, error: new Error('The verdict must be an object with verdict "a" or "b"') },
+});
+
 export async function classifyStore(evidence, options = {}) {
   const model = options.model ?? trustModel();
   const { object } = await generateObject({
     model,
-    schema: trustVerdictSchema,
+    schema: lenientVerdictSchema,
     schemaName: "storeTrustVerdict",
     temperature: 0,
     maxRetries: options.maxRetries ?? 1,
@@ -1143,8 +1156,9 @@ export async function classifyStore(evidence, options = {}) {
 
 function normaliseVerdict(object) {
   const verdict = object.verdict === "a" ? "a" : "b";
-  const confidence = Number.isFinite(object.confidence)
-    ? Math.min(1, Math.max(0, object.confidence))
+  const rawConfidence = Number(object.confidence);
+  const confidence = object.confidence != null && Number.isFinite(rawConfidence)
+    ? Math.min(1, Math.max(0, rawConfidence))
     : 0.5;
   const clean = (values, limit, width) =>
     (Array.isArray(values) ? values : [])
@@ -1197,8 +1211,6 @@ export async function doTrustCheck(storeUrl, options = {}) {
   }
 
   const evidence = await collectStoreEvidence(url, options);
-  console.log(evidence)
-//   return;
   const verdict = await (options.classify ?? classifyStore)(evidence, options);
   const r= {
     storeUrl: evidence.storeUrl,
