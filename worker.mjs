@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
-import { createPaidAdapter, paidMode, unpaidFailure } from "./paid-task.mjs";
+import { createPaidAdapter, paidMode, unpaidFailure, REFUND_WORD } from "./paid-task.mjs";
 import {
   taskTarget,
   isTaskForTarget,
@@ -15,7 +15,8 @@ import { reviewOrder, welcome } from "./logic/intake.mjs";
 import { logger } from "./log.mjs";
 const log = logger("worker");
 import { loadSokosumiRuntime } from "./sokosumi-runtime.mjs";
-const { readRuntimeCredential, createCoworkerHttpClient, fetchTasks } = await loadSokosumiRuntime();
+const { readRuntimeCredential, createCoworkerHttpClient, fetchTasks, fetchTaskEvents } =
+  await loadSokosumiRuntime();
 // Tasks run through the team pipeline; AITELIER_PIPELINE=false restores the plain LLM.
 const respond = process.env.AITELIER_PIPELINE === "false" ? answer : pipelineAnswer;
 const target = taskTarget();
@@ -57,6 +58,32 @@ const paid = await createPaidAdapter({
       mode: 0o600,
     }),
 });
+/**
+ * The customer's own way out of a result they did not want.
+ *
+ * Masumi has no partial refund to offer - authorize-refund takes a blockchain
+ * identifier and nothing else - so one plain word returns the whole payment.
+ * The ids handled here are kept in their own file rather than the chat's, so
+ * answering a comment and refunding for it cannot tread on each other.
+ */
+async function refundIfAsked(task, state) {
+  const seenFile = `.local/${task.id}-refund.json`;
+  const seen = existsSync(seenFile) ? JSON.parse(readFileSync(seenFile, "utf8")) : {};
+  const { events } = await fetchTaskEvents(runtime, task.id, AbortSignal.timeout(30000));
+  for (const event of events) {
+    if (event.actor?.type !== "user" || typeof event.comment !== "string") continue;
+    if (seen[event.id] || !REFUND_WORD.test(event.comment)) continue;
+    // Marked before the money moves, so a crash cannot authorize it twice.
+    seen[event.id] = "refunding";
+    writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+    const next = await paid.refund(task, state, event.comment);
+    seen[event.id] = "refunded";
+    writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+    log.info("refund asked for in a comment", { task: task.id });
+    return next;
+  }
+  return state;
+}
 // Decided once at start. A payment service that is not running used to send
 // every new Task into the paid flow, where it failed at "terms-pending" and
 // was closed: the customer got a refusal instead of their outfits.
@@ -230,7 +257,12 @@ while (true) {
         if (state.paid || (state.phase === "started" && paidFlow === "on")) {
           if (!state.paid) log.info("paid flow", { task: t.id });
           state = await paid.advance(t, state);
-          if (state.phase === "completed") await reply(t);
+          if (state.phase === "completed") {
+            // Asked before the chat answers: once the money is going back
+            // there is nothing left to discuss about buying.
+            state = await refundIfAsked(t, state);
+            if (state.phase === "completed") await reply(t);
+          }
           continue;
         }
         if (state.phase === "started") {
