@@ -45,6 +45,8 @@ Rules:
 - Honour an "Avoid" in the brief: if a theme or category is explicitly ruled out, do not select it. An overall avoid applies everywhere; a category-specific avoid removes that theme only from that category.
 - Leave themes, themesByCategory and seasons empty when the brief says nothing about that dimension — empty means "no constraint". The stock array is the exception: it must never be empty.
 - When the brief gives measurements but no size label, use the size chart to pick labels that fit. Otherwise choose the labels the brief names. Always include at least one stock size label; if any size information at all is given, expand to a larger array covering every number / size label in the range.
+- A word like "large" or "big" that describes the customer's build is not a garment size unless the brief uses it as one ("size L", "top L"). When in doubt, treat it as build and add a broad range of sizes.
+- Never require a garment letter size (XXS to XXXL) on shoes. Shoes are sized in numbers, so when the brief gives only a garment size, give the shoe slot a broad numeric range from the shoe size chart.
 - If the brief gives no size information whatsoever, still populate stock with a broad range of plausible catalogue labels, combining numeric sizes and letter sizes (e.g. ["XS", "S", "M", "L", "XL", "36", "38", "40", "42"]).
 - if any stock size label is used, everything else will be filtered out, so allays add the possible stocksizes, that the user could use
 - Set confidence low rather than guessing.`
@@ -401,13 +403,30 @@ function themesForCategory(selection, category) {
   return specific.length ? specific : selection.themes;
 }
 
+// A garment is sold in letter sizes; a shoe is not. The catalogue still has a
+// handful of mislabelled "shoes" with letter stock (a pair of gloves and a
+// t-shirt among them), which made "L" look like a shoe size.
+const LETTER_SIZE = /^(?:XXS|XS|S|M|L|XL|XXL|XXXL|XXXXL)$/;
+const GARMENT_SLOTS = new Set(["top", "bottom", "outer", "outerwear", "base", "mid"]);
+
+/**
+ * Whether a size the brief named can describe an item in this slot. A letter
+ * size only applies to garments, never to shoes.
+ *
+ * @param {string} size
+ * @param {string} slot
+ */
+function sizeFitsSlot(size, slot) {
+  return LETTER_SIZE.test(String(size).trim().toUpperCase())
+    ? GARMENT_SLOTS.has(slot)
+    : true;
+}
+
 function matches(candidate, selection, sizeOfSlot) {
+  const slot = candidate.category ?? "other";
   // With several themes selected, matching any one is the useful reading: a
   // brief asking for "old_money or casual" should not return nothing.
-  const wantedThemes = themesForCategory(
-    selection,
-    candidate.category ?? "other",
-  );
+  const wantedThemes = themesForCategory(selection, slot);
   if (wantedThemes.length) {
     const themes = Array.isArray(candidate.themes) ? candidate.themes : [];
     if (!themes.some((theme) => wantedThemes.includes(theme))) return false;
@@ -418,14 +437,18 @@ function matches(candidate, selection, sizeOfSlot) {
       return false;
   }
   if (selection.stock.length) {
+    // Only the labels that can describe this slot constrain it. A brief that
+    // names one garment size ("large") must not require shoes in size L: no
+    // shoe is sold that way, and the slot came back empty.
+    const wanted = selection.stock.filter((size) => sizeFitsSlot(size, slot));
     // A size only counts when it is a size of this item's slot: shoe size 43
     // must not match a waist-43 trouser. The slot's size list comes from the
     // catalogue, not from this item, so a sold-out size still counts as a match.
-    const sizes = selection.stock.filter(
+    const sizes = wanted.filter(
       (size) =>
         sizeOfSlot(candidate).includes(size) && size in (candidate.stock ?? {}),
     );
-    if (!sizes.length) return false;
+    if (wanted.length && !sizes.length) return false;
   }
   // The budget is a sanity bound here, not a per-item ceiling: no single
   // garment may cost more than the whole order. Dividing the budget by the

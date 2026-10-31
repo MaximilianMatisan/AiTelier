@@ -1,0 +1,4069 @@
+[
+ {
+  "id": "knowledgecotton-16312559894863",
+  "shop_id": "knowledgecotton",
+  "name": "Cashmere skirt - Light feather gray",
+  "vendor": "KnowledgeCotton Apparel - WMN",
+  "description": "This skirt combines effortless elegance with everyday comfort. Designed in a relaxed, slightly A-line fit, it drapes softly for a flattering silhouette and easy movement. The elastic waistband ensures a comfortable, flexible fit throughout the day. Its clean design makes it easy to style for both casual and more refined looks. Perfect for pairing with knits, shirts, or simple tops, it’s a versatile addition to any modern wardrobe. Style no.: 2040025 Color: Light feather gray Quality: 95% Organic Cotton / 5% Cashmere Washing instructions: Care: Handwash, Do not bleach, do not tumble dry, iron at low temperature, do not dryclean",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 50,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 0,
+   "XL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 58701357777231,
+   "S": 58701357809999,
+   "M": 58701357842767
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/cashmere-skirt-light-feather-gray",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Cashmere_skirt-Skirts-2040025-1228_Light_feather_gray-1.jpg?v=1790589065",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "cashmere-skirt-light-feather-gray",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "armedangels-16306753143109",
+  "shop_id": "armedangels",
+  "name": "Chino RS",
+  "vendor": "Reverse Supply",
+  "description": "Chino",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 58.9,
+  "stock": {
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 59930121208133
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/chino-z0fkuz9309280458",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/Z0FKUZ9309280458.jpg?v=1793099524",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "chino-z0fkuz9309280458",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "recolution-7356396568727",
+  "shop_id": "recolution",
+  "name": "MUSA",
+  "vendor": "recolution",
+  "description": "Es gibt Hosen, die trägt man. Und es gibt Hosen wie die MUSA, die begleitet dich. Ob auf dem Rad, im Office oder auf der Couch am Abend. Manche sagen, sie hätten seit Tagen nichts anderes getragen und man glaubt es sofort. Die MUSA sitzt locker, aber nie zu lässig. Sie ist bequem, ohne an Form zu verlieren. Aus feinster Bio-Baumwolle gefertigt, mit einem elastischen Bund und einer Passform, die sich wirklich nach dir richtet. Kein Rutschen. Kein Ziehen. Kein Kompromiss. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 59.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 41578395762839,
+   "XXL": 43711380848906
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-musa-dark-sand",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/206003-003_1.jpg?v=1737629016",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-musa-dark-sand",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-7365667651735",
+  "shop_id": "recolution",
+  "name": "MUSA",
+  "vendor": "recolution",
+  "description": "Es gibt Hosen, die trägt man. Und es gibt Hosen wie die MUSA, die begleitet dich. Ob auf dem Rad, im Office oder auf der Couch am Abend. Manche sagen, sie hätten seit Tagen nichts anderes getragen und man glaubt es sofort. Die MUSA sitzt locker, aber nie zu lässig. Sie ist bequem, ohne an Form zu verlieren. Aus feinster Bio-Baumwolle gefertigt, mit einem elastischen Bund und einer Passform, die sich wirklich nach dir richtet. Kein Rutschen. Kein Ziehen. Kein Kompromiss. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 59.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 41599483445399
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-musa-dark-navy",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/download_1830e8b8-ff9c-446c-a02b-56ebdb12beca.jpg?v=1790078938",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-musa-dark-navy",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9902740504842",
+  "shop_id": "recolution",
+  "name": "KALE",
+  "vendor": "recolution",
+  "description": "Wenn Jogginghose und Chino gemeinsame Sache machen, kommt die KALE dabei raus. Sie sieht nach Alltag aus, fühlt sich aber nach Wochenende an, lässig, bequem und absolut unkompliziert. Der elastische Bund mit Kordelzug sorgt für den Wohlfühlfaktor, das cleane Design für Looks, die überall funktionieren. Dank weichem Bio-Baumwoll-Mix und Regular Fit sitzt sie so entspannt, dass du gar nicht mehr drüber nachdenken musst. Einfach anziehen, losziehen und dich rundum wohlfühlen. Kein Wunder, dass sie so oft nachbestellt wird. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 59.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 50625794212106,
+   "S": 50625794244874,
+   "M": 50625794277642,
+   "L": 50625794310410,
+   "XL": 50625794343178,
+   "XXL": 50625794375946
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-kale-dark-sand",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/106045-003_1.jpg?v=1737624037",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-kale-dark-sand",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9902745551114",
+  "shop_id": "recolution",
+  "name": "TARO",
+  "vendor": "recolution",
+  "description": "Du willst eine bequeme Hose, die nicht nach Jogginghose aussieht? Dann ist die TARO dein Modell. Sie sitzt wie eine Jogginghose, sieht aber aus wie eine Chino: gerades Bein, klare Silhouette. Der elastische Bund gibt ein angenehmes Tragegefühl, der gerade Schnitt einen Look, der überall passt, auf dem Rad, im Büro oder beim Abendessen mit Freunden. Eine Hose, die jeden Tag funktioniert. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 59.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 50625819902218
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-taro-dark-sand",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/206018_003_1_42b478d7-0ea7-4e14-85e9-0a439707f7c4.jpg?v=1741936145",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-taro-dark-sand",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "knowledgecotton-16413092348239",
+  "shop_id": "knowledgecotton",
+  "name": "Chuck regular corduroy pants - Egret",
+  "vendor": "KnowledgeCotton Apparel - MEN",
+  "description": "Add timeless pieces marked by trans-seasonal features to your wardrobe. Our CHUCK corduroy chino pants are designed in a regular, straight fit. The chinos are made from organic, lightweight cotton with a touch of stretch for easy movement and a casual look. Finished with belt loops, a button closure, slanted front pockets, and discrete back pockets. Style no.: 1070077 Color: Egret Quality: 98% organic Cotton / 2% Elastane Washing instructions: Care: 40° normal wash, Do not bleach, do not tumble dry, iron at medium temperature, do not dryclean",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 59.98,
+  "stock": {
+   "26": 0,
+   "27": 0,
+   "28": 0,
+   "29": 1,
+   "30": 1,
+   "31": 1,
+   "32": 1,
+   "33": 1,
+   "34": 1,
+   "36": 1,
+   "38": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "29": 59230169825615,
+   "30": 59230169858383,
+   "31": 59230169891151,
+   "32": 59230169923919,
+   "33": 59230169956687,
+   "34": 59230169989455,
+   "36": 59230170022223,
+   "38": 59230170054991
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/chuck-regular-corduroy-pants-egret",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Chuck_regular_corduroy_pants-Pants-1070077-1387_Egret.jpg?v=1792756422",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "chuck-regular-corduroy-pants-egret",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "bravafabrics-6875737522365",
+  "shop_id": "bravafabrics",
+  "name": "Corduroy Pleated Pants Stone Green",
+  "vendor": "Brava Fabrics",
+  "description": "These soft and warm stone green high-waisted pleated corduroy pants with a straight leg cut are your wardrobe is missing this fall-winter. They feature a button and zipper closure and functional pockets. They are practical, comfy, and flattering at the same time. Ethically made from organic cotton. Available in other colors.",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 64.9,
+  "stock": {
+   "34": 0,
+   "36": 0,
+   "38": 0,
+   "40": 0,
+   "42": 1,
+   "44": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "42": 40369203675325
+  },
+  "delivery_days": 5,
+  "url": "https://bravafabrics.com/products/corduroy-pleated-pant-stone-green",
+  "image": "https://cdn.shopify.com/s/files/1/0043/0804/1831/files/1298_image_4_5_front_7088188e-ff78-4337-8cce-047838f39572.jpg?v=1763813136",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "corduroy-pleated-pant-stone-green",
+   "fetched_at": "2026-10-30T12:25:32.655Z"
+  }
+ },
+ {
+  "id": "bravafabrics-6943897190589",
+  "shop_id": "bravafabrics",
+  "name": "Corduroy Pleated Chino Pants Copper",
+  "vendor": "Brava Fabrics",
+  "description": "These soft and warm copper pleated chino corduroy pants with a straight leg cut are exactly what your wardrobe is missing this fall-winter. Featuring a button and zipper closure and functional pockets, they offer the perfect mix of practicality, comfort, and flattering style. Made ethically from organic cotton, they’re a sustainable choice that looks and feels amazing. Available in other colors, but they’re selling fast! Free exchanges if they’re not the perfect fit. Don’t wait – grab yours today and elevate your wardrobe!",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 64.9,
+  "stock": {
+   "38": 1,
+   "40": 0,
+   "42": 0,
+   "44": 0,
+   "46": 0,
+   "48": 0,
+   "50": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "38": 40597164785853
+  },
+  "delivery_days": 5,
+  "url": "https://bravafabrics.com/products/corduroy-pleated-chino-copper",
+  "image": "https://cdn.shopify.com/s/files/1/0043/0804/1831/files/1410_image_4_5_front_e12c484f-78e5-4ce7-bf4b-b77f18bb9fb6.jpg?v=1768897844",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "corduroy-pleated-chino-copper",
+   "fetched_at": "2026-10-30T12:25:32.655Z"
+  }
+ },
+ {
+  "id": "bravafabrics-7407177007293",
+  "shop_id": "bravafabrics",
+  "name": "Corduroy Pleated Pants Sailing Green",
+  "vendor": "Brava Fabrics",
+  "description": "These soft and warm emerald green high-waisted pleated corduroy pants with a straight leg cut are your wardrobe is missing this fall-winter. They feature a button and zipper closure and functional pockets. They are practical, comfy, and flattering at the same time. Ethically made from organic cotton. Available in other colors.",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 64.9,
+  "stock": {
+   "34": 1,
+   "36": 0,
+   "38": 0,
+   "40": 0,
+   "42": 0,
+   "44": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "34": 42519408410813,
+   "44": 42519408574653
+  },
+  "delivery_days": 5,
+  "url": "https://bravafabrics.com/products/corduroy-pleated-pant-sailing-green",
+  "image": "https://cdn.shopify.com/s/files/1/0043/0804/1831/files/3149_image_4_5_front_a931201b-d2f7-4892-af19-fbf3ec24dc1c.jpg?v=1732232325",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "corduroy-pleated-pant-sailing-green",
+   "fetched_at": "2026-10-30T12:25:32.655Z"
+  }
+ },
+ {
+  "id": "arteantwerp-8662953754962",
+  "shop_id": "arteantwerp",
+  "name": "Shane Knit Stripe Short - White",
+  "vendor": "Arte Antwerp",
+  "description": "The Shane Knit Stripe Short in white is a unique addition to your knit wardrobe. Made from premium cotton, this loose-knit pair of shorts is both breathable and comfortable. It features a navy striped design on the legs and comes with two side pockets as well as an adjustable drawstring waistband to ensure the desired fit. Its oversized silhouette creates a laid-back look that perfectly balances style with comfort.",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 66,
+  "stock": {
+   "3": 1,
+   "4": 1,
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "3": 47349203272018,
+   "4": 47349203304786,
+   "XS": 47349203075410,
+   "S": 47349203108178,
+   "M": 47349203140946,
+   "L": 47349203173714,
+   "XL": 47349203206482,
+   "XXL": 47349203239250
+  },
+  "delivery_days": 4,
+  "url": "https://arte-antwerp.com/products/shane-knit-stripe-short-white",
+  "image": "https://cdn.shopify.com/s/files/1/0844/1061/files/SS24-106K_White_01_2dd0e755-e32b-47f7-baf1-78616ecb4522.jpg?v=1760625501",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "shane-knit-stripe-short-white",
+   "fetched_at": "2026-10-30T12:25:26.584Z"
+  }
+ },
+ {
+  "id": "recolution-10161135485194",
+  "shop_id": "recolution",
+  "name": "STELLERA",
+  "vendor": "recolution",
+  "description": "Das Strickkleid STELLERA ist ein Winterkleid mit maritimer Note: feiner Strick aus Bio-Baumwolle, gerader Schnitt, hoher Kragen mit kurzem Reißverschluss. Der Strick hält warm, ohne aufzutragen, und fällt klar und gerade. Ein Klassiker, den man einmal anzieht und die ganze kalte Jahreszeit nicht mehr missen will. 100% Bio-Baumwolle. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Portugal.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "XS": 1,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 51538906808586
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/kleid-stellera-dark-plum",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/105021-407_1.jpg?v=1758544600",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "kleid-stellera-dark-plum",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9593966854410",
+  "shop_id": "recolution",
+  "name": "CYPERUS",
+  "vendor": "recolution",
+  "description": "Es gibt Tage, da brauchst du eine Hose, die einfach mitmacht. CYPERUS ist genau dafür gemacht. Morgens aufs Rad, kurz noch einen Kaffee holen, später im Homeoffice lümmeln und abends mit Freunden in die Bar, sie bleibt lässig, bequem und stilvoll. Der feine Bio-Cord gibt ihr Struktur, ohne steif zu wirken. Sie sitzt locker, fällt weich und trägt sich wie deine bequemste Jogginghose, sieht aber tausendmal besser aus. CYPERUS ist für alle, die Haltung zeigen wollen. Ohne auf Komfort zu verzichten. 98% Bio-Baumwolle, 2% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 49657582256394
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-cyperus-black",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/206017-101_1_a1aded8e-04d0-4895-951c-b428fc1c9425.jpg?v=1738865539",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-cyperus-black",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9593987334410",
+  "shop_id": "recolution",
+  "name": "KALE",
+  "vendor": "recolution",
+  "description": "Wenn Jogginghose und Chino gemeinsame Sache machen, kommt die KALE dabei raus. Sie sieht nach Alltag aus, fühlt sich aber nach Wochenende an, lässig, bequem und absolut unkompliziert. Der elastische Bund mit Kordelzug sorgt für den Wohlfühlfaktor, das cleane Design für Looks, die überall funktionieren. Dank weichem Bio-Baumwoll-Mix und Regular Fit sitzt sie so entspannt, dass du gar nicht mehr drüber nachdenken musst. Einfach anziehen, losziehen und dich rundum wohlfühlen. Kein Wunder, dass sie so oft nachbestellt wird. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 49657712083210,
+   "S": 49657712115978,
+   "M": 49657712148746,
+   "L": 49657712181514
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-kale-larch-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/60243-f0f4818546067.jpg?v=1721803172",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-kale-larch-brown",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9593989529866",
+  "shop_id": "recolution",
+  "name": "CHAITURUS",
+  "vendor": "recolution",
+  "description": "Die CHAITURUS ist im Grunde das gemütlichste Undercover-Talent in deinem Kleiderschrank: Sieht aus wie eine Chino, fühlt sich an wie dein Lieblings-Sonntag, so bequem, dass du sie am liebsten nie wieder ausziehen willst. Der feine Cord liegt angenehm auf der Haut und der elastische Bund macht jede Bewegung mit. Vom ersten Kaffee bis zum Abendessen: CHAITURUS begleitet dich durch den Tag, ohne Kompromisse. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 49657726599434
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-chaiturus-hazel-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/106035-914_1_c173e51c-e0c8-4d98-aaf1-471442fa7442.jpg?v=1730212639",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-chaiturus-hazel-brown",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9902745911562",
+  "shop_id": "recolution",
+  "name": "CATMINT",
+  "vendor": "recolution",
+  "description": "Die Chino CATMINT kombiniert klassischen Stil mit lässigem Look und einem modernen, lässigen Schnitt. Ihr Loose Fit sorgt für eine bewusst baggy geschnittene Silhouette, die maximalen Komfort bietet. Hergestellt aus einem Bio-Baumwoll-Mix mit leichtem Stretchanteil, fühlt sie sich angenehm weich an und bietet optimale Bewegungsfreiheit. Der elastische Bund hinten sowie der Verschluss mit Steinnussknopf und Reißverschluss garantieren eine perfekte Passform. Praktische Eingriffstaschen vorne und Paspeltaschen hinten runden das durchdachte Design ab – ideal für entspannte, aber stilvolle Looks. Hinweis: Die Hose fällt größer aus, daher empfehlen wir, eine Nummer kleiner zu wählen. Übrigens: Dieser Artikel ist bereits vorgewaschen – er läuft beim Waschen nicht mehr ein und bleibt in Form. 96% Bio-Baumwolle, 4% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in der Türkei.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 1,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 50625822753034,
+   "XL": 50625822785802
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/chino-catmint-black",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/206026-101_5.jpg?v=1741936240",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "chino-catmint-black",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9902745977098",
+  "shop_id": "recolution",
+  "name": "CATMINT",
+  "vendor": "recolution",
+  "description": "Die Chino CATMINT kombiniert klassischen Stil mit lässigem Look und einem modernen, lässigen Schnitt. Ihr Loose Fit sorgt für eine bewusst baggy geschnittene Silhouette, die maximalen Komfort bietet. Hergestellt aus einem Bio-Baumwoll-Mix mit leichtem Stretchanteil, fühlt sie sich angenehm weich an und bietet optimale Bewegungsfreiheit. Der elastische Bund hinten sowie der Verschluss mit Steinnussknopf und Reißverschluss garantieren eine perfekte Passform. Praktische Eingriffstaschen vorne und Paspeltaschen hinten runden das durchdachte Design ab – ideal für entspannte, aber stilvolle Looks. Hinweis: Die Hose fällt größer aus, daher empfehlen wir, eine Nummer kleiner zu wählen. Übrigens: Dieser Artikel ist bereits vorgewaschen – er läuft beim Waschen nicht mehr ein und bleibt in Form. 96% Bio-Baumwolle, 4% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in der Türkei.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 1,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 50625823408394,
+   "XL": 50625823441162
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/chino-catmint-eukalyptus",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/206026-314_1.jpg?v=1738929705",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "chino-catmint-eukalyptus",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "silbon-15824022274425",
+  "shop_id": "silbon",
+  "name": "Pantalon sport chino pana piedra",
+  "vendor": "Silbon",
+  "description": "Pantalón sport chino de pana, confeccionado en 100% algodón. Presenta cintura con trabillas, cierre frontal de botón y bolsillos laterales. Su diseño limpio y versátil es ideal para combinar con camisas, polos o prendas de punto en looks casuales y smart casual de otoño-invierno.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "36": 1,
+   "38": 1,
+   "40": 1,
+   "42": 1,
+   "44": 1,
+   "46": 1,
+   "48": 1,
+   "50": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 64718482375033,
+   "38": 64718482407801,
+   "40": 64718482440569,
+   "42": 64718482473337,
+   "44": 64718482506105,
+   "46": 64718482538873,
+   "48": 64718482571641,
+   "50": 64718482604409
+  },
+  "delivery_days": 5,
+  "url": "https://silbonshop.com/products/pantalon-sport-chino-pana-piedra-2",
+  "image": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/FW261020907046_1.jpg?v=1793118285",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "pantalon-sport-chino-pana-piedra-2",
+   "fetched_at": "2026-10-30T12:25:33.583Z"
+  }
+ },
+ {
+  "id": "silbon-15824022307193",
+  "shop_id": "silbon",
+  "name": "Pantalon sport chino pana gris marengo",
+  "vendor": "Silbon",
+  "description": "Pantalón sport chino de pana, confeccionado en 100% algodón. Presenta cintura con trabillas, cierre frontal de botón y bolsillos laterales. Su diseño limpio y versátil es ideal para combinar con camisas, polos o prendas de punto en looks casuales y smart casual de otoño-invierno.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 69.9,
+  "stock": {
+   "36": 1,
+   "38": 1,
+   "40": 1,
+   "42": 1,
+   "44": 1,
+   "46": 1,
+   "48": 1,
+   "50": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 64718482669945,
+   "38": 64718482702713,
+   "40": 64718482735481,
+   "42": 64718482768249,
+   "44": 64718482801017,
+   "46": 64718482833785,
+   "48": 64718482866553,
+   "50": 64718482899321
+  },
+  "delivery_days": 5,
+  "url": "https://silbonshop.com/products/pantalon-sport-chino-pana-gris-marengo",
+  "image": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/FW261020911047_10.jpg?v=1792408849",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "pantalon-sport-chino-pana-gris-marengo",
+   "fetched_at": "2026-10-30T12:25:33.583Z"
+  }
+ },
+ {
+  "id": "recolution-8092084371722",
+  "shop_id": "recolution",
+  "name": "CHAITURUS",
+  "vendor": "recolution",
+  "description": "Die CHAITURUS ist im Grunde das gemütlichste Undercover-Talent in deinem Kleiderschrank: Sieht aus wie eine Chino, fühlt sich an wie dein Lieblings-Sonntag, so bequem, dass du sie am liebsten nie wieder ausziehen willst. Der feine Cord liegt angenehm auf der Haut und der elastische Bund macht jede Bewegung mit. Vom ersten Kaffee bis zum Abendessen: CHAITURUS begleitet dich durch den Tag, ohne Kompromisse. 97% Bio-Baumwolle, 3% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 79.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 44075391123722,
+   "S": 44075391156490,
+   "XL": 44075391254794
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-chaiturus-dark-arctic-blue",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/57045-919a256569666.jpg?v=1689170345",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-chaiturus-dark-arctic-blue",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9593968230666",
+  "shop_id": "recolution",
+  "name": "CHAITURUS",
+  "vendor": "recolution",
+  "description": "Die CHAITURUS ist im Grunde das gemütlichste Undercover-Talent in deinem Kleiderschrank: Sieht aus wie eine Chino, fühlt sich an wie dein Lieblings-Sonntag, so bequem, dass du sie am liebsten nie wieder ausziehen willst. Der feine Cord liegt angenehm auf der Haut und der elastische Bund macht jede Bewegung mit. Vom ersten Kaffee bis zum Abendessen: CHAITURUS begleitet dich durch den Tag, ohne Kompromisse. 98% Bio-Baumwolle, 2% Elasthan. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Indien.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 79.9,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 1,
+   "L": 1,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 49657589301514,
+   "L": 49657589334282
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/jogg-chino-chaiturus-black",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/106035-101_2_5f3e6abb-b146-4d75-8046-26a8e4fcd72f.jpg?v=1730212581",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jogg-chino-chaiturus-black",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "organicbasics-15887358493004",
+  "shop_id": "organicbasics",
+  "name": "Soft Knit Barrel Leg Pants",
+  "vendor": "Organic Basics",
+  "description": "Sweater weather, all the way down. These soft knit pants have a relaxed barrel-leg shape and adjustable drawstring waist for an easy, head-to-toe cozy look.",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 86,
+  "stock": {
+   "XXS": 1,
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1,
+   "XXXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XXS": 58030800568652,
+   "XS": 58030800601420,
+   "S": 58030800634188,
+   "M": 58030800666956,
+   "L": 58030800699724,
+   "XL": 58030800732492,
+   "XXL": 58030800765260,
+   "XXXL": 58030800798028
+  },
+  "delivery_days": 3,
+  "url": "https://organicbasics.com/products/womens-soft-knit-barrel-leg-pants-black",
+  "image": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_organic_basics-women-organic_cotton-soft_knit-barrel_leg_pants-black-studio-1.jpg?v=1787210961",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "womens-soft-knit-barrel-leg-pants-black",
+   "fetched_at": "2026-10-30T12:25:25.457Z"
+  }
+ },
+ {
+  "id": "organicbasics-15887358525772",
+  "shop_id": "organicbasics",
+  "name": "Soft Knit Barrel Leg Pants",
+  "vendor": "Organic Basics",
+  "description": "Sweater weather, all the way down. These soft knit pants have a relaxed barrel-leg shape and adjustable drawstring waist for an easy, head-to-toe cozy look.",
+  "category": "bottom",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 86,
+  "stock": {
+   "XXS": 1,
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1,
+   "XXXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XXS": 58030800830796,
+   "XS": 58030800863564,
+   "S": 58030800896332,
+   "M": 58030800929100,
+   "L": 58030800961868,
+   "XL": 58030800994636,
+   "XXL": 58030801027404,
+   "XXXL": 58030801060172
+  },
+  "delivery_days": 3,
+  "url": "https://organicbasics.com/products/womens-soft-knit-barrel-leg-pants-northern-lights",
+  "image": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_organic_basics-women-organic_cotton-soft_knit-barrel_leg_pants-northern_lights-studio-1.jpg?v=1787210972",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "womens-soft-knit-barrel-leg-pants-northern-lights",
+   "fetched_at": "2026-10-30T12:25:25.457Z"
+  }
+ },
+ {
+  "id": "scalpers-10857488023879",
+  "shop_id": "scalpers",
+  "name": "PANTALÓN CHINO PANA",
+  "vendor": "scalperscompany",
+  "description": "Pantalón chino confeccionado en tejido de pana. Relaxed fit. Cintura con trabillas y cierre por cremallera y botón. Pinzas frontales y bolsillos laterales.",
+  "category": "bottom",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 89.99,
+  "stock": {
+   "38": 1,
+   "40": 1,
+   "42": 1,
+   "44": 1,
+   "46": 1,
+   "48": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "38": 54160597877063,
+   "40": 54160597909831,
+   "42": 54160597942599,
+   "44": 54160597975367,
+   "46": 54160598008135,
+   "48": 54160598040903
+  },
+  "delivery_days": 5,
+  "url": "https://scalperscompany.com/products/69239-scgenova-cord-pants-aw2627-cream",
+  "image": "https://cdn.shopify.com/s/files/1/0015/0942/5197/files/69239-CREAM-S-1.jpg?v=1792147801",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "69239-scgenova-cord-pants-aw2627-cream",
+   "fetched_at": "2026-10-30T12:25:33.612Z"
+  }
+ },
+ {
+  "id": "jlindeberg-15729692770630",
+  "shop_id": "jlindeberg",
+  "name": "Brooke Pleated Skirt / White",
+  "vendor": "WH2026, G",
+  "description": "The Brooke Pleated Skirt is a lightweight golf skirt designed around movement, coverage, and a clean pleated silhouette. Fine micro pleats create fluid motion through every step and swing, while attached inner shorts provide secure coverage without changing the outer line. An elastic waistband with J.Lindeberg branding keeps the fit comfortable, and a D-ring adds a practical sport detail. A welt pocket with a zipper on the back keeps small essentials secure. Moisture-wicking, fast-drying performance helps manage comfort as temperatures rise, balancing athletic function with a refined, feminine shape.",
+  "category": "bottom",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 90,
+  "stock": {
+   "L": 1,
+   "M": 1,
+   "S": 1,
+   "XL": 1,
+   "XS": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 57371454865734,
+   "M": 57371454898502,
+   "S": 57371454931270,
+   "XL": 57371454964038,
+   "XS": 57371454996806
+  },
+  "delivery_days": 5,
+  "url": "https://www.jlindeberg.com/products/brooke-pleated-skirt-white",
+  "image": "https://cdn.shopify.com/s/files/1/0674/3336/5782/files/c02cbaa8e654ae5b908ee612a553800a_001.jpg?v=1789977047",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "brooke-pleated-skirt-white",
+   "fetched_at": "2026-10-30T12:25:37.518Z"
+  }
+ },
+ {
+  "id": "soulland-15218050629980",
+  "shop_id": "soulland",
+  "name": "Reseller Melange Blazer - L",
+  "vendor": "Soulland",
+  "description": null,
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 68,
+  "stock": {
+   "L": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 55516219867484
+  },
+  "delivery_days": 4,
+  "url": "https://soulland.com/products/reseller-melange-blazer-l",
+  "image": "https://cdn.shopify.com/s/files/1/0104/8852/files/832a24e3-e33d-4a89-9c64-392e80fdcbcc_59eac03f-0ddf-4284-9293-89991206c120.png?v=1790471909",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "reseller-melange-blazer-l",
+   "fetched_at": "2026-10-30T12:25:25.326Z"
+  }
+ },
+ {
+  "id": "armedangels-16306928386373",
+  "shop_id": "armedangels",
+  "name": "Blazer RS",
+  "vendor": "Reverse Supply",
+  "description": "Blazer",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 80.9,
+  "stock": {
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 59931239416133
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/blazer-ctcmnj9610070612",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/CTCMNJ9610070612.jpg?v=1793103245",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "blazer-ctcmnj9610070612",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "armedangels-16306787451205",
+  "shop_id": "armedangels",
+  "name": "Blazer RS",
+  "vendor": "Reverse Supply",
+  "description": "Blazer",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 98.9,
+  "stock": {
+   "XS": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 59930255524165
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/blazer-ddkxn1j509300739",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/DDKXN1J509300739.jpg?v=1793100359",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "blazer-ddkxn1j509300739",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "armedangels-16306787516741",
+  "shop_id": "armedangels",
+  "name": "Blazer RS",
+  "vendor": "Reverse Supply",
+  "description": "Blazer",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 98.9,
+  "stock": {
+   "XS": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 59930255589701
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/blazer-ddkxn1j509300739-1",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/DDKXN1J509300739_558eb31a-f7f4-49f1-bbee-817d731d409d.jpg?v=1793100359",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "blazer-ddkxn1j509300739-1",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "recolution-10161134895370",
+  "shop_id": "recolution",
+  "name": "MORINGA",
+  "vendor": "recolution",
+  "description": "Der Cardigan MORINGA überzeugt durch zeitlose Eleganz und einen entspannten Look. Hergestellt aus 100% Bio-Baumwolle, bietet er dank der feinen Rib-Struktur eine weiche Haptik und hochwertige Verarbeitung. Der Regular Fit sorgt für eine vielseitige und bequeme Passform. Dieser Strickcardigan ist der perfekte Begleiter für jeden Anlass, stilvoll und angenehm zu tragen. 100% Bio-Baumwolle. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Portugal.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 99.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 51538902679818,
+   "S": 51538902712586,
+   "M": 51538902745354,
+   "L": 51538902778122,
+   "XL": 51538902810890,
+   "XXL": 51538902843658
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/cardigan-moringa-black",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/103048-101_2_ac7e059a-8611-49e5-84c6-f60950add939.jpg?v=1787336950",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "cardigan-moringa-black",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "armedangels-16286591680837",
+  "shop_id": "armedangels",
+  "name": "Blazer RS",
+  "vendor": "Reverse Supply",
+  "description": "Blazer",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 104.9,
+  "stock": {
+   "L": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 59839607767365
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/blazer-qpq7so5v04150444",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/QPQ7SO5V04150444.jpg?v=1792590460",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "blazer-qpq7so5v04150444",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "soulland-15456559956316",
+  "shop_id": "soulland",
+  "name": "Reseller Gabe blazer - M",
+  "vendor": "SOULLAND",
+  "description": "Gabe is a loose fit blazer with big side patch pockets, and one patch chest pocket on left side in crinkle nylon twill. Made in 100% polyamide (recycled) 122 g/m2 Fabric originates from Shengze Town, China, Recyctex Made in Suzhou, China Woven label in OekoTex certified polyester. Hangtags made of FSC certified paper and recycled plastic.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 110,
+  "stock": {
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 56839841612124
+  },
+  "delivery_days": 4,
+  "url": "https://soulland.com/products/reseller-gabe-blazer-m-1",
+  "image": "https://cdn.shopify.com/s/files/1/0104/8852/files/0f39857a-270b-4a7d-93f7-c35894bcc43b_60be971a-d1f3-4847-88af-1a5ae3e186ca.png?v=1790478989",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "reseller-gabe-blazer-m-1",
+   "fetched_at": "2026-10-30T12:25:25.326Z"
+  }
+ },
+ {
+  "id": "asphaltgold-11074334687499",
+  "shop_id": "asphaltgold",
+  "name": "Nike\tTech Loose Dri-FIT Shori Knit Full-Zip All-Over-Print Jacket",
+  "vendor": "Nike",
+  "description": "Gesticktes Nike-Logo auf der linken Brust Kapuze Raglanärmel Durchgehender Zwei-Wege-Frontreißverschluss Chevron-Designlinie auf der Brust Seitliche Reißverschlusstaschen Aufhängeschlaufe Elastisch eingefasste Ärmelbündchen Elastisch eingefasster Saum Reflektierendes Allover-Gittermuster Mittelschweres Strickmaterial Feuchtigkeitsableitende Dri-FIT-Technologie 44 % Polyester, 43 % Baumwolle, 13 % Elastan",
+  "category": "outer",
+  "gender": "unisex",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 119,
+  "stock": {
+   "XXL": 1,
+   "XL": 1,
+   "L": 1,
+   "M": 1,
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XXL": 53468947579147,
+   "XL": 53468947644683,
+   "L": 53468947677451,
+   "M": 53468947710219,
+   "S": 53468947742987
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/niketech-loose-drifit-shori-knit-fullzip-alloverprint-jacket-sequoia-cargo-khaki-black",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/0ie59bvxnlht-IV6599-355_Nike_Tech-Loose-Dri-FIT-Shori-Knit-Full-Zip-All-Over-Print-Jacket-Sequoia-Cargo-Khaki-Black_os-1.jpg?v=1792769513",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "niketech-loose-drifit-shori-knit-fullzip-alloverprint-jacket-sequoia-cargo-khaki-black",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "overkill-16141890486652",
+  "shop_id": "overkill",
+  "name": "Distressed Knit Hooded Jacket",
+  "vendor": "Alpha Industries",
+  "description": "The Alpha Industries Distressed Knit Hooded Jacket in Silver combines a distinctive worn-in look with a relaxed, modern interpretation of knitwear. Its cool silver-grey tone is broken up by lighter and darker yarn nuances, creating a mottled, subtly washed appearance that emphasizes the characteristic distressed aesthetic. Open-knit sections, intentionally irregular stitches and frayed details give the jacket a raw, individual texture. The hood adds a functional element while reinforcing the easygoing silhouette. A full-length front zipper allows the Alpha Industries knit jacket to be worn open or closed, while ribbed cuffs and hem create a defined finish. The relaxed shape is ideal for effortless layering with a T-shirt, long-sleeve top or lightweight sweatshirt. Combined with denim, cargo pants or clean basics, the structured surface stands out particularly well and adds extra depth to the outfit. The blend of silver-grey coloring, striking texture and deliberately aged appearance creates a versatile piece for contemporary casual looks. Subtle Alpha Industries details complete the Distressed Knit Hooded Jacket with an authentic branded accent without overpowering the rugged character of the design. • Color: Silver – cool silver-grey with a mottled, subtly washed appearance • Distressed knit with open stitches and frayed details • Hood and full-length front zipper • Ribbed cuffs and hem • Article number: 268404-31",
+  "category": "outer",
+  "gender": "men",
+  "themes": [
+   "old_money",
+   "streetwear"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 119,
+  "stock": {
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 57525311439228,
+   "M": 57525311471996,
+   "L": 57525311504764,
+   "XL": 57525311537532
+  },
+  "delivery_days": 3,
+  "url": "https://www.overkillshop.com/products/alpha-industries-distressed-knit-hooded-jacket-268404-31-silver",
+  "image": "https://cdn.shopify.com/s/files/1/0631/5514/2847/files/268404-31-SILVER_1.jpg?v=1791200625",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "alpha-industries-distressed-knit-hooded-jacket-268404-31-silver",
+   "fetched_at": "2026-10-30T12:25:26.614Z"
+  }
+ },
+ {
+  "id": "scalpers-10796733530439",
+  "shop_id": "scalpers",
+  "name": "ARTLOVE | BLAZER EVERA",
+  "vendor": "ARTLOVE",
+  "description": "Blazer Artlove confeccionada en 58% poliéster, 24% viscosa y 18% acrílico. Presenta diseño estampado a cuadros, cuello de traje, bolsillos con solapas y cierre con botones.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 119,
+  "stock": {
+   "36": 1,
+   "38": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 53914167607623,
+   "38": 53914167640391
+  },
+  "delivery_days": 5,
+  "url": "https://scalperscompany.com/products/74530-veste-evera-aw2627-ib-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0015/0942/5197/files/74530-BROWN-S-1.jpg?v=1793196065",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "74530-veste-evera-aw2627-ib-brown",
+   "fetched_at": "2026-10-30T12:25:33.612Z"
+  }
+ },
+ {
+  "id": "scalpers-10857542975815",
+  "shop_id": "scalpers",
+  "name": "BLAZER CRUZADA CUADROS",
+  "vendor": "scalperscompany",
+  "description": "Blazer confeccionada en tejido ligeramente elástico de cuadros con lúrex. Cuello con botón cruzado y manga larga. Bolsillo en el pecho. Forro interior. *Prenda perteneciente a un conjunto.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 139,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 54160891806023,
+   "S": 54160891838791,
+   "M": 54160891871559,
+   "L": 54160891904327,
+   "XL": 54160891937095
+  },
+  "delivery_days": 5,
+  "url": "https://scalperscompany.com/products/72985-scnew-knitty-blazer-aw2627-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0015/0942/5197/files/72985-BROWN-P-2.jpg?v=1793263233",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "72985-scnew-knitty-blazer-aw2627-brown",
+   "fetched_at": "2026-10-30T12:25:33.612Z"
+  }
+ },
+ {
+  "id": "komodo-15834611220858",
+  "shop_id": "komodo",
+  "name": "EMU Hooded Wool Jacket - Khaki",
+  "vendor": "KOMODO",
+  "description": "EMU Hooded Wool Jacket - Khaki EMU JACKET - Khaki 100% Lambswool / Lining 100% Organic Cotton 30º Eco Machine Wash The EMU Jacket ensures ultimate warmth, breathability and durability, perfect for both brisk autumn evenings and chilly winter days. it is very soft and keeps you warm in the coldest of weathers. Sizing: Model wears MEDIUM Model’s height 180cm / 5’11”",
+  "category": "outer",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 140,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 1,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 56681884746106
+  },
+  "delivery_days": 7,
+  "url": "https://komodo.co.uk/products/emu-hooded-wool-jacket-khaki",
+  "image": "https://cdn.shopify.com/s/files/1/0863/4804/files/K2-LW-50-EMU-JACKET-KHAKI.jpg?v=1773405847",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "emu-hooded-wool-jacket-khaki",
+   "fetched_at": "2026-10-30T12:25:38.418Z"
+  }
+ },
+ {
+  "id": "stanray-15116413501819",
+  "shop_id": "stanray",
+  "name": "Coverall Jacket (Navy Wool)",
+  "vendor": "Stan Ray",
+  "description": "Utility jacket made from 100% heavy weight cotton, featuring a relaxed fit, two oversized deep front pockets and two chest pockets. • 100% heavyweight cotton • Triple Chain Stitched Flat-felled Seams • Bartacked Stress Points • 2 deep front bellow pockets • Oversized relaxed fit • Classic Stan Ray ‘Donut’ button fastening",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 141.95,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 1,
+   "L": 0,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 55528075592059
+  },
+  "delivery_days": 3,
+  "url": "https://stanray.eu/products/coverall-jacket-navy-wool-aw25",
+  "image": "https://cdn.shopify.com/s/files/1/2425/1015/files/COVERALLJACKET_NAVYWOOLMIX-1_1.jpg?v=1754302240",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "coverall-jacket-navy-wool-aw25",
+   "fetched_at": "2026-10-30T12:26:23.142Z"
+  }
+ },
+ {
+  "id": "silbon-15795818627449",
+  "shop_id": "silbon",
+  "name": "Abrigo paño corto camel",
+  "vendor": "Silbon",
+  "description": "Abrigo corto en color camel con cuello alto, cierre frontal de botones y amplios bolsillos de parche. Presenta mangas largas con trabillas ajustables en los puños y una silueta limpia y versátil, ideal para completar looks de mujer de entretiempo y otoño-invierno con un estilo elegante y contemporáneo.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 149.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 64590628585849,
+   "S": 64590628520313,
+   "M": 64590628487545,
+   "L": 64590628454777,
+   "XL": 64590628553081,
+   "XXL": 64590628618617
+  },
+  "delivery_days": 5,
+  "url": "https://silbonshop.com/products/abrigo-pano-corto-camel",
+  "image": "https://cdn.shopify.com/s/files/1/0794/1311/7206/files/FW262050107410_3.jpg?v=1790078233",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "abrigo-pano-corto-camel",
+   "fetched_at": "2026-10-30T12:25:33.583Z"
+  }
+ },
+ {
+  "id": "arteantwerp-8909061751122",
+  "shop_id": "arteantwerp",
+  "name": "Camo Trenchcoat - Camo",
+  "vendor": "Arte Antwerp",
+  "description": "The Camo Trenchcoat features a bold camo all-over print. Made from premium nylon, it has a concealed button closure and is equipped with two front pockets and a chest pocket. Finished with a navy branded label on the back below the collar.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 150,
+  "stock": {
+   "3": 1,
+   "4": 1,
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "3": 48156451176786,
+   "4": 48156451242322,
+   "XS": 48156450750802,
+   "S": 48156450816338,
+   "M": 48156450849106,
+   "L": 48156450914642,
+   "XL": 48156451012946,
+   "XXL": 48156451078482
+  },
+  "delivery_days": 4,
+  "url": "https://arte-antwerp.com/products/camo-trenchcoat-camo",
+  "image": "https://cdn.shopify.com/s/files/1/0844/1061/files/squrecamo.jpg?v=1724250223",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "camo-trenchcoat-camo",
+   "fetched_at": "2026-10-30T12:25:26.584Z"
+  }
+ },
+ {
+  "id": "soulland-15217957110108",
+  "shop_id": "soulland",
+  "name": "Reseller Penelope blazer - M",
+  "vendor": "Soulland",
+  "description": "Penelope is an oversized fit, three button, fully lined blazer. Welted flap pockets and welted chest pocket. Light shoulder pads. 53% polyester (recycled), 43% wool (rws), 4% elastane Fabric originates from Bulgaria Made in Turkey Woven label in OekoTex certified polyester. Hangtags made of FSC certified paper and recycled plastic. Idi is 176 cm and is wearing women’s size S. Mikkel is 188 cm and is wearing men’s size M.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 150,
+  "stock": {
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 55515633451356
+  },
+  "delivery_days": 4,
+  "url": "https://soulland.com/products/reseller-penelope-blazer-m",
+  "image": "https://cdn.shopify.com/s/files/1/0104/8852/files/stockitem-461-1681486519785.jpg?v=1790476431",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "reseller-penelope-blazer-m",
+   "fetched_at": "2026-10-30T12:25:25.326Z"
+  }
+ },
+ {
+  "id": "arteantwerp-9796730126674",
+  "shop_id": "arteantwerp",
+  "name": "Wool Jacket - Black",
+  "vendor": "Arte Antwerp",
+  "description": "This refined jacket is designed as an ideal layering piece for the transitional months. Crafted from premium boiled wool, the black jacket has a boxy fit. It's designed with discreet side pockets, two front chest pockets and colour-matched buttons, finished with the Arte logo embroidered in 3D under the collar at the back.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 156,
+  "stock": {
+   "3": 0,
+   "4": 1,
+   "XS": 1,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "4": 49838948024658,
+   "XS": 49838947795282
+  },
+  "delivery_days": 4,
+  "url": "https://arte-antwerp.com/products/wool-jacket-black",
+  "image": "https://cdn.shopify.com/s/files/1/0844/1061/files/SS25-072J_Black_1.jpg?v=1740654923",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "wool-jacket-black",
+   "fetched_at": "2026-10-30T12:25:26.584Z"
+  }
+ },
+ {
+  "id": "scalpers-11332261708103",
+  "shop_id": "scalpers",
+  "name": "BLAZER CRUZADA SOLAPAS",
+  "vendor": "scalperscompany",
+  "description": "Blazer confeccionada en tejido fluido. Regular fit. Cuello con solapas y cierre cruzado con botones en la parte delantera, manga larga. Detalle solapas.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 159,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 55422866063687,
+   "S": 55422866096455,
+   "M": 55422866129223,
+   "L": 55422866161991,
+   "XL": 55422866194759
+  },
+  "delivery_days": 5,
+  "url": "https://scalperscompany.com/products/c1-72141-scbianca-blazer-aw2627-terracotta",
+  "image": "https://cdn.shopify.com/s/files/1/0015/0942/5197/files/72141-TERRACOTTA-P-3.jpg?v=1790757201",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "c1-72141-scbianca-blazer-aw2627-terracotta",
+   "fetched_at": "2026-10-30T12:25:33.612Z"
+  }
+ },
+ {
+  "id": "knowledgecotton-16236912279887",
+  "shop_id": "knowledgecotton",
+  "name": "Corduroy blazer - Forest Night",
+  "vendor": "KnowledgeCotton Apparel - MEN",
+  "description": "This blazer combines classic tailoring with the soft comfort of organic cotton corduroy. Designed in a relaxed fit, it offers a laid-back yet polished silhouette, ideal for both smart and casual occasions. Featuring a traditional notch lapel, three-button closure, and three front patch pockets, it delivers a timeless look with practical details. The rich texture adds visual interest, making it a versatile layering piece for cooler days or refined indoor styling. Style no.: 1190086 Color: Forest Night Quality: 100% Organic Cotton Washing instructions: Care: 30° normal wash, Do not bleach, do not tumble dry, iron at low temperature, do not dryclean",
+  "category": "outer",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 160,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 0,
+   "XXL": 1,
+   "XXXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XXL": 58282723574095
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/corduroy-blazer-forest-night",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Corduroy_blazer-Overshirts-1190086-1090_Forest_Night-1.jpg?v=1790589584",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "corduroy-blazer-forest-night",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "knowledgecotton-16271020589391",
+  "shop_id": "knowledgecotton",
+  "name": "Corduroy blazer - Lion",
+  "vendor": "KnowledgeCotton Apparel - MEN",
+  "description": "This blazer combines classic tailoring with the soft comfort of organic cotton corduroy. Designed in a relaxed fit, it offers a laid-back yet polished silhouette, ideal for both smart and casual occasions. Featuring a traditional notch lapel, three-button closure, and three front patch pockets, it delivers a timeless look with practical details. The rich texture adds visual interest, making it a versatile layering piece for cooler days or refined indoor styling. Style no.: 1190086 Color: Lion Quality: 100% Organic Cotton Washing instructions: Care: 30° normal wash, Do not bleach, do not tumble dry, iron at low temperature, do not dryclean",
+  "category": "outer",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 160,
+  "stock": {
+   "XS": 0,
+   "S": 1,
+   "M": 0,
+   "L": 0,
+   "XL": 0,
+   "XXL": 0,
+   "XXXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 58460650864975
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/corduroy-blazer-lion",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Corduroy_blazer-Overshirts-1190086-1499_Lion-1.jpg?v=1790589655",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "corduroy-blazer-lion",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "scalpers-10857528557895",
+  "shop_id": "scalpers",
+  "name": "BLAZER DETALLES TERCIOPELO",
+  "vendor": "scalperscompany",
+  "description": "Blazer confeccionada en tejido con lana a cuadros. Cuello con solapa combinada con terciopelo y manga larga. Cierre por botón. Bolsillos laterales de vivo en terciopelo. Abertura trasera en el bajo.",
+  "category": "outer",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 169,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 54160825614663,
+   "S": 54160825647431,
+   "M": 54160825680199,
+   "L": 54160825712967,
+   "XL": 54160825745735
+  },
+  "delivery_days": 5,
+  "url": "https://scalperscompany.com/products/72298-scnewprince-blazer-aw2627-bluecheck",
+  "image": "https://cdn.shopify.com/s/files/1/0015/0942/5197/files/72298-BLUECHECK-P-1.jpg?v=1793188408",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "72298-scnewprince-blazer-aw2627-bluecheck",
+   "fetched_at": "2026-10-30T12:25:33.612Z"
+  }
+ },
+ {
+  "id": "arteantwerp-8908980781394",
+  "shop_id": "arteantwerp",
+  "name": "Wool Hooded Jacket - Navy",
+  "vendor": "Arte Antwerp",
+  "description": "The Wool Hooded jacket has a relaxed fit and is crafted from boiled wool. The jacket features two front pockets, a zip closure and premium lining for a comfortable wear. Finished with a tonal embroidery on the left chest.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 174,
+  "stock": {
+   "3": 1,
+   "4": 1,
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 0,
+   "XL": 0,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "3": 48155253702994,
+   "4": 48155253768530,
+   "XS": 48155253309778,
+   "S": 48155253375314,
+   "M": 48155253440850,
+   "XXL": 48155253670226
+  },
+  "delivery_days": 4,
+  "url": "https://arte-antwerp.com/products/wool-hooded-jacket-navy",
+  "image": "https://cdn.shopify.com/s/files/1/0844/1061/files/AW24-020J_Navy_1.jpg?v=1724232544",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "wool-hooded-jacket-navy",
+   "fetched_at": "2026-10-30T12:25:26.584Z"
+  }
+ },
+ {
+  "id": "asphaltgold-11067321549067",
+  "shop_id": "asphaltgold",
+  "name": "Adidas\tx Song for the Mute ADI008 Knit Jacket",
+  "vendor": "Adidas",
+  "description": "Exklusive Song for the Mute x adidas Originals Kollaboration Runder Logo-Patch, Song for the Mute Schriftzug und 3-Streifen an den Ärmeln Zwei-Wege-Reißverschluss Gerippter Stehkragen und Reißverschlusstaschen Strukturiertes Strick-Mischgewebe 59 % Polyacryl, 30 % Polyamid, 8 % Wolle, 3 % Elastan",
+  "category": "outer",
+  "gender": "unisex",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 179,
+  "stock": {
+   "L": 1,
+   "XL": 1,
+   "M": 1,
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 53443976167691,
+   "XL": 53443976233227,
+   "M": 53443976265995,
+   "S": 53443976298763
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidasx-song-for-the-mute-adi008-knit-jacket-preloved-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/LD1913-Adidas-x-Song-for-the-Mute-ADI008-Knit-Jacket-Preloved-Brown-os-1.jpg?v=1792059041",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidasx-song-for-the-mute-adi008-knit-jacket-preloved-brown",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "overkill-16104147878268",
+  "shop_id": "overkill",
+  "name": "ADI008 Knit Jacket",
+  "vendor": "adidas",
+  "description": "In an impressive collaboration between Song for the Mute and adidas, this knit jacket merges avant-garde fashion details with classic sportswear heritage. The main body impresses with a warm, deep shade of brown called Preloved Brown, characterized by a soft, slightly brushed texture. A striking contrast is created by the deep black ribbed cuffs at the collar, sleeve ends, and hem, alongside the iconic three stripes running along the sleeves. A refined full-length two-way silver zip and functional zippered side pockets add a utility-inspired touch, while a round patch detail on the chest and subtle branding lettering complete the exclusive aesthetic. Thanks to its premium sweater construction, the garment offers an optimal combination of cozy warmth and a soft handfeel. The regular fit provides a relaxed silhouette that pairs effortlessly with modern tailored trousers. High-quality craftsmanship and avant-garde design make this collaboration an exceptional addition to sophisticated wardrobes. With this jacket, luxurious material composition and timeless style merge into an expressive everyday statement. • Exclusive collaboration between Song for the Mute and adidas Originals • Premium knit construction in an earthy Preloved Brown tone with a soft touch • Contrasting black ribbed trims and iconic three stripes along the sleeves • Practical silver two-way front zip and secure zippered side pockets • Item number: LD1913",
+  "category": "outer",
+  "gender": "men",
+  "themes": [
+   "old_money",
+   "streetwear"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 179,
+  "stock": {
+   "M": 1,
+   "L": 1,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 57392045916540,
+   "L": 57392045949308,
+   "XL": 57392045982076
+  },
+  "delivery_days": 3,
+  "url": "https://www.overkillshop.com/products/song-for-the-mute-x-adidas-adi008-knit-jacket-ld1913-preloved-brown",
+  "image": "https://cdn.shopify.com/s/files/1/0631/5514/2847/files/LD1913_1.jpg?v=1792572636",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "song-for-the-mute-x-adidas-adi008-knit-jacket-ld1913-preloved-brown",
+   "fetched_at": "2026-10-30T12:25:26.614Z"
+  }
+ },
+ {
+  "id": "arteantwerp-8910961049938",
+  "shop_id": "arteantwerp",
+  "name": "Striped Blazer - Navy",
+  "vendor": "Arte Antwerp",
+  "description": "Made from premium cotton, the Striped Blazer in navy is this season's take on a classic blazer. It features a double-breasted design, striped pattern, 4-button closure, a welt chest pocket, and two flap pockets. Lightweight with a relaxed fit, the blazer is finished with a woven label on the cuff.",
+  "category": "outer",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 180,
+  "stock": {
+   "3": 0,
+   "4": 0,
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 48161316831570
+  },
+  "delivery_days": 4,
+  "url": "https://arte-antwerp.com/products/striped-blazer-black",
+  "image": "https://cdn.shopify.com/s/files/1/0844/1061/files/stripedblazerfinal_square.jpg?v=1723189340",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "striped-blazer-black",
+   "fetched_at": "2026-10-30T12:25:26.584Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10099475742987",
+  "shop_id": "asphaltgold",
+  "name": "Nike Clogposite",
+  "vendor": "Nike",
+  "description": "In den frühen 2000ern kreierte Nike aus den Basketballschuhen Foamposite und Flightposite den Clogposite – den idealen Schuh für die Zeit vor und nach dem Spiel. Und jetzt ist er wieder da. Dieses neue Modell verleiht der Clog-Silhouette mit atmungsaktiven Textilien und einer geformten Zwischensohle ein zeitgemäßes Update. Die Farbgebung in Sanddrift and Black ist mit Metallic-Akzenten ausgestattet und sorgt für einen futuristischen Look, der genauso auffällig ist wie seine bahnbrechenden Vorgänger.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 32,
+  "stock": {
+   "36": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0,
+   "48.5": 0,
+   "40.5": 0,
+   "47.5": 0,
+   "45.5": 0,
+   "44.5": 0,
+   "42.5": 0,
+   "38.5": 0,
+   "37.5": 1,
+   "36.5": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37.5": 51151288566027
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/nike-clogposite-ironstone-ironstonesafety-orange",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/BPso58fRjWUkbXbCL9U8_HF2900-001-Nike-Clogposite-Ironstone-Ironstone-Safety-Orange-os-1.jpg?v=1743429815",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "nike-clogposite-ironstone-ironstonesafety-orange",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10140081946891",
+  "shop_id": "asphaltgold",
+  "name": "New Balance 471",
+  "vendor": "New Balance",
+  "description": "Der 471 verwandelt das Erbe der 70er Jahre in einen neuen, alltagstauglichen Laufschuh mit einer Neuinterpretation der visuellen Signaturen dieser Ära. Das schlanke, niedrige Profil, die keilförmige EVA-Zwischensohle und die Fischgrät-Laufsohle bieten einen vertrauten Ausgangspunkt, so dass die gehobene Materialauswahl die Führung übernimmt. Atmungsaktives Mesh-Obermaterial und haarige Wildleder-Overlays sorgen für einen mühelos gelebten Look, während das klassische „Fang“-Design an der Zehenbox ein einzigartiges optisches Merkmal von New Balance ist, das den 471 von der Masse abhebt.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 32,
+  "stock": {
+   "36": 0,
+   "37": 1,
+   "38": 0,
+   "40": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "47": 0,
+   "44.5": 0,
+   "42.5": 0,
+   "41.5": 0,
+   "40.5": 0,
+   "47.5": 0,
+   "46.5": 0,
+   "45.5": 0,
+   "39.5": 0,
+   "38.5": 0,
+   "37.5": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37": 51280081387787
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/new-balance-u471ab-light-chrome-blue-black-slate-gray",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/rcYB7HLCeDbma4cM01zB_U471AB-New-Balance-U471AB-Light-Chrome-Blue-Black-Slate-Gray-os-1.jpg?v=1746021151",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "new-balance-u471ab-light-chrome-blue-black-slate-gray",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10855469416715",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Predator Sala",
+  "vendor": "Adidas",
+  "description": "Dieser adidas Schuh ist eine Neuinterpretation des legendären Predator Schuhs und erinnert mit seinem Obermaterial aus hochwertigem Leder mit dezentem Glanz und einer umschlagbaren Zunge an seine Fußball-DNA. Die Gummiaußensohle sorgt für Stabilität auf jedem Untergrund, während das Lederfutter für zusätzlichen Tragekomfort sorgt. Fließende Linien und Details in kontrastierenden Farben sorgen für einen dynamischen Look.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 32,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 1,
+   "45": 0,
+   "46": 0,
+   "47": 1,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "44": 52819345277195,
+   "47": 52819345441035
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-predator-sala-core-black-red-core-black",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/vwsg5kdnzof-IH7009_Adidas_Predator-Sala-Core-Black-Red-Core-Black_os-1.jpg?v=1768482966",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-predator-sala-core-black-red-core-black",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "komodo-7165852450913",
+  "shop_id": "komodo",
+  "name": "HELENA SLIDER Tropic Dark",
+  "vendor": "KOMODO",
+  "description": "• Upper: 100% Organic Cotton • Footbed: Recycled PU Footbed • Sole: 100% Upcycled tyre rubber • 100% Vegan Please note: Our footwear sizing is a little small - if you are sometimes between sizes we recommend you buy the larger size!",
+  "category": "shoes",
+  "gender": "women",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 35,
+  "stock": {
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 1,
+   "40": 0,
+   "41": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "39": 41687219830881
+  },
+  "delivery_days": 7,
+  "url": "https://komodo.co.uk/products/helena-slider-tropic-dark-1",
+  "image": "https://cdn.shopify.com/s/files/1/0863/4804/files/B3-LV-17BT_BALI-TROPIC-DARK_A.jpg?v=1716225512",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "helena-slider-tropic-dark-1",
+   "fetched_at": "2026-10-30T12:25:38.418Z"
+  }
+ },
+ {
+  "id": "naevegan-16013175292287",
+  "shop_id": "naevegan",
+  "name": "LOUISE CORK Brown",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Apresentamos Louise Cork: bailarinas femininas de biqueira quadrada, delicadamente confecionadas em cortiça bordada. Compre online estas bailarinas livres de crueldade feitas de cortiça — um material leve e durável. Estas bailarinas minimalistas contam com um forro em microfibra certificado pelo OEKO-TEX Standard 100, garantindo propriedades hipoalergénicas, antibacterianas e antimicrobianas, prevenindo o desenvolvimento de odores. Com solas de borracha neolite, estes sapatos oferecem uma fusão ideal de estilo e conforto para qualquer ocasião.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 35.75,
+  "stock": {
+   "36": 0,
+   "37": 1,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37": 58783937036671
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/louise-cork-brown-black-second-life",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Louise_Brown_Cork_50f1cca5-ef40-4039-8ab1-409c863074e7.jpg?v=1724320749",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "louise-cork-brown-black-second-life",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10744394776843",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Adiracer Lo W",
+  "vendor": "Adidas",
+  "description": "Der Adi Racer Lo ist von der cleanen Silhouette von Rennwagen inspiriert und perfekt für einen Lifestyle auf der Überholspur. Das Obermaterial aus Leder kommt mit den typischen doppelten Kreuznähten, während die reflektierende Paspelierung für bessere Sichtbarkeit bei Dämmerung und Dunkelheit sorgt. Außerdem bietet der Carbon-Einsatz in der Sohle ein superleichtes Tragegefühl. Egal, ob du dir nur schnell einen Coffee-to-go holst oder dich nach Feierabend mit Freund_innen triffst, mit dem Adi Racer Logo meisterst du selbstbewusst die Herausforderungen des Alltags.",
+  "category": "shoes",
+  "gender": "women",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 37,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 1,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "39": 52443878555915
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-adiracer-lo-w-aluminum-aluminum-aluminum",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/laLjh02JtL23yA6hDKRR-JR8862-Adidas-Adiracer-Lo-W-Aluminum-Aluminum-Aluminum-os-1.jpg?v=1760363635",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-adiracer-lo-w-aluminum-aluminum-aluminum",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "naevegan-9473835172135",
+  "shop_id": "naevegan",
+  "name": "Sapatilhas Vegan de Cano Alto em PET Reciclado Redo Cinzento",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Descubra as Redo PET Grey, as intemporais sapatilhas veganas unisséxo de cana alta com solas vulcanizadas antiderrapantes, feitas em PET certificado Global Recycled Standard. Estes sapatos de atacadores apresentam um design de contraste moderno e tradicional com uma parte superior leve em tecido. Adornadas com logotípos na palmilha, na parte de trás do calcanhar e na língua, além de um símbolo de reciclagem no tornozelo exterior, priorizam a liberdade de movimento com costura dupla reforçada e costuras à vista. Hipoalergénicas e livres de toxinas, com forro 100% algodão orgânico e solas leves em borracha natural, garantem transpirabilidade e proteção antimicrobiana, prevenindo odores.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 37.5,
+  "stock": {
+   "36": 1,
+   "37": 1,
+   "38": 1,
+   "39": 1,
+   "40": 0,
+   "41": 1,
+   "42": 0,
+   "43": 0,
+   "44": 1,
+   "45": 0,
+   "46": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 48875459117351,
+   "37": 48987998552359,
+   "38": 48987998683431,
+   "39": 48987998716199,
+   "41": 48987998880039,
+   "44": 48987999109415
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/redo-grey",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Redo_20Grey_4e91f281-b264-4daf-a1fc-31b5cd49bd36.jpg?v=1724320326",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "redo-grey",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "lanius-15894427632000",
+  "shop_id": "lanius",
+  "name": "U-Boot Langarmshirt (GOTS)",
+  "vendor": "LANIUS",
+  "description": "Ein unkompliziertes Basic für vielseitige Looks: Dieses Damen Langarmshirt mit U-Boot-Ausschnitt überzeugt durch seine klare Silhouette und angenehm weichen Jersey aus 100% Bio-Baumwolle. Der feminine Ausschnitt verleiht dem schlichten Design eine elegante Note und macht das Shirt zum vielseitigen Begleiter für Alltag und Büro.",
+  "category": "shoes",
+  "gender": null,
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 39.9,
+  "stock": {
+   "34": 1,
+   "36": 1,
+   "38": 1,
+   "40": 1,
+   "42": 1,
+   "44": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "34": 58684855288192,
+   "36": 58684855320960,
+   "38": 58684855353728,
+   "40": 58684855386496,
+   "42": 58684855419264,
+   "44": 58684855452032
+  },
+  "delivery_days": 3,
+  "url": "https://lanius.com/products/u-boot-langarmshirt",
+  "image": "https://cdn.shopify.com/s/files/1/0574/1566/3704/files/LANIUS_226_15168-00-582-atlantic-36_U-BootLangarmshirtGOTS_02_cbcb5de4-5928-4cb0-8801-920f1c6de45a.jpg?v=1791795218",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "u-boot-langarmshirt",
+   "fetched_at": "2026-10-30T12:25:30.194Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10221481591051",
+  "shop_id": "asphaltgold",
+  "name": "New Balance 475",
+  "vendor": "New Balance",
+  "description": "New Balance hat ein verborgenes Juwel aus den Archiven geborgen. Der 475 wurde ursprünglich 1986 auf den Markt gebracht und als Laufschuh für jeden Tag mit hoher Laufleistung konzipiert. Sein elegantes, schnittiges Design und die hochwertige Materialmischung überbrücken locker die Kluft zwischen morgendlichen Laufrunden auf dem Bürgersteig und moderner Mode. Eine klassische Mesh-Basis wird hier mit hochwertigen Wildleder- und Lederakzenten veredelt, eine Außensohle mit Stollenprofil und reflektierende Details erinnern an die Wurzeln des Schuhs im Sport.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41,
+  "stock": {
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "40": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "47": 0,
+   "46.5": 0,
+   "45.5": 0,
+   "44.5": 0,
+   "42.5": 0,
+   "40.5": 0,
+   "41.5": 0,
+   "39.5": 0,
+   "38.5": 0,
+   "37.5": 1,
+   "47.5": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37.5": 51540167065867
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/new-balance-u475pb-light-chrome-blue-black-linen",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/77yZ8YZp4vtVhCmfGgZg_U475PB-New-Balance-U475PB-Light-Chrome-Blue-Black-Linen-OS-1.jpg?v=1750078714",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "new-balance-u475pb-light-chrome-blue-black-linen",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10644336410891",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Samba XLG",
+  "vendor": "Adidas",
+  "description": "Eine weitere Ikonen bekommt diese Saison das XLG-Treatment. Diese Oversize-Version des geliebten Samba hat eine gepolsterte Zunge und eine dickere Außensohle als das Original. Sie sind mit einem Obermaterial aus Wildleder, 3-Streifen aus Synthetikleder und weichem Textilfutter ausgestattet. Dunkle Farbakzente am Futter, an den Schnürsenkeln und an den 3-Streifen sorgen für einen frischen neuen Look, der einen coolen Kontrast zum helleren Untergrund bildet. Eine markanter T-förmiger Zehenbereich hält den Look in der Tradition verwurzelt.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41,
+  "stock": {
+   "35": 0,
+   "36": 1,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 51969182302475
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-samba-xlg-crew-orange-carbon-gum-4",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/6MDi57fEzaHjlJKTmpI1-JR1111-Adidas-Samba-XLG-Crew-Orange-Carbon-Gum-4-os-1.jpg?v=1753191598",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-samba-xlg-crew-orange-carbon-gum-4",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10793552445707",
+  "shop_id": "asphaltgold",
+  "name": "Adidas x Slam Jam F50 Sala SP Consortium",
+  "vendor": "Adidas",
+  "description": "Adidas x Slam Jam F50 Sala SP Consortium ist mehr als ein Sneaker. Es ist eine Hommage an die urbane Kultur, die Vergangenheit und Zukunft verbindet. Das Design lehnt sich an die Fußballästhetik an und bringt sie in die Straßen von heute. Tech Metallic, Clear Granite und Cream White harmonieren perfekt und verleihen dem Schuh einen zeitlosen Look. Textil- und Leder-Elemente treffen auf eine robuste Gummisohle – ein Statement von Qualität und Stil. Slam Jam, bekannt für seine avantgardistischen Kollaborationen, verleiht dem F50 Sala eine exklusive Note. Die Partnerschaft mit Adidas zeigt, wie Streetwear und High Fashion nahtlos verschmelzen. Ein Sneaker für jene, die Wert auf Details legen und Geschichte an ihren Füßen tragen wollen. Perfekt für den Alltag, verleiht er jedem Outfit eine subtile Raffinesse. Ob zum lässigen Denim oder zur eleganten Chino, der F50 Sala beweist, dass sportlicher Ursprung und urbaner Chic Hand in Hand gehen. Ein Must-Have für die Sneaker-Saison, das nicht nur Sneakerheads begeistert.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 1,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "39": 52542263984395
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-x-slam-jam-f50-sala-sp-consortium-tech-metallic-clear-granite-cream-white",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/Ge2FLcYt8x6gGUmN0gbp-JR2206-Adidas-x-Slam-Jam-F50-Sala-SP-Consortium-Tech-Metallic--Clear-Granite-Cream-White-os-1.jpg?v=1762179772",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-x-slam-jam-f50-sala-sp-consortium-tech-metallic-clear-granite-cream-white",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10793715695883",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Italia 60s *Federazione Italiana Giuoco Calcio* *Home*",
+  "vendor": "Adidas",
+  "description": "Der Adidas Italia 60s *Federazione Italiana Giuoco Calcio* *Home* ist mehr als ein Sneaker. Er ist eine Hommage an die goldene Ära des Fußballs und verbindet Vintage-Vibes mit zeitlosem Design. Das edle Leder in monochromem Supplier Color erzählt Geschichten von Stadien und Straßen, wo der Sport Kult und Kultur zugleich ist. Die Gum-Sohle verleiht dem Schuh eine natürliche Wärme und erdet deinen Look. Ob zum entspannten Streetwear-Outfit oder als stilvolles Highlight im modernen Business-Casual – dieser Sneaker ist ein Statement. Ein Stück italienische Fußballgeschichte, das sich nahtlos in urbane Szenarien einfügt und dabei nie aufdringlich wirkt. Ein Schuh für alle, die Wert auf Authentizität legen und sich mit der Geschichte des Sports verbunden fühlen. Perfekt für den urbanen Alltag, ob auf Asphalt oder Kopfsteinpflaster.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 42,
+  "stock": {
+   "35": 0,
+   "36": 1,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 52543115264267
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-italia-60s-federazione-italiana-giuoco-calcio-home-supplier-color-supplier-color-supplier-color",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/Z3NSjrkhkYwR6PeTHws5-KI8569-Adidas-Italia-60s-Federazione-Italiana-Giuoco-Calcio-Home-Supplier-Color-Supplier-Color-Supplier-Color-os-1.jpg?v=1762527044",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-italia-60s-federazione-italiana-giuoco-calcio-home-supplier-color-supplier-color-supplier-color",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10738607227147",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Predator Sala",
+  "vendor": "Adidas",
+  "description": "Dieser adidas Schuh ist eine Neuinterpretation des legendären Predator Schuhs und erinnert mit seinem Obermaterial aus hochwertigem Leder mit dezentem Glanz und einer umschlagbaren Zunge an seine Fußball-DNA. Die Gummiaußensohle sorgt für Stabilität auf jedem Untergrund, während das Lederfutter für zusätzlichen Tragekomfort sorgt. Fließende Linien und Details in kontrastierenden Farben sorgen für einen dynamischen Look.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 43,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 1,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "40": 52429591609611
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-predator-sala-footwear-white-royal-blue-gum-4",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/6zJOP9Md19xWAKxUYQ56-JR9972-Adidas-Predator-Sala-Footwear-White-Royal-Blue-Gum-4-os-1.jpg?v=1759846164",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-predator-sala-footwear-white-royal-blue-gum-4",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "naevegan-15752579776895",
+  "shop_id": "naevegan",
+  "name": "Martina Sapatos de Salto Vegan",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Este par faz parte da nossa coleção Second Life — devolvido à NAE, inspecionado pela nossa equipa e pronto para um novo dono. Estes não são sapatos usados: são pares por usar que foram devolvidos antes de alguma vez terem sido utilizados, e que passaram na nossa inspeção de qualidade. Mesma qualidade, mesmos materiais, melhor preço. Enviado a partir do nosso armazém nos EUA. Note que os artigos Second Life são de venda final e não podem ser devolvidos. Martina é um par de sapatos veganos de salto com uma silhueta clássica Mary Jane e uma forma moderna e marcante. Confecionados em AppleSkin® preto com debrum bege, têm um forro suave OnSteam, uma tira ajustável e um confortável salto quadrado. Feitos à mão em Portugal para um estilo intemporal.",
+  "category": "shoes",
+  "gender": null,
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 46.88,
+  "stock": {
+   "36": 1,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 57866697998719
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/martina-sapatos-salto-alto-1",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Martina_Black_1.jpg?v=1755433037",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "martina-sapatos-salto-alto-1",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10796447269131",
+  "shop_id": "asphaltgold",
+  "name": "Adidas x Bad Bunny x Mercedes AMG Adiracer GT Lo",
+  "vendor": "Adidas",
+  "description": "Die Kollaboration *Adidas x Bad Bunny x Mercedes AMG Adiracer GT Lo* bringt Street-Credibility auf das nächste Level. Eine Symbiose aus urbanem Flair und Motorsport-Vibes. Bad Bunny vereint mit Mercedes AMG und Adidas – das Ergebnis ist ein Sneaker, der Grenzen sprengt. Das Obermaterial aus Leder und Synthetik trifft auf eine Textil-Deckschicht, die sich angenehm anfühlt. Der Mix aus Branch, Sand und Cinder setzt subtile Akzente, die jedem Look das gewisse Etwas verleihen. Dieser Sneaker erzählt Geschichten von der Straße und der Rennstrecke. Das Design reflektiert die Dynamik der Zusammenarbeit und bleibt dabei minimalistisch und ausdrucksstark. Perfekt für den urbanen Alltag, wo Stil und Komfort gleichsam zählen. Die Ortholite-Technologie sorgt für ein angenehmes Tragegefühl, während die Gummisohle sicheren Halt bietet. Kombiniere den *Adidas x Bad Bunny x Mercedes AMG Adiracer GT Lo* mit einer lässigen Cargohose und einem oversized Hoodie. Ideal für den Übergang vom Streetstyle zum Nightlife. Ein Sneaker, der nicht nur getragen, sondern erlebt wird.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 47,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 1,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "40": 52597140947211
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-x-bad-bunny-x-mercedes-amg-adiracer-gt-lo-branch-sand-cinder",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/gCKQ4U5eyVbUjE3BVava-HQ2570-Adidas-x-Bad-Bunny-x-Mercedes-AMG-Adiracer-GT-Lo-Branch-Sand-Cinder-os-1.jpg?v=1762354446",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-x-bad-bunny-x-mercedes-amg-adiracer-gt-lo-branch-sand-cinder",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "naevegan-9473476886823",
+  "shop_id": "naevegan",
+  "name": "JAQUE Beige",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Sapatos Vegan Jaque Bege e Preto Slingback",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 47.5,
+  "stock": {
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "42": 48987923448103
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/jaque-beige",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Jaque.png?v=1723109586",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jaque-beige",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10746697187595",
+  "shop_id": "asphaltgold",
+  "name": "Adidas SL 72 OG W",
+  "vendor": "Adidas",
+  "description": "Die adidas Sleeveless 72 OG Schuhe sind von dem 72er Archiv-Modell inspiriert, das mit seiner leichten Konstruktion die Schuhindustrie revolutioniert hat. Das Obermaterial aus Glattleder ist mit einem Schlangen-Print versehen, der für eine gewisse Struktur sorgt. Die ikonische, niedrig profilierte Zwischensohle und die Gummiaußensohle bilden unterschiedliche Höhen und Proportionen, die eine Anspielung auf das ursprüngliche Design sind.",
+  "category": "shoes",
+  "gender": "women",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 1,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "40": 52450386739467
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-sl-72-og-w-preloved-brown-core-black-crew-white",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/sli7EaYzRSgLm17MveGW-JS3981-Adidas-SL-72-OG-W-Preloved-Brown-Core-Black-Crew-White-os-1.jpg?v=1760623909",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-sl-72-og-w-preloved-brown-core-black-crew-white",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10860131942667",
+  "shop_id": "asphaltgold",
+  "name": "Puma Speedcat Icons",
+  "vendor": "Puma",
+  "description": "Der Puma Speedcat Icons trifft den Puls urbaner Ästhetik. In elegantem Puma Black und Frosted Ivory zeigt sich der Sneaker mit einem klaren, minimalistischen Design, das zeitlos bleibt. Das Obermaterial aus hochwertigem Leder und das textile Deckmaterial sorgen für einen angenehmen Tragekomfort und eine lässige Note. Der ikonische Leder-Logo-Print rundet das Gesamtbild ab und verleiht dem Schuh eine subtile, stilvolle Identität. Hier geht es nicht nur um einen Sneaker, sondern um einen Ausdruck von Lebensstil. Der Speedcat Icons verbindet Sportlichkeit mit modischem Anspruch und ist damit die perfekte Wahl für die Straße. Die Ortholite-Technologie sorgt dafür, dass jeder Schritt leicht und bequem ist, egal ob beim Bummeln durch die Stadt oder beim Treffen mit Freunden. Kombiniere den Puma Speedcat Icons mit deiner Lieblings-Jeans oder einem lässigen Jogger. Dieser Sneaker ist nicht nur ein Schuh, sondern ein Statement. Ein Must-have für alle, die Urban-Culture leben und lieben.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49,
+  "stock": {
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 1,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "38.5": 0,
+   "37.5": 0,
+   "40.5": 0,
+   "42.5": 0,
+   "44.5": 0,
+   "46.5": 0,
+   "48.5": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "44": 52831964659979
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/puma-speedcat-icons-puma-black-frosted-ivory",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/uf1kg97oxpo-406226-01_Puma_Speedcat-Icons_Puma-Black-Frosted-Ivory_os-1.jpg?v=1768834605",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "puma-speedcat-icons-puma-black-frosted-ivory",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "naevegan-9472374833447",
+  "shop_id": "naevegan",
+  "name": "Sabrinas Vegan para Mulher Aure Preto",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Apresentamos as nossas elegantes e estilosas sandálias tipo bailarina veganas, feitas em luxuoso material AppleSkin® preto. Estas bailarinas apresentam um design minimalista com duas tiras elásticas adornadas com o logotípo NAE, simbolizando o nosso compromisso contra a exploração animal. Perfeitas tanto para ocasiões casuais como mais elegantes, estas sandálias oferecem conforto e sofisticação a cada passo. Enriqueça a sua coleção de calçado com as nossas sandálias veganas, meticulosamente concebidas e fabricadas com cuidado. Entre na moda vegana com confiança e estilo.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 1,
+   "40": 0,
+   "41": 0,
+   "42": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "39": 48987827831079,
+   "42": 48987828027687
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/aure-black",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Aure_Black_27979403-703b-4955-9342-3d1af3e8df67.jpg?v=1724321985",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "aure-black",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "naevegan-9472540573991",
+  "shop_id": "naevegan",
+  "name": "Sapatilhas Vegan em AppleSkin® Clove Preto",
+  "vendor": "NAE Vegan Shoes",
+  "description": "Descubra as Clove Black: sapatilhas veganas unisséxo de cana baixa com charme minimalista e solas vulcanizadas, em material AppleSkin®, uma alternativa livre de crueldade ao couro tradicional. Compre online estas sapatilhas urbanas intemporais com um trabalho detalhado, incluindo um logotípo bordado na língua e uma gravação na parte superior da sola. Hipoalérgénicas, livres de toxinas e resistentes à água, estas sapatilhas priorizam o conforto e a transpirabilidade. Ideais para o uso diário, tanto em ambientes internos como para um passeio casual, combinam sem esforço moda e conforto. Eleve o seu estilo com as Clove Black, onde a estética vibrante encontra o conforto do dia a dia, a cada passo.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 0,
+   "37": 1,
+   "38": 1,
+   "39": 1,
+   "40": 1,
+   "41": 1,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37": 48987870789927,
+   "38": 48987870888231,
+   "39": 48987870953767,
+   "40": 48987871019303,
+   "41": 48987871117607
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/clove-black",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Clove_Black_27a48812-61b9-4907-ba77-b1893ee7c9dc.jpg?v=1724321543",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "clove-black",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "naevegan-9473382121767",
+  "shop_id": "naevegan",
+  "name": "Sapatilhas Vegan Hade Cinzento",
+  "vendor": "Nae Vegan Shoes",
+  "description": "Apresentamos as Hade Grey: sapatilhas desportivas veganas unisséxo, de cana baixa e com atacadores, meticulosamente fabricadas em PET reciclado — um material livre de crueldade, respirável e leve. Compre estas sapatilhas minimalistas online. Hipoalérgénicas e livres de toxinas, o forro em microfibra fabricado com poliéster reciclado pós-consumo garante transpirabilidade, propriedades antimicrobianas e uma palmilha acolchoada resistente à humidade que oferece suporte ao arco do pé. Juntamente com a gola acolchoada e o forro flexível, estas sapatilhas oferecem conforto sem fricção. Versáteis e na moda, estes ténis veganos combinam na perfeição com looks modernos, proporcionando conforto o dia todo, em ambientes internos ou externos. Com a parte superior e o forro em PET reciclado, atacadores em poliéster reciclado e uma sola exterior em borracha EVA antiderrapante e acolchoada, combinam durabilidade e estilo, fabricadas com cuidado em Portugal.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 1,
+   "37": 1,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 48874681598247,
+   "37": 48987909226791
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/hade-grey",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Hade_Grey_68aedeff-de1e-4009-9536-bdcae0c836e8.jpg?v=1724321160",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "hade-grey",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "naevegan-9473588494631",
+  "shop_id": "naevegan",
+  "name": "JOR Blue",
+  "vendor": "NAE Vegan Shoes",
+  "description": "Conheça os Jor Re-PET Blue, os ténis de corrida unissexo fabricados a partir de garrafas de plástico recicladas com certificação GRS, ideais para actividades ao ar livre e corrida. Estes ténis têm solas leves em EVA, atacadores de poliéster duráveis.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 1,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 48875019796775
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/jor-blue",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/MG_7966.jpg?v=1725230353",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jor-blue",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "naevegan-9473593803047",
+  "shop_id": "naevegan",
+  "name": "JOR White",
+  "vendor": "NAE Vegan Shoes",
+  "description": "Conheça os Jor Re-PET White, os ténis de corrida unissexo fabricados a partir de garrafas de plástico recicladas com certificação GRS, ideais para actividades ao ar livre e corrida. Estes ténis têm solas leves em EVA, atacadores de poliéster duráveis.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 0,
+   "37": 1,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "37": 48987927118119
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/jor-white",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Jor_White_c8fa95d5-83e9-4a6d-a653-89b38cefa465.jpg?v=1724320897",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "jor-white",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "naevegan-9473618608423",
+  "shop_id": "naevegan",
+  "name": "KOMO Green",
+  "vendor": "NAE Vegan Shoes",
+  "description": "Apresentamos \"Komo\" da NAE Vegan Shoes, o nosso mais recente sneaker vegano feito de microfibra reciclada. Com detalhes verdes na frente e atrás, estes sneakers transmitem uma sofisticação minimalista. Concebido para o estilo, \"Komo\" oferece uma silhueta elegante e uma construção cuidada. Perfeito para quem procura calçado vegano sem abdicar do estilo. Entre no futuro da moda com \"Komo\" e faça uma declaração com o seu guarda-roupa.",
+  "category": "shoes",
+  "gender": "unisex",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.5,
+  "stock": {
+   "36": 1,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 0,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "36": 48875065278759
+  },
+  "delivery_days": 5,
+  "url": "https://nae-vegan.com/products/komo-green",
+  "image": "https://cdn.shopify.com/s/files/1/0880/1733/8663/files/Komo_Green_9bf29f72-9c4c-479c-9306-836490b99ab7.jpg?v=1724320842",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "komo-green",
+   "fetched_at": "2026-10-30T12:25:35.412Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10205582786827",
+  "shop_id": "asphaltgold",
+  "name": "Adidas Sambae W",
+  "vendor": "Adidas",
+  "description": "Diese Version des adidas Samba verpasst dem legendären Look ein angesagtes Upgrade. Früher war er ein Hallenfußballschuh, heute ist er ein beliebtes Streetwear-Piece. Dieses Modell lässt mit einem Obermaterial aus smoothem Leder, einer transparenten Außensohle mit Plateau aus Naturgummi und aufgestickten 3-Streifen das Style-Barometer ordentlich steigen. Die Stitch and Turn Methode im Zehenbereich macht die Nähte unsichtbar und rundet das Premium-Modell für ein sleekes Finish perfekt ab.",
+  "category": "shoes",
+  "gender": "women",
+  "themes": [
+   "casual"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 50,
+  "stock": {
+   "35": 0,
+   "36": 0,
+   "37": 0,
+   "38": 0,
+   "39": 0,
+   "40": 0,
+   "41": 1,
+   "42": 0,
+   "43": 0,
+   "44": 0,
+   "45": 0,
+   "46": 0,
+   "47": 0,
+   "48": 0,
+   "49": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "41": 51496146698507
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/adidas-sambae-w-footwear-white-off-white-aurich-ivy",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/bc3JHfAwPOr9p9WqE6kh_JQ0983-Adidas-Sambae-W-Footwear-White-Off-White-Aurich-Ivy-os-1.jpg?v=1748440811",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "adidas-sambae-w-footwear-white-off-white-aurich-ivy",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "thokkthokk-8229184798987",
+  "shop_id": "thokkthokk",
+  "name": "TT118 Polo Shirt PIQUÉ (GOTS)",
+  "vendor": "ThokkThokk",
+  "description": "Dieses Polo kam aus unserer Produktion in Asien. Der Nachfolger wird in der EU gefertigt. Was von der alten Ware noch da ist, geht jetzt raus. Hinten länger als vorn Der Rückenteil ist in jeder Größe 2 cm länger als das Vorderteil. Seitenschlitze vorn 3 cm und hinten 4 cm. Schnitt und Passform Klassisches Polo, weit geschnitten. Die Mehrweite gegenüber dem Körpermaß beträgt rund 12 cm. Material Bio-Baumwolle Piqué. Details Rippkragen 6,5 cm hoch, Knopfleiste 4 cm breit, Ärmelbündchen 2 cm. Vor dem Bestellen Unter dieser Beschreibung findest Du die Maße des fertigen Teils und eine Größenempfehlung für Dein Körpermaß. Zwei Minuten Maßband ersparen Dir den Rückversand. Warum wir das machen Ein Kleidungsstück, das im Lager liegt, hat seine Baumwolle umsonst verbraucht. Getragen zu werden ist das Einzige, wofür es gemacht wurde. Deshalb jetzt raus statt in zwei Jahren als Posten. → Größenberatung als PDF Messanleitung, alle Maße des fertigen Teils und die Größenempfehlung auf zwei Seiten.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 12,
+  "stock": {
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 44335289762059,
+   "M": 44335289598219,
+   "L": 44335289663755
+  },
+  "delivery_days": 3,
+  "url": "https://thokkthokk.com/products/tt118-polo-shirt-pique",
+  "image": "https://cdn.shopify.com/s/files/1/0698/4781/0315/files/PREORDER--TT118-Polo-Shirt-PIQUe-5749_18.jpg?v=1747232047",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "tt118-polo-shirt-pique",
+   "fetched_at": "2026-10-30T12:25:29.368Z"
+  }
+ },
+ {
+  "id": "melawear-7824967139375",
+  "shop_id": "melawear",
+  "name": "Poloshirt Style JASPAL",
+  "vendor": "MELA",
+  "description": "Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau zeichnet sich dieses atmungsaktive Shirt durch ein besonders angenehmes Tragegefühl aus und ist vollständig vegan. JASPAL ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt dein neues Lieblings-Shirt! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Kleidung tragen kann, unabhängig von Geschlechterstereotypen.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 27.9,
+  "stock": {
+   "L": 1,
+   "S": 1,
+   "XL": 0,
+   "M": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 43227374157871,
+   "S": 43619242410031
+  },
+  "delivery_days": 3,
+  "url": "https://melawear.de/products/poloshirt-jaspal",
+  "image": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Jaspal-Polo-Shirt-black-01.jpg?v=1753359094",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "poloshirt-jaspal",
+   "fetched_at": "2026-10-30T12:25:29.921Z"
+  }
+ },
+ {
+  "id": "melawear-7825107976239",
+  "shop_id": "melawear",
+  "name": "Langarm Polo Shirt Style DIVIT",
+  "vendor": "MELA",
+  "description": "Hergestellt aus 100% Fairtrade-Baumwolle aus biologischem Anbau zeichnet sich dieses atmungsaktive Langarmshirt durch ein besonders angenehmes Tragegefühl aus und ist vollständig vegan. DIVIT ist Teil unserer Kollektionsware. Da wir Überproduktion vermeiden wollen, haben wir diesen Artikel zunächst limitiert hergestellt. Sichere dir also jetzt dein neues Lieblings-Langarmshirt! Wenn dir dieser Style gefällt, dann ist er für dich bestimmt. Wir glauben, dass jede*r unsere Kleidung tragen kann, unabhängig von Geschlechterstereotypen.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 34.9,
+  "stock": {
+   "XL": 1,
+   "L": 1,
+   "S": 1,
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 43229028188207,
+   "L": 43295088869423,
+   "S": 43295088902191,
+   "M": 43295088934959
+  },
+  "delivery_days": 3,
+  "url": "https://melawear.de/products/herren-langarm-polo-shirt-divit",
+  "image": "https://cdn.shopify.com/s/files/1/0628/5964/0879/files/Divit-Rugby-Shirt-dark-blue-01.jpg?v=1753180372",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "herren-langarm-polo-shirt-divit",
+   "fetched_at": "2026-10-30T12:25:29.921Z"
+  }
+ },
+ {
+  "id": "stanray-15116414976379",
+  "shop_id": "stanray",
+  "name": "Flannel Shirt (Bright Blue Plaid)",
+  "vendor": "Stan Ray",
+  "description": "The Flannel Shirt offers a stylish and versatile option for year-round comfort. Made from 145gsm poly/cotton mix, this shirt is both soft and durable, perfect for wearing on its own or as a layering piece. The NEW check pattern adds a subtle, modern touch to the classic flannel design, making it a great addition to both casual and smart-casual wardrobes. 145gsm 70% Polyester/ 30% Cotton Composition Short Sleeve Design Button-Down Collar",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 39.9,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 1,
+   "L": 0,
+   "XL": 0,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 55528090894715,
+   "XXL": 55528090993019
+  },
+  "delivery_days": 3,
+  "url": "https://stanray.eu/products/flannel-shirt-bright-blue-plaid-aw25",
+  "image": "https://cdn.shopify.com/s/files/1/2425/1015/files/FLANNELSHIRT_BRIGHTBLUEPLAID-1_1.jpg?v=1753712208",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "flannel-shirt-bright-blue-plaid-aw25",
+   "fetched_at": "2026-10-30T12:26:23.142Z"
+  }
+ },
+ {
+  "id": "stanray-15116415041915",
+  "shop_id": "stanray",
+  "name": "Flannel Shirt (Green Plaid)",
+  "vendor": "Stan Ray",
+  "description": "The Flannel Shirt offers a stylish and versatile option for year-round comfort. Made from 145gsm poly/cotton mix, this shirt is both soft and durable, perfect for wearing on its own or as a layering piece. The NEW check pattern adds a subtle, modern touch to the classic flannel design, making it a great addition to both casual and smart-casual wardrobes. 145gsm 70% Polyester/ 30% Cotton Composition Short Sleeve Design Button-Down Collar",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 39.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 0,
+   "L": 0,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 55528091320699,
+   "S": 55528091353467
+  },
+  "delivery_days": 3,
+  "url": "https://stanray.eu/products/flannel-shirt-green-plaid-aw25",
+  "image": "https://cdn.shopify.com/s/files/1/2425/1015/files/FLANNELSHIRT_GREENPLAID-1_1.jpg?v=1753709458",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "flannel-shirt-green-plaid-aw25",
+   "fetched_at": "2026-10-30T12:26:23.142Z"
+  }
+ },
+ {
+  "id": "armedangels-16306799149381",
+  "shop_id": "armedangels",
+  "name": "Strickcardigan RS",
+  "vendor": "Reverse Supply",
+  "description": "Strickcardigan",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41.9,
+  "stock": {
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 59930297008453
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/strickcardigan-84zs1mmi09300731-1",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/84ZS1MMI09300731_2daaaa37-bea1-4ba8-867e-d88ae8fe2d93.jpg?v=1793100613",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "strickcardigan-84zs1mmi09300731-1",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "armedangels-16306809209157",
+  "shop_id": "armedangels",
+  "name": "Poloshirt RS",
+  "vendor": "Reverse Supply",
+  "description": "Poloshirt",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41.9,
+  "stock": {
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 59930331414853
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/poloshirt-xssqughl09300759",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/XSSQUGHL09300759.jpg?v=1793100789",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "poloshirt-xssqughl09300759",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "armedangels-16306809274693",
+  "shop_id": "armedangels",
+  "name": "Poloshirt RS",
+  "vendor": "Reverse Supply",
+  "description": "Poloshirt",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 41.9,
+  "stock": {
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 59930331611461
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/poloshirt-xssqughl09300759-1",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/XSSQUGHL09300759_47db5a07-28a6-49e3-83cb-fa51d30f51a2.jpg?v=1793100790",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "poloshirt-xssqughl09300759-1",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "armedangels-16286595744069",
+  "shop_id": "armedangels",
+  "name": "Strickcardigan RS",
+  "vendor": "Reverse Supply",
+  "description": "Strickcardigan",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 44.9,
+  "stock": {
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 59839634800965
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/strickcardigan-rvy1pzeg04160401",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/RVY1PZEG04160401_a5ed52d8-2c98-4e1d-86ba-ea7b1bab614f.jpg?v=1792590632",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "strickcardigan-rvy1pzeg04160401",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "knowledgecotton-15134156357967",
+  "shop_id": "knowledgecotton",
+  "name": "Bubble knit crew neck - Vintage Indigo",
+  "vendor": "KnowledgeCotton Apparel - MEN",
+  "description": "Our VAGN crew neck is a great addition to your wardrobe for all chilly days and nights. This knitted crew neck is made of 100% organic cotton in a small bubble pattern and has a regular fit. The simple design is finished with a rounded rib neck, rib cuffs, and rib hem. Style no.: 1080067 Color: Vintage Indigo Quality: 100% Organic Cotton Washing instructions: Care: 40° normal wash, Do not bleach, do not tumble dry, iron at medium temperature, do not dryclean",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 44.98,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0,
+   "XXXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 54377690366287
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/vagn-regular-bubble-knit-crew-neck-regenerative-organic-certified-gots-vegan-vintage-indigo",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Bubble_knit_crew_neck-Knits-1080067-1226_Vintage_Indigo.jpg?v=1790594294",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "vagn-regular-bubble-knit-crew-neck-regenerative-organic-certified-gots-vegan-vintage-indigo",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "soulland-15288936366428",
+  "shop_id": "soulland",
+  "name": "Reseller Logo Crewneck - S",
+  "vendor": "Soulland",
+  "description": null,
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money",
+   "streetwear"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 45,
+  "stock": {
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 55887815672156
+  },
+  "delivery_days": 4,
+  "url": "https://soulland.com/products/reseller-logo-crewneck-s",
+  "image": "https://cdn.shopify.com/s/files/1/0104/8852/files/stockitem-190-1672760632852_c457784a-4807-499f-a5ed-e74321e51730.jpg?v=1790473312",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "reseller-logo-crewneck-s",
+   "fetched_at": "2026-10-30T12:25:25.326Z"
+  }
+ },
+ {
+  "id": "organicbasics-9184705839436",
+  "shop_id": "organicbasics",
+  "name": "Soft Knit Rib Crop Cardigan",
+  "vendor": "Organic Basics",
+  "description": "A cropped slim-fit cardigan that will upgrade your wardrobe instantly. Made with 60% organic cotton.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 47.4,
+  "stock": {
+   "XXS": 0,
+   "XS": 0,
+   "S": 0,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 48564525826380,
+   "L": 48564525859148,
+   "XL": 48564525891916,
+   "XXL": 48564525924684
+  },
+  "delivery_days": 3,
+  "url": "https://organicbasics.com/products/soft-knit-rib-crop-cardigan-golden-clay",
+  "image": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/eyglpr1sarisr2hio0bf.jpg?v=1723642849",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "soft-knit-rib-crop-cardigan-golden-clay",
+   "fetched_at": "2026-10-30T12:25:25.457Z"
+  }
+ },
+ {
+  "id": "organicbasics-9184706036044",
+  "shop_id": "organicbasics",
+  "name": "Soft Knit Rib Crop Cardigan",
+  "vendor": "Organic Basics",
+  "description": "A cropped slim-fit cardigan that will upgrade your wardrobe instantly. Made with 60% organic cotton.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 47.4,
+  "stock": {
+   "XXS": 1,
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XXS": 48564527530316,
+   "L": 48564527792460,
+   "XL": 48564527857996,
+   "XXL": 48564527923532
+  },
+  "delivery_days": 3,
+  "url": "https://organicbasics.com/products/soft-knit-rib-crop-cardigan-silver-mist",
+  "image": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/qgxgyt93mny25iahsulp.jpg?v=1723642875",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "soft-knit-rib-crop-cardigan-silver-mist",
+   "fetched_at": "2026-10-30T12:25:25.457Z"
+  }
+ },
+ {
+  "id": "komodo-16042568483194",
+  "shop_id": "komodo",
+  "name": "OLIVER Organic Cotton Knit Polo - Black",
+  "vendor": "KOMODO",
+  "description": "OLIVER Organic Cotton Knit Polo - Black Vegan 100% Organic cotton 30º Eco Machine Washable Lightweight and breathable, this organic cotton polo is perfect for warmer days. The pointelle knit adds subtle texture while keeping things cool, and the classic polo neck works with everything. Finished with natural coconut buttons that feel as good as they look. Regular fit, ready to become a summer staple. Sizing: Model wears: MEDIUM Model's height: 175cm / 5.8\"",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 48,
+  "stock": {
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "EXTRA-LARGE": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 56831200952698,
+   "M": 56831200985466,
+   "L": 56831201018234,
+   "EXTRA-LARGE": 56831201051002
+  },
+  "delivery_days": 7,
+  "url": "https://komodo.co.uk/products/oliver-black-tee-ss26",
+  "image": "https://cdn.shopify.com/s/files/1/0863/4804/files/KOMODO-KNITWEAR-695.jpg?v=1776898475",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "oliver-black-tee-ss26",
+   "fetched_at": "2026-10-30T12:25:38.418Z"
+  }
+ },
+ {
+  "id": "komodo-16042568515962",
+  "shop_id": "komodo",
+  "name": "OLIVER Organic Cotton Knit Polo - Cream",
+  "vendor": "KOMODO",
+  "description": "OLIVER Organic Cotton Knit Polo - Cream Vegan 100% Organic cotton 30º Eco Machine Washable Lightweight and breathable, this organic cotton polo is perfect for warmer days. The pointelle knit adds subtle texture while keeping things cool, and the classic polo neck works with everything. Finished with biodegradable natural coconut buttons that feel as good as they look. Regular fit, ready to become a summer staple. Sizing: Model wears: MEDIUM Model's height: 175cm / 5.8\"",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 48,
+  "stock": {
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "EXTRA-LARGE": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 56831201083770,
+   "M": 56831201116538,
+   "L": 56831201149306,
+   "EXTRA-LARGE": 56831201182074
+  },
+  "delivery_days": 7,
+  "url": "https://komodo.co.uk/products/oliver-cream-tee-ss26",
+  "image": "https://cdn.shopify.com/s/files/1/0863/4804/files/KOMODO-Springshoot-21.jpg?v=1778245905",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "oliver-cream-tee-ss26",
+   "fetched_at": "2026-10-30T12:25:38.418Z"
+  }
+ },
+ {
+  "id": "komodo-16042568548730",
+  "shop_id": "komodo",
+  "name": "OLIVER Organic Cotton Knit Polo - Green",
+  "vendor": "KOMODO",
+  "description": "OLIVER Organic Cotton Knit Polo - Green Vegan 100% Organic cotton 30º Eco Machine Washable Lightweight and breathable, this organic cotton polo is perfect for warmer days. The pointelle knit adds subtle texture while keeping things cool, and the classic polo neck works with everything. Finished with biodegradable natural coconut buttons that feel as good as they look. Regular fit, ready to become a summer staple. Sizing: Model wears: MEDIUM",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 48,
+  "stock": {
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "EXTRA-LARGE": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 56831201214842,
+   "M": 56831201247610,
+   "L": 56831201280378,
+   "EXTRA-LARGE": 56831201313146
+  },
+  "delivery_days": 7,
+  "url": "https://komodo.co.uk/products/oliver-green-tee-ss26",
+  "image": "https://cdn.shopify.com/s/files/1/0863/4804/files/KOMODO-KNITWEAR-746.jpg?v=1776898781",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "oliver-green-tee-ss26",
+   "fetched_at": "2026-10-30T12:25:38.418Z"
+  }
+ },
+ {
+  "id": "recolution-10340579672330",
+  "shop_id": "recolution",
+  "name": "MORINGA",
+  "vendor": "recolution",
+  "description": "Der Cardigan MORINGA überzeugt durch zeitlose Eleganz und einen entspannten Look. Hergestellt aus 100% Bio-Baumwolle, bietet er dank der feinen Rib-Struktur eine weiche Haptik und hochwertige Verarbeitung. Der Regular Fit sorgt für eine vielseitige und bequeme Passform. Dieser Strickcardigan ist der perfekte Begleiter für jeden Anlass, stilvoll und angenehm zu tragen. 100% Bio-Baumwolle. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Portugal.",
+  "category": "top",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.9,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 52281292259594
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/cardigan-moringa-sage-green",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/103048-332_6.jpg?v=1772720740",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "cardigan-moringa-sage-green",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-10340580098314",
+  "shop_id": "recolution",
+  "name": "EUKALYPTUS",
+  "vendor": "recolution",
+  "description": "Der Pullover EUKALYPTUS überzeugt mit seiner natürlichen Melange-Optik und weichem Griff. Gefertigt aus 100% Bio-Baumwolle, mit moderner Struktur und angenehmem Tragekomfort. Der klassische Rundhalsausschnitt und der Regular Fit sorgen für eine lässige Passform, die sich vielseitig kombinieren lässt. Ob für den Alltag oder gemütliche Abende – dieser Strickpullover ist die perfekte Wahl für stilbewusste Männer. 100% Bio-Baumwolle. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Portugal.",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.9,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 52281293701386,
+   "XXL": 52281293734154
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/pullover-eukalyptus-greige",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/203028-918_2.jpg?v=1772733824",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "pullover-eukalyptus-greige",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-10340582949130",
+  "shop_id": "recolution",
+  "name": "CAMELLIA",
+  "vendor": "recolution",
+  "description": "Wenn du luftige Sommerstyles liebst, wirst du unsere Bluse CAMELLIA mögen. Der entspannte Schnitt und der offene Kragen sorgen für lässige Eleganz – perfekt für warme Tage. Durch die Mischung aus Viskose (LENZING™ ECOVERO™) und Leinen fühlt sich der Stoff angenehm kühl an und fällt locker. Die kurze Länge macht CAMELLIA zur idealen Kombipartnerin für High-Waist-Hosen oder Röcke. Kleines Extra: die edlen Steinnussknöpfe, die dem Look eine natürliche Note geben. 65% Viskose (LENZING™ ECOVERO™), 35% Leinen. Produziert in der Türkei.",
+  "category": "top",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.9,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 1,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 52281304547594,
+   "S": 52281304580362,
+   "M": 52281304613130,
+   "L": 52281304645898,
+   "XL": 52281304678666,
+   "XXL": 52281304711434
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/bluse-camellia-lava-red",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/104053-411_2.jpg?v=1766049666",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "bluse-camellia-lava-red",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "recolution-9901102989578",
+  "shop_id": "recolution",
+  "name": "MORINGA",
+  "vendor": "recolution",
+  "description": "Der Cardigan MORINGA überzeugt durch zeitlose Eleganz und einen entspannten Look. Hergestellt aus 100% Bio-Baumwolle, bietet er dank der feinen Rib-Struktur eine weiche Haptik und hochwertige Verarbeitung. Der Regular Fit sorgt für eine vielseitige und bequeme Passform. Dieser Strickcardigan ist der perfekte Begleiter für jeden Anlass, stilvoll und angenehm zu tragen. 100% Bio-Baumwolle. Dieses Produkt ist GOTS-zertifiziert (CERES-063). Produziert in Portugal.",
+  "category": "top",
+  "gender": "women",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 49.9,
+  "stock": {
+   "XS": 0,
+   "S": 0,
+   "M": 0,
+   "L": 0,
+   "XL": 1,
+   "XXL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 50616970379530,
+   "XXL": 50616970412298
+  },
+  "delivery_days": 3,
+  "url": "https://www.recolution.de/products/cardigan-moringa-mars-red",
+  "image": "https://cdn.shopify.com/s/files/1/0418/4548/9815/files/103048-405_2.jpg?v=1737635051",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "cardigan-moringa-mars-red",
+   "fetched_at": "2026-10-30T12:25:28.278Z"
+  }
+ },
+ {
+  "id": "knowledgecotton-16099363488079",
+  "shop_id": "knowledgecotton",
+  "name": "Raglan knit sweater - Night Sky",
+  "vendor": "KnowledgeCotton Apparel - MEN",
+  "description": "Crafted from soft organic cotton, this knitted sweater offers a cozy and breathable layer for cooler days. Designed in a regular fit, it features a classic crew neck and ribbed detailing at the collar, cuffs, and hem for a structured finish. The textured knit adds subtle depth, making it an easy choice for both casual and dressed-up occasions. Ideal for pairing with denim or tailored trousers, this sweater brings comfort and timeless style to your wardrobe. Style no.: 1080117 Color: Night Sky Quality: 100% Organic Cotton",
+  "category": "top",
+  "gender": "men",
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 50,
+  "stock": {
+   "S": 0,
+   "M": 0,
+   "L": 1,
+   "XL": 0,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "L": 57687722033487
+  },
+  "delivery_days": 4,
+  "url": "https://www.knowledgecottonapparel.com/products/raglan-knit-sweater-night-sky",
+  "image": "https://cdn.shopify.com/s/files/1/0601/1797/5218/files/Raglan_knit_sweater-Knits-1080117-1412_Night_Sky_cbb9cbf6-2ceb-48ac-a96d-b51658f6d7d5.jpg?v=1790589025",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "raglan-knit-sweater-night-sky",
+   "fetched_at": "2026-10-30T12:25:30.486Z"
+  }
+ },
+ {
+  "id": "asphaltgold-10882015527179",
+  "shop_id": "asphaltgold",
+  "name": "Polo Ralph Lauren Jersey Graphic T-Shirt",
+  "vendor": "Polo Ralph Lauren",
+  "description": "Weiter geschnitten an Brust, Taille und Ärmeln mit einem tieferen Armausschnitt Wappen des „Ralph's Beach Club“ mit Seepferdchen auf der linken Brustseite und mittig auf dem Rücken Rundhalsausschnitt Kurzärmlig 100 % Baumwolle",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money",
+   "streetwear"
+  ],
+  "seasons": [
+   "spring",
+   "summer",
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 51,
+  "stock": {
+   "L": 0,
+   "M": 0,
+   "S": 0,
+   "XL": 1,
+   "XXL": 0
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XL": 52894806114571
+  },
+  "delivery_days": 2,
+  "url": "https://www.asphaltgold.com/products/polo-ralph-lauren-jersey-graphic-tshirt-deckwash-white",
+  "image": "https://cdn.shopify.com/s/files/1/0473/6965/0340/files/l3qxf4e7ya-710B14580001_Polo-Ralph-Lauren_Jersey-Graphic-T-Shirt_Deckwash-White_os-1.jpg?v=1789739400",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "polo-ralph-lauren-jersey-graphic-tshirt-deckwash-white",
+   "fetched_at": "2026-10-30T12:25:26.653Z"
+  }
+ },
+ {
+  "id": "soulland-15218044404060",
+  "shop_id": "soulland",
+  "name": "Reseller Sailor Knitted Sweater - M",
+  "vendor": "Soulland",
+  "description": null,
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 51,
+  "stock": {
+   "M": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "M": 55516202467676
+  },
+  "delivery_days": 4,
+  "url": "https://soulland.com/products/reseller-sailor-knitted-sweater-m",
+  "image": "https://cdn.shopify.com/s/files/1/0104/8852/files/stockitem-432-1675958035490_43291a7a-4e48-4d38-ac2d-eafd6b8ebcef.jpg?v=1790476252",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "reseller-sailor-knitted-sweater-m",
+   "fetched_at": "2026-10-30T12:25:25.326Z"
+  }
+ },
+ {
+  "id": "armedangels-16286661312837",
+  "shop_id": "armedangels",
+  "name": "Strickcardigan RS",
+  "vendor": "Reverse Supply",
+  "description": "Strickcardigan",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 51.9,
+  "stock": {
+   "S": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "S": 59839888851269
+  },
+  "delivery_days": 3,
+  "url": "https://www.armedangels.com/products/strickcardigan-touv8y1904200556",
+  "image": "https://cdn.shopify.com/s/files/1/0915/0850/6949/files/TOUV8Y1904200556.jpg?v=1792591774",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "strickcardigan-touv8y1904200556",
+   "fetched_at": "2026-10-30T12:25:28.251Z"
+  }
+ },
+ {
+  "id": "organicbasics-8738579579212",
+  "shop_id": "organicbasics",
+  "name": "True Knit Sleeveless Turtleneck",
+  "vendor": "Organic Basics",
+  "description": "Look cool while staying warm in this soft and cozy knitted top. Features a roll-neck and a a cropped fit that hits at the natural waist. Made in a ribbed cotton material.",
+  "category": "top",
+  "gender": null,
+  "themes": [
+   "old_money"
+  ],
+  "seasons": [
+   "autumn",
+   "winter"
+  ],
+  "price_eur": 52.5,
+  "stock": {
+   "XS": 1,
+   "S": 1,
+   "M": 1,
+   "L": 0,
+   "XL": 1
+  },
+  "stock_kind": "boolean",
+  "variants": {
+   "XS": 47268378181964,
+   "S": 47268378214732,
+   "M": 47268378247500,
+   "XL": 47268378313036
+  },
+  "delivery_days": 3,
+  "url": "https://organicbasics.com/products/true-knit-sleeveless-turtleneck-soft-vanilla",
+  "image": "https://cdn.shopify.com/s/files/1/0636/2284/0540/files/dg_organic_basics-women-organic_cotton-true_knit-sleeveless_turtleneck-soft_vanilla-studio-1.jpg?v=1724797338",
+  "source": {
+   "type": "shopify_products_json",
+   "handle": "true-knit-sleeveless-turtleneck-soft-vanilla",
+   "fetched_at": "2026-10-30T12:25:25.457Z"
+  }
+ }
+]

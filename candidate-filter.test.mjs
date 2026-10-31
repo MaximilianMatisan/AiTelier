@@ -208,6 +208,31 @@ test("a size keeps only the items that carry that label", () => {
   assert.ok(!ids(result).includes("bottom-32"));
 });
 
+test("a garment letter size does not empty the shoe slot", () => {
+  // The bug: a brief saying "large" became stock ["L"], and the filter asked
+  // every slot for size L. Shoes are sized in numbers, so the slot came back
+  // empty and the run stopped before the stylist.
+  const items = [
+    item("top-l", { stock: { L: 1 } }),
+    item("bottom-l", { category: "bottom", stock: { L: 1 } }),
+    item("shoes-43", { category: "shoes", stock: { "43": 1 } }),
+    // A mislabelled "shoe" whose stock carries letters must not make "L" a
+    // shoe size either.
+    item("shoes-gloves", { category: "shoes", stock: { L: 1 } }),
+  ];
+  const real = catalogueFacets(items);
+  const result = applySelection(
+    items,
+    real,
+    selection({ categoryCounts: { top: 1, bottom: 1, shoes: 1 }, stock: ["L"] }),
+  );
+  assert.deepEqual(result.missing, []);
+  assert.ok(ids(result).includes("shoes-43"), "numeric shoe size was dropped");
+  // Tops and bottoms still honour the stated size.
+  assert.ok(ids(result).includes("top-l"));
+  assert.ok(ids(result).includes("bottom-l"));
+});
+
 test("a flat size list cannot tell shoe size 43 from waist 43", () => {
   // The comment in matches() says a waist-43 trouser must not match shoe 43.
   // `stock` carries no slot, so it does: this pins today's behaviour.
