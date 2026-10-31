@@ -41,15 +41,18 @@ const PIPELINE_BUDGET_MS =
   Number(process.env.AITELIER_PIPELINE_BUDGET_MS) || 8 * 60_000;
 
 /** Runs the pipeline as its own process; resolves true on exit code 0. */
-export function runPipeline(args, timeoutMs, logFile) {
+export function runPipeline(args, timeoutMs, logFile, env = {}) {
   return new Promise((resolve) => {
     const log = openSync(logFile, "a", 0o600);
+    // Variables passed here win over .env: the child reads .env only for what
+    // its environment does not already hold.
     const child = spawn(process.execPath, ["--env-file-if-exists=.env", ...args], {
       cwd: ROOT,
       stdio: ["ignore", log, log],
       env: {
         ...process.env,
         PYTHON: process.env.PYTHON ?? (existsSync(path.join(ROOT, VENV_PYTHON)) ? VENV_PYTHON : "python3"),
+        ...env,
       },
     });
     const timer = setTimeout(() => child.kill("SIGTERM"), timeoutMs);
@@ -69,20 +72,37 @@ export function runPipeline(args, timeoutMs, logFile) {
 const TRANSIENT = /Service Unavailable|Too Many Requests|\b429\b|\b50[234]\b|overloaded|ECONNRESET|ETIMEDOUT|fetch failed/i;
 
 /**
+ * The models a repeated run uses. A model that answers "high demand" tends to
+ * keep answering it for a while, so waiting alone often is not enough: with
+ * AITELIER_FALLBACK_MODEL set, the retries ask that model instead. The stylist
+ * follows only when it talks to the same provider as the filter.
+ */
+export function fallbackModelEnv(env = process.env) {
+  const model = env.AITELIER_FALLBACK_MODEL?.trim();
+  if (!model) return {};
+  const sameProvider = !env.GEMINI_BASE_URL?.trim() || env.GEMINI_BASE_URL.trim() === env.ZAI_BASE_URL?.trim();
+  return sameProvider ? { ZAI_MODEL: model, GEMINI_MODEL: model } : { ZAI_MODEL: model };
+}
+
+/**
  * runPipeline(), repeated when a run failed on a provider outage. Every
  * attempt appends to the same log; only the lines one attempt wrote decide
  * whether it is repeated. Gives up when the next try would not fit in
  * `timeoutMs`, so the caller still has its margin to submit.
  */
-export async function runPipelineRetrying(run, args, timeoutMs, logFile, { waits = [15_000, 30_000], sleep = (ms) => new Promise((r) => setTimeout(r, ms)), minRunMs = 90_000 } = {}) {
+export async function runPipelineRetrying(run, args, timeoutMs, logFile, { waits = [15_000, 30_000], sleep = (ms) => new Promise((r) => setTimeout(r, ms)), minRunMs = 90_000, env = process.env } = {}) {
   const end = Date.now() + timeoutMs;
   for (let attempt = 0; ; attempt++) {
     const from = existsSync(logFile) ? statSync(logFile).size : 0;
-    if (await run(args, end - Date.now(), logFile)) return true;
+    if (await run(args, end - Date.now(), logFile, attempt ? fallbackModelEnv(env) : {})) return true;
     const wrote = existsSync(logFile) ? readFileSync(logFile, "utf8").slice(from) : "";
     const wait = waits[attempt];
     if (wait === undefined || !TRANSIENT.test(wrote) || end - Date.now() - wait < minRunMs) return false;
-    log.warn("provider unavailable, running the pipeline again", { attempt: attempt + 2, waitS: wait / 1000 });
+    log.warn("provider unavailable, running the pipeline again", {
+      attempt: attempt + 2,
+      waitS: wait / 1000,
+      model: fallbackModelEnv(env).ZAI_MODEL ?? env.ZAI_MODEL ?? "unchanged",
+    });
     await sleep(wait);
   }
 }

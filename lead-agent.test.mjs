@@ -213,3 +213,27 @@ test("a run that failed on a provider outage is repeated, any other failure is n
   assert.equal(await runPipelineRetrying(down, [], 60_000, logFile, noWait), false);
   assert.equal(calls, 3, "two retries, then it gives up");
 });
+
+test("a repeated run asks the fallback model, the first one does not", async (t) => {
+  const { runPipelineRetrying, fallbackModelEnv } = await import("./logic/lead-agent.mjs");
+  const dir = path.join(tmpdir(), `fallback-${process.pid}`);
+  mkdirSync(dir, { recursive: true });
+  t.after(() => rmSync(dir, { recursive: true, force: true }));
+  const logFile = path.join(dir, "pipeline.log");
+  const seen = [];
+  const run = async (_args, _ms, file, env) => {
+    seen.push(env);
+    if (seen.length === 1) {
+      writeFileSync(file, "503 Service Unavailable\n", { flag: "a" });
+      return false;
+    }
+    return true;
+  };
+  const env = { ZAI_MODEL: "primary", ZAI_BASE_URL: "https://p", AITELIER_FALLBACK_MODEL: "spare" };
+  assert.equal(await runPipelineRetrying(run, [], 60_000, logFile, { waits: [1], sleep: async () => {}, minRunMs: 0, env }), true);
+  assert.deepEqual(seen, [{}, { ZAI_MODEL: "spare", GEMINI_MODEL: "spare" }]);
+
+  assert.deepEqual(fallbackModelEnv({}), {});
+  // A stylist on another provider keeps its own model.
+  assert.deepEqual(fallbackModelEnv({ ...env, GEMINI_BASE_URL: "https://other" }), { ZAI_MODEL: "spare" });
+});
