@@ -23,7 +23,7 @@ holds.
 | Step 3 · candidate filter | ✅ `candidateFilter.mjs` (LLM picks filters, code applies them) |
 | Step 3a · customer profile | ✅ `logic/run-pipeline.mjs`: drops garments marked for the other gender, maps a waist size to the letter size shops use when that reaches a cheaper item |
 | Step 3b · drop sizes the customer cannot buy | ✅ `logic/buyable.mjs` |
-| Step 4 · shop trust check | ⚠️ `trustcheck.mjs` works on its own, **not yet in the pipeline** |
+| Step 4 · shop trust check | ✅ `logic/trust-shops.mjs` runs `trustcheck.mjs` on each shop behind the chosen pieces, after the stylist; **shown on the page and logged only, it decides nothing** |
 | Step 5 · stylist (LLM) | ✅ Person 3, `person3/`; outfits that misuse shorts are rejected by code |
 | Step 6 · final check, five guarantees | ✅ Person 3; ⚠️ checks the cached snapshot unless the live re-check service runs |
 | Step 7 · result page | ✅ `logic/result-page.mjs` writes one HTML page per run; `logic/publish.mjs` puts it on Cloudflare Pages and the Sokosumi result links it (needs `CLOUDFLARE_ACCOUNT_ID`) |
@@ -35,7 +35,7 @@ holds.
 | Pinterest board as style input | ✅ `logic/pinterest.mjs` + `logic/style-profile.mjs`: the first 25 pins of a public board, read by a vision model, steer the stylist |
 | Image input (body photo) | ⏳ Not supported; the task description is text only |
 
-`npm test` runs 326 tests, 1 of them marked todo. On `4a27faa` six of them fail: four intake
+`npm test` runs 348 tests, 1 of them marked todo. Six of them fail: four intake
 tests and two Pinterest tests still expect the free-text checks that `7845365` removed (see
 [Known limits](#known-limits)). Person 3's `pytest` passes 30, skips 1.
 The last measured end-to-end runs ended in `APPROVED` with a 500 EUR budget and in `REFUND`
@@ -61,7 +61,8 @@ logic/run-pipeline.mjs  one process per stage, output in catalog/cache/run/<task
   │  3a customer envelope        order or brief -> customer.json; drop the other gender, map sizes
   │  3b logic/buyable.mjs       keep only sizes the customer can buy
   │  5  person3 scripts.run_catalog   stylist + final check (6) -> person3/result.json
-  │  7  logic/result-page.mjs   result.json -> index.html, the page the customer reads
+  │  4  logic/trust-shops.mjs   the chosen pieces' shops -> trust.json (shown only, decides nothing)
+  │  7  logic/result-page.mjs   result.json (+ style-profile.json, trust.json) -> index.html
   ▼
 logic/publish.mjs       index.html -> Cloudflare Pages, /r/<random>, noindex
   ▼
@@ -152,6 +153,7 @@ check never reaches the module.
 | `catalog/` | Person 1 | Shop seed, cached catalogue, demo order and shortlist — see [catalog/README.md](catalog/README.md) |
 | `candidateFilter.mjs` | Person 2 | Candidate filter |
 | `trustcheck.mjs` | Person 2 | Shop trust check (imprint, policies, domain, LLM verdict) |
+| `logic/trust-shops.mjs` | lead agent | Step 4 in the pipeline: checks the chosen pieces' shops, for the page and the log only |
 | `logic/buyable.mjs` | Person 2/3 | Drops unbuyable sizes before the stylist |
 | `person3/` | Person 3 | Python stylist and final check — see [person3/README.md](person3/README.md) |
 | `PERSON3_*.md` | Person 3 | Input and output contracts, global context |
@@ -294,6 +296,16 @@ node trustcheck.mjs https://www.knowledgecottonapparel.com
 
 Results are cached for 24 hours in `trustCache/<host>.json`.
 
+In the pipeline, step 4 runs after the stylist on the shops behind the chosen pieces, one shop
+at a time. Each shop is checked inside its own `try`/`catch` with a 60 s limit, and the whole
+step stops starting new shops after 150 s, so it always ends inside the stage's three minutes.
+A shop that cannot be checked is "not checked". The verdicts go to the run log
+(`trust: <shop> trustworthy, 92%`) and to the result page: a note on every piece and a section
+"The shops" with the verdict, its summary and up to three red flags. **They decide nothing:** no
+piece is dropped, no outfit refused, no refund caused, and the paid flow never reads them. The
+check reads third-party pages and asks a model, so a guarantee the customer pays on cannot rest
+on it.
+
 ## The order format
 
 A task description is either free text or contains a JSON object.
@@ -405,13 +417,16 @@ cd person3 && .venv/bin/pytest -q
 - **Themes are keyword heuristics.** Only `casual`, `old_money` and `streetwear` exist; punk,
   sportswear and a fit attribute are not in the catalogue yet.
 - **Runtime.** About 110 s with the live filter, about 25 s with the demo shortlist.
-- **Trust check is not in the pipeline yet.** Shop trust is currently assumed.
+- **Shop trust is shown, not guaranteed.** Step 4 informs the customer; the five guarantees
+  still assume every shop is honest. The check uses the model behind `ZAI_*`, so on a free-tier
+  key with a daily request limit (20 for Gemini's free tier) it competes with the filter, the
+  stylist and the Pinterest step, and shows "not checked" once the quota is used up.
 - **Pinterest feed.** Only the newest ~25 pins of a board are in its feed, and Pinterest could
   change or end the feed. The board step adds about 15–40 s with the live model.
 
 ## Next steps
 
-1. Put the trust check into the pipeline (cached per shop), then offer it as an x402 service.
+1. Offer the shop trust check as an x402 service.
 2. Set up Masumi payments on Preprod and complete one paid task with a transaction hash.
 3. Turn on live re-checks in step 6 for paid tasks.
 4. Give a per-item reason in the report, tied to the Pinterest board where there is one.

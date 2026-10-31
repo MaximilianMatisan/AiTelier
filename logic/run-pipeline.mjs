@@ -539,6 +539,7 @@ async function main() {
   const customer = path.join(outDir, "customer.json");
   const selectionFile = path.join(outDir, "selection.json");
   const styleFile = path.join(outDir, "style-profile.json");
+  const trustFile = path.join(outDir, "trust.json");
   const resultDir = path.join(outDir, "person3");
 
   console.log(`order:  ${orderPath}`);
@@ -581,6 +582,8 @@ async function main() {
     // A rerun into the same folder must not show an earlier order's board.
     await rm(path.resolve(ROOT, styleFile), { force: true });
   }
+  // Nor an earlier run's shop checks.
+  await rm(path.resolve(ROOT, trustFile), { force: true });
 
   const ok =
     (await stage(
@@ -695,6 +698,18 @@ async function main() {
   // The customer reads a page, not result.json. Generate it whichever way the
   // run went: a refusal has to be explainable too.
   if (ok) {
+    // Step 4, shown only: the shops behind the chosen pieces are checked and
+    // the verdicts go to the log and the page. Nothing above depends on them,
+    // and a check that fails or overruns never stops the run.
+    await stage("4b/4 shop trust check (shown only)", "", async () => {
+      try {
+        const checked = await run("node", ["--env-file-if-exists=.env", "logic/trust-shops.mjs", "--run", outDir]);
+        if (!checked.ok) console.log(`trust: not run, ${checked.reason}`);
+      } catch (error) {
+        console.log(`trust: not run, ${error.message}`);
+      }
+      return { ok: true };
+    });
     await stage("5/5 result page (Person 1)", "", () =>
       run("node", [
         "logic/result-page.mjs",
