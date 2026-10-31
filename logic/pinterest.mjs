@@ -10,6 +10,7 @@
 // and a link that redirected anywhere else could make this server fetch an
 // internal address on their behalf.
 import { fileURLToPath } from "node:url";
+import { logger } from "../log.mjs";
 
 /** Hosts a board link may name: pinterest.com, de.pinterest.com, pinterest.co.uk, ... */
 const PINTEREST_HOST = /^(?:[a-z]{2,3}\.)?pinterest\.(?:[a-z]{2,3}|co\.uk|com\.au|com\.mx|co\.kr)$/;
@@ -32,6 +33,16 @@ const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif
 const MAX_REDIRECTS = 5;
 
 const BOARD_HELP = "Send the link of a public Pinterest board, for example https://www.pinterest.com/name/board-name/";
+const log = logger("pinterest");
+
+const linkLabel = (link) => {
+  try {
+    const url = new URL(/^https?:\/\//i.test(link) ? link : `https://${link}`);
+    return `${url.hostname}${url.pathname}`;
+  } catch {
+    return String(link).slice(0, 120);
+  }
+};
 
 /**
  * The first Pinterest link in a text, as written. Accepts links with or without
@@ -41,7 +52,9 @@ export function findPinterestLink(text) {
   const match = String(text ?? "").match(
     /(?<![\w.-])(?:https?:\/\/)?(?:[a-z]{2,3}\.)?pinterest\.[a-z.]{2,6}\/[^\s<>"'()[\]{}]*|(?<![\w.-])(?:https?:\/\/)?pin\.it\/[A-Za-z0-9]+/i,
   );
-  return match ? match[0].replace(/[.,;:!?]+$/, "") : null;
+  const link = match ? match[0].replace(/[.,;:!?]+$/, "") : null;
+  if (link) log.info("Pinterest link found", { link: linkLabel(link) });
+  return link;
 }
 
 /**
@@ -191,17 +204,28 @@ async function resolveShort(url, fetchImpl) {
  * customer can act on: a secret board, a pin link, an empty board.
  */
 export async function readBoard(link, { fetchImpl = fetch, limit = MAX_PINS } = {}) {
+  log.info("Pinterest board read started", { link: linkLabel(link), limit });
   let target = parseBoardLink(link);
   if (target.error) throw new Error(target.error);
-  if (target.kind === "short") target = await resolveShort(target.url, fetchImpl);
+  if (target.kind === "short") {
+    log.debug("Resolving Pinterest short link", { link: linkLabel(target.url) });
+    target = await resolveShort(target.url, fetchImpl);
+    log.info("Pinterest short link resolved", { kind: target.kind, board: target.board });
+  }
   let feed;
   try {
     feed = await guardedGet(target.feed, { fetchImpl, hosts: [PINTEREST_HOST], maxBytes: FEED_MAX_BYTES });
   } catch (error) {
+    log.warn("Pinterest board fetch failed", {
+      board: target.board,
+      status: error.status,
+      reason: String(error?.message ?? error).slice(0, 160),
+    });
     if (error.status === 404) throw new Error("This board is not public or does not exist. Secret boards cannot be read.");
     throw new Error(`Pinterest did not answer: ${error.message}`);
   }
   const pins = parseFeed(feed.body.toString("utf8"), limit);
+  log.info("Pinterest pins found", { kind: target.kind, board: target.board, pins: pins.length, limit });
   if (!pins.length) throw new Error("This board has no pins with pictures.");
   return { board: { kind: target.kind, user: target.user, board: target.board ?? null }, pins };
 }
@@ -213,19 +237,28 @@ export async function readBoard(link, { fetchImpl = fetch, limit = MAX_PINS } = 
 export async function downloadImages(pins, { fetchImpl = fetch, concurrency = 5 } = {}) {
   const images = new Array(pins.length).fill(null);
   let next = 0;
+  let failed = 0;
   async function worker() {
     while (next < pins.length) {
       const index = next++;
       try {
         const got = await guardedGet(pins[index].image, { fetchImpl, hosts: [IMAGE_HOST], maxBytes: IMAGE_MAX_BYTES });
         if (IMAGE_TYPES.has(got.type)) images[index] = { ...pins[index], bytes: got.body, mediaType: got.type };
-      } catch {
+        else failed++;
+      } catch (error) {
+        failed++;
+        log.debug("Pinterest image skipped", {
+          index: index + 1,
+          reason: String(error?.message ?? error).slice(0, 160),
+        });
         // skipped; the count of pictures used is reported with the profile
       }
     }
   }
   await Promise.all(Array.from({ length: Math.min(concurrency, pins.length) }, worker));
-  return images.filter(Boolean);
+  const downloaded = images.filter(Boolean);
+  log.info("Pinterest images downloaded", { requested: pins.length, downloaded: downloaded.length, skipped: failed });
+  return downloaded;
 }
 
 async function main() {
