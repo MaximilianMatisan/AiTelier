@@ -448,14 +448,18 @@ export function confirmText(outfit) {
 
 /** The receipt or the refusal the payment module came back with. */
 export function checkoutText(outcome, outfit) {
-  if (outcome?.status === "paid")
+  if (outcome?.status === "paid") {
+    const paid = Number.isFinite(outcome.paidAmount) ? outcome.paidAmount : outfit.total;
+    const currency = outcome.paidCurrency || outfit.currency;
     return [
-      `Paid: **${outfit.name}**, ${money(outfit.total, outfit.currency)}.`,
+      `Paid: **${outfit.name}**, ${money(paid, currency)}.`,
       outcome.txHash ? `Transaction: \`${outcome.txHash}\`` : null,
+      outcome.detail ? `_${outcome.detail}_` : null,
       outcome.mock ? "_No money moved: this run used the mock payment provider._" : null,
       "",
       "Shall I style another capsule for you?",
     ].filter((line) => line !== null).join("\n");
+  }
   const detail = outcome?.detail ? ` ${outcome.detail}` : "";
   return `The payment did not go through, so nothing was bought.${detail}\n\nThe outfit is still on the table: say **yes** to try again, or pick another look.`;
 }

@@ -67,6 +67,7 @@ export function purchaseFromOutfit(outfit, { conversationId, budget_eur = null, 
       price: Number(item.price ?? 0),
       currency: item.currency ?? outfit?.currency ?? "EUR",
       product_url: item.product_url ?? "",
+      image_url: item.image_url ?? "",
     })),
     total: Number(outfit?.total ?? 0),
     shipping: Number(outfit?.shipping ?? 0),
@@ -147,7 +148,7 @@ export function normaliseOutcome(outcome) {
  * the customer what happened, and a thrown error in a comment loop reads as a
  * silent agent.
  */
-export async function payForOutfit(outfit, { conversationId, budget_eur = null, pay, env = process.env, timeoutMs = 120_000 } = {}) {
+export async function payForOutfit(outfit, { conversationId, budget_eur = null, pay, env = process.env, timeoutMs = 180_000 } = {}) {
   const purchase = purchaseFromOutfit(outfit, { conversationId, budget_eur });
   const errors = validatePurchase(purchase);
   if (errors.length) {

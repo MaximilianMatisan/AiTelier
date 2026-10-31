@@ -232,7 +232,7 @@ export function formatResult(result) {
   return lines.join("\n").trim();
 }
 
-export async function pipelineAnswer(input, journal, deadline, { run = runPipeline, publish = publishPage } = {}) {
+export async function pipelineAnswer(input, journal, deadline, { run = runPipeline, publish = publishPage, payment = null } = {}) {
   const intake = readOrder(input);
   if (!intake.ok) {
     log.warn("order refused", { errors: intake.errors.length, first: intake.errors[0] });
@@ -260,6 +260,10 @@ export async function pipelineAnswer(input, journal, deadline, { run = runPipeli
     "--task-id", taskId,
   ];
   if (process.env.AITELIER_SHORTLIST) args.push("--shortlist", process.env.AITELIER_SHORTLIST);
+  // The escrow deposit, when the paid flow has one. The page names it the same
+  // way the result text does, so the customer reads one transaction twice
+  // rather than two different claims.
+  if (payment?.txHash) args.push("--payment-tx", payment.txHash);
   log.info("pipeline started", {
     task: taskId,
     order: intake.order.brief ? "free-text" : "json",
