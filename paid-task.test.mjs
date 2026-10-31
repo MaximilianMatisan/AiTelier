@@ -12,6 +12,7 @@ import {
   REFUND_OFFER,
   REFUND_WORD,
   refundAuthorizedNotice,
+  REFUND_NEEDS_REQUEST,
 } from "./paid-task.mjs";
 const registration = {
   walletId: "seller-wallet",
@@ -567,4 +568,50 @@ test("the refund notice says the whole amount is coming back", () => {
   assert.match(text, /full amount/);
   assert.match(text, /too expensive/);
   assert.doesNotMatch(refundAuthorizedNotice(null), /You told us/);
+});
+
+test("a refund we cannot authorize is told apart from a failure", async () => {
+  // authorize-refund authorizes a request the buyer has already raised. Until
+  // one exists Core answers 404 "Payment not found or in invalid state", and
+  // we hold the payment, not the purchase, so we cannot raise it for them.
+  // Claiming a refund here would be a lie about money.
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    mps: async () => {
+      throw new Error("MPS /api/v1/payment/authorize-refund failed HTTP 404. Inspect saved state before retry.");
+    },
+    core: { ...core, post: async () => ({ data: { id: "event" } }) },
+  });
+  const error = await adapter
+    .refund(task, { input: "abc", paid: { stage: "awaiting-withdrawal", payment } }, "no")
+    .then(() => null, (e) => e);
+  assert.ok(error, "it must not resolve as though the money went back");
+  assert.equal(error.needsBuyerRequest, true);
+});
+
+test("a real payment failure is not mistaken for a missing request", async () => {
+  const adapter = await createPaidAdapter({
+    target,
+    registration,
+    save: async () => {},
+    answer: async () => "unused",
+    mps: async () => {
+      throw new Error("MPS /api/v1/payment/authorize-refund failed HTTP 500. Inspect saved state before retry.");
+    },
+    core: { ...core, post: async () => ({ data: { id: "event" } }) },
+  });
+  const error = await adapter
+    .refund(task, { input: "abc", paid: { stage: "awaiting-withdrawal", payment } }, "no")
+    .then(() => null, (e) => e);
+  assert.ok(error);
+  assert.notEqual(error.needsBuyerRequest, true, "a 500 must still look like a failure");
+});
+
+test("what we say when we cannot refund promises nothing we cannot do", () => {
+  assert.doesNotMatch(REFUND_NEEDS_REQUEST, /returns the full amount|is authorized/);
+  assert.match(REFUND_NEEDS_REQUEST, /cannot hand this payment back on my own/);
+  assert.match(REFUND_NEEDS_REQUEST, /you.*raise|raise.*you/i);
 });

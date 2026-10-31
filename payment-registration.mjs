@@ -30,6 +30,17 @@ async function request(path, body) {
     throw Error(`${r.status}: ${JSON.stringify(j.error ?? j.message ?? {})}`);
   return j.data;
 }
+/**
+ * Which of the agent's registered payment sources a purchase refers to.
+ * paid-task.mjs needs this index and refuses to quote without it; the registry
+ * returns the single Preprod Web3CardanoV2 source registered below.
+ */
+function paymentSourceIndex(registration) {
+  const index = (registration?.supportedPaymentSources ?? []).findIndex(
+    (s) => s.paymentSourceType === "Web3CardanoV2" && s.network === "Preprod",
+  );
+  return index < 0 ? undefined : index;
+}
 if (process.argv[2] === "key") {
   if (state.runtimeKeyId) {
     requireSavedRuntimeToken(".local/mps-runtime.env");
@@ -139,6 +150,7 @@ if (process.argv[2] === "key") {
   state.registrationId = r.id;
   state.registrationWritePending = false;
   state.registration = r;
+  state.supportedPaymentSourceIndex = paymentSourceIndex(r);
   save();
   console.log(JSON.stringify(r));
 } else {
@@ -154,6 +166,7 @@ if (process.argv[2] === "key") {
         state.registration = x;
         state.agentIdentifier = x.agentIdentifier;
         state.registrationState = x.state;
+        state.supportedPaymentSourceIndex = paymentSourceIndex(x);
       } else Object.values(x).forEach(walk);
     }
   };
@@ -164,6 +177,7 @@ if (process.argv[2] === "key") {
       id: state.registrationId,
       state: state.registration?.state,
       agentIdentifier: state.agentIdentifier,
+      supportedPaymentSourceIndex: state.supportedPaymentSourceIndex,
       transaction: state.registration?.CurrentTransaction,
       error: state.registration?.error,
     }),

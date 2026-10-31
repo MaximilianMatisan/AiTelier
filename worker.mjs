@@ -3,7 +3,13 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
-import { createPaidAdapter, paidMode, unpaidFailure, REFUND_WORD } from "./paid-task.mjs";
+import {
+  createPaidAdapter,
+  paidMode,
+  unpaidFailure,
+  REFUND_WORD,
+  REFUND_NEEDS_REQUEST,
+} from "./paid-task.mjs";
 import {
   taskTarget,
   isTaskForTarget,
@@ -76,7 +82,28 @@ async function refundIfAsked(task, state) {
     // Marked before the money moves, so a crash cannot authorize it twice.
     seen[event.id] = "refunding";
     writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
-    const next = await paid.refund(task, state, event.comment);
+    let next;
+    try {
+      next = await paid.refund(task, state, event.comment);
+    } catch (error) {
+      if (!error?.needsBuyerRequest) {
+        // A real failure: leave it unmarked so the next poll tries again,
+        // rather than swallowing the customer's request for good.
+        delete seen[event.id];
+        writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+        throw error;
+      }
+      // We cannot refund alone. Say so once - the chat must not answer this
+      // with "I did not catch a change there" - and leave it to the on-chain
+      // watcher, which authorizes the moment a request appears.
+      await postTaskComment(runtime, task.id, REFUND_NEEDS_REQUEST);
+      seen[event.id] = "told-how-to-ask";
+      writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
+      log.warn("refund asked for, but the escrow has no request to authorize", {
+        task: task.id,
+      });
+      return state;
+    }
     seen[event.id] = "refunded";
     writeFileSync(seenFile, JSON.stringify(seen), { mode: 0o600 });
     log.info("refund asked for in a comment", { task: task.id });
@@ -231,15 +258,21 @@ while (true) {
               review.action === "ask" ? "asked for the missing details" : "order refused",
               { task: t.id, reasons: review.reasons, closed },
             );
-            writeFileSync(
-              journal,
-              JSON.stringify({
-                ...state,
-                phase: review.action === "ask" ? "asked" : "refused",
-                reasons: review.reasons,
-              }),
-              { mode: 0o600 },
-            );
+            // Updated in memory as well as on disk. Writing only the journal
+            // left this pass still holding phase "started", so the refusal
+            // never took effect: the Task fell straight through to the paid
+            // flow, the escrow was locked, and the refusal itself was
+            // submitted as the result. The customer was charged to be told
+            // their order was unusable, under a message saying nothing was
+            // charged. The paid flow then saved its own state over the
+            // journal, so the next poll refused again - which is why the same
+            // refusal was posted to the thread every few seconds.
+            state = {
+              ...state,
+              phase: review.action === "ask" ? "asked" : "refused",
+              reasons: review.reasons,
+            };
+            writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
           }
         }
         // A Task that was refused, or sent back for the missing details, is not
