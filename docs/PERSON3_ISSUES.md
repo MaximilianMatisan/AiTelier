@@ -54,10 +54,25 @@ layers in `resolver.py:109`. Mapping `"black slim jeans"` to `bottom` needs the
 same keyword matching Person 1 already does in `logic/data/normalize.js`
 (`categoryOf`), which is worth reusing rather than writing twice.
 
-**Stopgap available on Person 1's side:** `options.required_layers` is honoured
-when set, so Person 1 could compute it and leave owned layers out. Not done,
-because it would mean duplicating the season-based derivation in
-`app/models.py` and the two would drift. Say the word if you want it anyway.
+**A stopgap is now in place on Person 1's side, and it should be removed once
+this is fixed properly.** `options.required_layers` is honoured when set, so
+`layersMinusOwned` in `logic/run-pipeline.mjs` classifies each owned garment
+into a layer and sends the list with those layers left out.
+
+Two things to know about it:
+
+- It only sends anything when an owned garment actually maps to a layer that
+  was going to be required. Every other order still falls through to
+  `app/models.py:102` untouched.
+- Because Person 3 offers no way to subtract a single layer, the stopgap has
+  to supply the whole list, which means `requiredLayersFor` is **a copy of
+  your rule**. `run-pipeline.test.mjs` pins all four branches and also reads
+  `app/models.py` and asserts your keyword groups are still there verbatim, so
+  if you change the rule that test fails and names the fragment it could not
+  find. Please let it fail rather than deleting it — it is the only thing
+  holding the copy to the original.
+
+Reading `customer.owned` in Person 3 makes all of this unnecessary.
 
 ---
 

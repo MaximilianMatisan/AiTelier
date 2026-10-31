@@ -18,7 +18,7 @@ import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { readOrder, refusal, SEASONS } from "./intake.mjs";
-import { equivalentSizes } from "./data/normalize.js";
+import { equivalentSizes, categoryOf } from "./data/normalize.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -312,6 +312,76 @@ export function fitSizesToCatalogue(sizes, envelope) {
   return { sizes: adjusted, swaps };
 }
 
+// A knit and a shirt are both "top" to the catalogue's classifier, but Person 3
+// keeps base and mid apart, so the two are separated here.
+const MID_WORDS =
+  /\b(?:sweater|pullover|knit|strick|cardigan|jumper|hoodie|sweatshirt|fleece|roll-?neck|turtleneck|gilet)\b/i;
+
+/**
+ * Which layer a garment the customer already owns fills, or null when it
+ * cannot be placed. Guessing is the one thing not to do here: dropping the
+ * wrong layer buys the customer nothing for that slot.
+ */
+export function layerOwned(text) {
+  const words = String(text ?? "").toLowerCase();
+  const category = categoryOf(words);
+  if (category === "bottom" || category === "shoes" || category === "outer") return category;
+  if (category === "top") return MID_WORDS.test(words) ? "mid" : "base";
+  return null;
+}
+
+/**
+ * The layers Person 3 would ask for.
+ *
+ * MIRRORS `StylistRequest.required_layers` in person3/app/models.py. Person 3
+ * uses `options.required_layers` when we set it and derives the list from the
+ * weather words when we do not, so removing a single layer means supplying the
+ * whole list - there is no way to subtract one. The test pins every branch, so
+ * if Person 3's rule changes the mismatch shows up there rather than in a
+ * customer's result.
+ */
+const LAYERS_BY_WEATHER = [
+  [["summer", "hot", "warm", "tropical"], ["base", "bottom", "shoes"]],
+  [["winter", "cold", "snow", "freezing"], ["base", "mid", "outer", "bottom", "shoes"]],
+  [["autumn", "spring", "mild", "rain", "wet"], ["base", "mid", "bottom", "shoes"]],
+];
+
+export function requiredLayersFor(customer = {}) {
+  const text = [customer.season, customer.climate, customer.fit_description]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  for (const [words, layers] of LAYERS_BY_WEATHER)
+    if (words.some((word) => text.includes(word))) return layers;
+  return ["base", "bottom", "shoes"];
+}
+
+/**
+ * What to ask Person 3 for once the customer's own wardrobe is taken off the
+ * list, or null to leave Person 3's own rule alone.
+ *
+ * Person 3 never reads `customer.owned` (see docs/PERSON3_ISSUES.md), so a
+ * brief saying "I already own black slim jeans" made the model leave the
+ * bottom out - correctly - and then the resolver refused the outfit for a
+ * missing bottom and the whole order was refunded. Naming the layers keeps
+ * that from happening while the stylist is fixed properly.
+ *
+ * Nothing is sent when the customer owns nothing we can place, so this
+ * duplication stays out of the path of every other order.
+ */
+export function layersMinusOwned(customer = {}) {
+  const owned = [...new Set((customer.owned ?? []).map(layerOwned).filter(Boolean))];
+  if (!owned.length) return null;
+  const required = requiredLayersFor(customer);
+  const covered = owned.filter((layer) => required.includes(layer));
+  if (!covered.length) return null;
+  const kept = required.filter((layer) => !covered.includes(layer));
+  // Owning every layer is not an order for clothes; let Person 3 answer as it
+  // would have rather than asking it to build an outfit out of nothing.
+  if (!kept.length) return null;
+  return { required: kept, covered };
+}
+
 /**
  * Fill the slots the customer left open with one label each.
  *
@@ -485,6 +555,18 @@ async function main() {
       const { sizes: settled, assumed } = unifySizes(sizes, shortlisted);
       brief.customer.sizes = settled;
       for (const note of assumed) console.log(`size: ${note}`);
+      // Person 3 does not read customer.owned, so the layers it must still
+      // buy are named for it. Without this a brief that mentions a garment the
+      // customer owns was refunded for a layer the model rightly left out.
+      const wardrobe = layersMinusOwned(brief.customer);
+      if (wardrobe) {
+        brief.options = { ...brief.options, required_layers: wardrobe.required };
+        console.log(
+          `owned: ${wardrobe.covered.join(", ")} already owned; asking Person 3 for ${wardrobe.required.join(", ")}`,
+        );
+      } else if ((brief.customer.owned ?? []).length) {
+        console.log(`owned: ${brief.customer.owned.length} item(s) could not be placed in a layer`);
+      }
       // run_catalog.py copies every top-level key but `customer` into its own
       // input, so this is what names the run and its artifact folder.
       brief.task_id = taskId;
