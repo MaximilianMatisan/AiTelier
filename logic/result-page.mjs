@@ -2,6 +2,7 @@
 //
 //   node logic/result-page.mjs --run catalog/cache/run
 //   node logic/result-page.mjs --run catalog/cache/run --out /tmp/result.html
+//   node logic/result-page.mjs --run catalog/cache/run --payment-tx <hash>
 //
 // The customer is about to let money go, or has just had it returned, and the
 // page has to show why: what was chosen, what it costs with shipping, and for
@@ -15,6 +16,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { txExplorerUrl, shortTxHash } from "../settlement.mjs";
 
 const flag = (name, fallback) => {
   const i = process.argv.indexOf(name);
@@ -162,7 +164,7 @@ function boardSection(style) {
   </section>`;
 }
 
-export function renderPage({ result, envelope, live, style = null }) {
+export function renderPage({ result, envelope, live, style = null, payment = null }) {
   const byItem = new Map((envelope.items ?? []).map((i) => [i.item_id, i]));
   const shops = new Map((envelope.shops ?? []).map((s) => [s.shop_id, s]));
   const approved = result.status === "APPROVED";
@@ -220,6 +222,14 @@ export function renderPage({ result, envelope, live, style = null }) {
   const index =
     looks.length > 1
       ? `<nav class="index">${looks.map((_, n) => `<a href="#set-${n + 1}">Set ${n + 1}</a>`).join("")}</nav>`
+      : "";
+
+  // The deposit, when the paid flow confirmed one. The page exists to be
+  // checked, and the customer's own payment is the part they can check without
+  // trusting us: a hash on an explorer says where the money is.
+  const paid =
+    payment?.txHash && payment?.url
+      ? `<p class="pay"><strong>Payment</strong> — 1 test USDM held in escrow on Cardano Preprod · <a href="${esc(payment.url)}" target="_blank" rel="noopener noreferrer">transaction ${esc(shortTxHash(payment.txHash))}</a></p>`
       : "";
 
   return `<!doctype html>
@@ -324,6 +334,8 @@ export function renderPage({ result, envelope, live, style = null }) {
   .carts a:hover { opacity:.85 }
   .refused { border:1px solid var(--no); background:var(--nobg); border-radius:12px; padding:22px; margin-bottom:56px }
   .refused h2 { font-size:24px }
+  .pay { margin:0 0 22px; padding-bottom:20px; border-bottom:1px solid var(--line) }
+  .pay strong { color:var(--ink); font-weight:500 }
   footer { border-top:1px solid var(--line); margin-top:24px; padding-top:22px; color:var(--soft); font-size:13px }
   footer ul { padding-left:18px }
   footer li { margin-bottom:6px }
@@ -365,6 +377,7 @@ ${refused}
 ${sets}
 
 <footer>
+  ${paid}
   <strong>What these numbers rest on</strong>
   <ul>
     <li>Stock is what the shop publishes: available or not, never a count.</li>
@@ -410,10 +423,16 @@ async function main() {
   const style = await read(at("style-profile.json"), null);
 
   const out = path.resolve(ROOT, flag("--out", path.join(run, "index.html")));
-  await writeFile(out, renderPage({ result, envelope, live, style }));
+  // A hash that cannot be a transaction is not a link the page may show.
+  const paymentTx = flag("--payment-tx", null);
+  const paymentUrl = paymentTx ? txExplorerUrl(paymentTx) : null;
+  const payment = paymentUrl ? { txHash: paymentTx, url: paymentUrl } : null;
+  await writeFile(out, renderPage({ result, envelope, live, style, payment }));
 
   const checked = Object.values(live);
   console.log(`${result.status} · ${(result.outfits ?? []).length} outfits · ${checked.filter((r) => r.stale === false).length}/${checked.length} items confirmed live`);
+  if (payment) console.log(`payment: ${payment.txHash}`);
+  else if (paymentTx) console.log(`payment: "${paymentTx}" is not a transaction hash, left out`);
   console.log(`-> ${path.relative(ROOT, out)}`);
 }
 

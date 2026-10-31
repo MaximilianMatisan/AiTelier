@@ -10,6 +10,10 @@
 // The provider behind the filter returned Service Unavailable and Too Many
 // Requests repeatedly, so the demo needs a path that does not depend on it.
 //
+// --payment-tx <hash> puts the escrow deposit on the result page. The paid flow
+// passes it; a run started by hand has none, and the page then leaves the line
+// out rather than claiming a transaction it cannot show.
+//
 // Person 1 owns the catalogue and this wiring. Person 2 owns candidateFilter,
 // Person 3 owns the stylist. Each stage is a separate process on purpose: a
 // stage can be fixed or re-run on its own while the others keep working.
@@ -527,6 +531,9 @@ async function main() {
   for (const w of intake.warnings) console.log(`warning: ${w}`);
   const order = intake.order;
   const prepared = flag("--shortlist", null);
+  // The escrow deposit the paid flow confirmed, when there is one. Passed
+  // through to the page so it names the transaction the customer paid into.
+  const paymentTx = flag("--payment-tx", null);
   const shortlist = prepared ?? path.join(outDir, "shortlist.json");
   const envelope = path.join(outDir, "person3.input.json");
   const customer = path.join(outDir, "customer.json");
@@ -689,7 +696,11 @@ async function main() {
   // run went: a refusal has to be explainable too.
   if (ok) {
     await stage("5/5 result page (Person 1)", "", () =>
-      run("node", ["logic/result-page.mjs", "--run", outDir]),
+      run("node", [
+        "logic/result-page.mjs",
+        "--run", outDir,
+        ...(paymentTx ? ["--payment-tx", paymentTx] : []),
+      ]),
     );
   }
 

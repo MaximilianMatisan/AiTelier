@@ -326,7 +326,11 @@ the variant ids kept in `raw`. A REFUND page says nothing was charged and
 offers no cart at all.
 
 It closes with what the numbers rest on: stock is available-or-not and never a
-count, shipping is a deliberately high estimate rather than a quote.
+count, shipping is a deliberately high estimate rather than a quote. A paid run
+adds the deposit above that list: `--payment-tx <hash>` puts the escrow
+transaction on Preprod CardanoScan, so the customer can check where their money
+is instead of taking the page's word for it. Without a confirmed deposit the
+line is left out rather than faked.
 
 Shop titles are third-party text and are escaped before they reach the page.
 

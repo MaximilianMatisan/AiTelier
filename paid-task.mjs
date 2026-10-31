@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { readFileSync, existsSync, writeFileSync } from "node:fs";
 import { parseEnv } from "node:util";
-import { verifySettlement } from "./settlement.mjs";
+import { verifySettlement, escrowTransaction, shortTxHash } from "./settlement.mjs";
 import { loadSokosumiRuntime } from "./sokosumi-runtime.mjs";
 import {
   taskTarget,
@@ -76,6 +76,14 @@ export function unpaidFailure(state, error) {
   return null;
 }
 
+/**
+ * The receipt line under the result. Only said when the escrow service showed a
+ * confirmed deposit: a customer who paid can open the transaction themselves,
+ * and a customer who did not is not shown a link to nothing.
+ */
+export function paymentLine({ txHash, url }) {
+  return `**Payment:** 1 test USDM held in escrow on Cardano Preprod — [transaction ${shortTxHash(txHash)}](${url})`;
+}
 export function confirmedState(payment, expected) {
   return (
     (payment.CurrentTransaction?.status === "Confirmed" &&
@@ -337,12 +345,17 @@ export async function createPaidAdapter({
           state = await persist(task, state, { ...p, stage: "model-pending" });
           if (Date.now() >= Number(p.payment.submitResultTime))
             throw new Error("Result deadline expired before model send");
+          // The deposit exists by now: the escrow was just read as FundsLocked.
+          // It travels with the answer so the result page can link the same
+          // transaction that the result text names.
+          const escrow = escrowTransaction(observed);
           let result;
           try {
             result = await answer(
               state.input,
               `.local/${task.id}-session.json`,
               Number(p.payment.submitResultTime),
+              { payment: escrow },
             );
           } catch (error) {
             if (!error?.refund) throw error;
@@ -364,6 +377,10 @@ export async function createPaidAdapter({
           }
           if (typeof result !== "string" || !result.trim())
             throw new Error("Model did not return a result");
+          // Under the result, not at the top: the outfits are what was bought,
+          // the deposit is the receipt. Hashed with the rest, so what the
+          // escrow is told matches what the customer read.
+          if (escrow) result = `${result}\n\n${paymentLine(escrow)}`;
           writeFileSync(`.local/${task.id}.txt`, result, { mode: 0o600 });
           return persist(task, state, {
             ...p,
