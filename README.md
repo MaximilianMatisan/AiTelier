@@ -70,16 +70,18 @@ During the chat they can ask for changes or a restyle before confirming.
 
 ### Pipeline stages
 
-The detailed pipeline runs one process per stage and writes its output under the run folder.
+The detailed pipeline runs one process per stage and writes its output under the run folder. The Pinterest stage runs only when a board is given.
 
-* Stage 0: Pinterest style profile, only when a board is given.
-* Stage 1: candidate filter over the cached catalogue.
-* Stage 2: shortlist converted to Person 3 input.
-* Stage 3: customer profile built from the order or brief.
-* Stage 3b: sizes the customer cannot buy are dropped.
-* Stage 4: stylist builds outfits and the five guarantees are checked.
-* Stage 4b: shop trust check, shown on the page and logged only.
-* Stage 5: result page written from the run.
+```mermaid
+flowchart TD
+  S0["0 Pinterest style profile"] ==> S1["1 Candidate filter over cached catalogue"]
+  S1 ==> S2["2 Shortlist to Person 3 input"]
+  S2 ==> S3["3 Customer profile from order or brief"]
+  S3 ==> S3B["3b Drop sizes the customer cannot buy"]
+  S3B ==> S4["4 Stylist builds outfits and five guarantees are checked"]
+  S4 ==> S4B["4b Shop trust check"]
+  S4B ==> S5["5 Result page"]
+```
 
 The worker owns intake, the paid flow, Sokosumi task state and the refund path. The chat owns confirmation and checkout. The result page owns the customer summary.
 
