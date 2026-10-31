@@ -72,7 +72,8 @@ Two things to know about it:
   find. Please let it fail rather than deleting it — it is the only thing
   holding the copy to the original.
 
-Reading `customer.owned` in Person 3 makes all of this unnecessary.
+Reading `customer.owned` in Person 3 makes all of this unnecessary. See also
+**G**, which is the same line refusing for a different reason.
 
 ---
 
@@ -202,3 +203,47 @@ A2UI from somewhere other than this machine shows broken images.
 Tasks running at once overwrote each other's look boards. `task_id` is now the
 real Task id, so each run has its own folder — worth knowing if you cached any
 artifact paths.
+
+---
+
+## G. A layer the model declines becomes a total refusal
+
+Found by running the four regression briefs on 31 Oct. This is the same
+`resolver.py:109` as **A**, but it is not about `owned` — it fires whenever the
+model chooses not to fill a layer, for any reason.
+
+The brief `"male, 150cm, Small; Slim; Old Money"` came back `REFUND`:
+
+```
+"reason": "missing required layers: bottom; missing required layers: bottom"
+```
+
+What actually happened, from `03-selection.json`:
+
+- the model built two sensible outfits of base + mid + shoes, all in size S
+- it put no bottom in either one
+- the shortlist's only bottoms were two products, duplicated — "Soft Knit
+  Barrel Leg Pants" and "True Knit Wide Leg Pants" — plus one short that
+  `combinations.py:42` correctly rejects outside summer
+- neither belongs in a men's old-money look, so the model left the layer out
+- `resolver.py:109` turned that judgement into a refusal of every outfit, and
+  all five guarantees then reported "no outfit passed"
+
+The model was right and the result was a refund.
+
+Worth separating two cases at that line:
+
+- the layer is **covered** (owned, or the model explains itself) → build the
+  outfit without it
+- the layer is **genuinely unavailable** → say *that*, so the customer reads
+  "no trousers in your size and style" instead of five guarantees failing for
+  no stated reason
+
+Either beats refusing silently. A thin shortlist should degrade to a smaller
+outfit or a precise complaint, not to a total refusal.
+
+**Note on that run:** the live filter was returning `Service Unavailable`
+(the ZAI provider), so it used `catalog/cache/shortlist.demo.json`. Against
+the full 8725-item catalogue the model would very likely have found trousers.
+The refusal behaviour is real either way — this is what any thin shortlist
+produces.

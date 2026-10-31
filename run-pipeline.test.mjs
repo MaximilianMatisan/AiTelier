@@ -8,6 +8,8 @@ import {
   layerOwned,
   requiredLayersFor,
   layersMinusOwned,
+  briefToCustomer,
+  unifySizes,
 } from "./logic/run-pipeline.mjs";
 import { keepBuyable } from "./logic/buyable.mjs";
 
@@ -121,4 +123,54 @@ test("Person 3's rule has not changed under the copy of it", () => {
     'return ["base", "mid", "bottom", "shoes"]',
   ])
     assert.ok(models.includes(fragment), `person3/app/models.py no longer contains ${fragment}`);
+});
+
+// intake.namesSize accepts a bare "Small", so the order passes the gate before
+// the escrow. The brief reader did not read it, so nothing downstream knew the
+// size and unifySizes went on to pick L for a customer who asked for Small.
+test("a size stated without a label word is still read", () => {
+  const read = (brief) =>
+    briefToCustomer(brief, null, { today: new Date("2026-10-31") }).envelope.customer.sizes;
+  assert.equal(read("male, 150cm, Small; Slim; Old Money").base, "S");
+  assert.equal(read("medium please, autumn outfits").base, "M");
+  assert.equal(read("extra large outfits for winter").base, "XL");
+  // A labelled size still wins over a bare one.
+  assert.equal(read("top M, but small budget").base, "M");
+  // Nothing to read leaves every slot unset, which is what unifySizes fills.
+  // The gate stops an order like this before it ever gets here.
+  assert.deepEqual(
+    Object.values(read("old money autumn looks")).filter(Boolean),
+    [],
+  );
+});
+
+test("an unstated bottom is matched to the top the customer did state", () => {
+  // Chosen on stock alone, a customer who asked for Small was given XL
+  // trousers and Person 3 refused to build that outfit at all.
+  const envelope = {
+    items: [
+      { category: "bottom", sizes: [{ label: "XL", in_stock: true }, { label: "XL", in_stock: true }] },
+      { category: "bottom", sizes: [{ label: "S", in_stock: true }] },
+    ],
+  };
+  const { sizes, assumed } = unifySizes({ base: "S", mid: "S", outer: "S" }, envelope);
+  assert.equal(sizes.bottom, "S", "XL is better stocked but does not match an S top");
+  assert.match(assumed.join(" "), /to match S/);
+});
+
+test("a bottom falls back to stock when nothing matches the top", () => {
+  const envelope = { items: [{ category: "bottom", sizes: [{ label: "XXL", in_stock: true }] }] };
+  const { sizes } = unifySizes({ base: "S" }, envelope);
+  assert.equal(sizes.bottom, "XXL", "better an odd size than no trousers at all");
+});
+
+test("a waist label counts as matching a letter top size", () => {
+  // equivalentSizes("M") is ["M", "32", "33"], so a waist-sized rack matches.
+  const envelope = {
+    items: [
+      { category: "bottom", sizes: [{ label: "40", in_stock: true }, { label: "40", in_stock: true }] },
+      { category: "bottom", sizes: [{ label: "32", in_stock: true }] },
+    ],
+  };
+  assert.equal(unifySizes({ base: "M" }, envelope).sizes.bottom, "32");
 });

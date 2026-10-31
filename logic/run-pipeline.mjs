@@ -17,7 +17,7 @@ import { spawn } from "node:child_process";
 import { readFile, writeFile, mkdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { readOrder, refusal, SEASONS } from "./intake.mjs";
+import { reviewOrder, SEASONS } from "./intake.mjs";
 import { equivalentSizes, categoryOf } from "./data/normalize.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -135,6 +135,7 @@ export function orderToCustomer(order, brief = null) {
 // and its result shows the budget it used, so the customer sees the assumption.
 const DEFAULT_BUDGET_EUR = Number(process.env.AITELIER_DEFAULT_BUDGET_EUR) || 500;
 const LETTER_SIZES = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const SPELLED_TOP_SIZE = { small: "S", medium: "M", large: "L", "extra large": "XL" };
 const WORD_NUMBERS = { one: 1, two: 2, three: 3, four: 4, five: 5, ein: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5 };
 
 /**
@@ -196,11 +197,25 @@ export function briefToCustomer(brief, selection = null, { today = new Date() } 
   // A size the customer wrote out ("feet 40", "waist 32", "top M") beats the
   // filter's reading, which falls back to a broad range when unsure.
   const said = (re) => text.match(re)?.[1];
+  /**
+   * A brief that only says "Small" states a top size as plainly as "top M"
+   * does, and intake.namesSize treats it as one - so the order passes the gate
+   * before the escrow. Without reading it here nothing downstream knew the
+   * size, and unifySizes went on to pick L for a customer who asked for Small.
+   */
+  const bareTopSize = () => {
+    // "extra large" first, or the alternation would stop at "large".
+    const spelled = text.match(/\b(extra[- ]large|small|medium|large)\b/)?.[1];
+    if (spelled) return SPELLED_TOP_SIZE[spelled.replace("-", " ")];
+    return text.match(/(?:^|[^a-z])(xxs|xs|s|m|l|xl|xxl|xxxl)(?:[^a-z]|$)/)?.[1]?.toUpperCase();
+  };
   const sizes = {
     ...sizesFromLabels(selection?.stock),
     ...Object.fromEntries(
       Object.entries({
-        top: said(/\b(?:top|tops|shirt|oberteil|size|größe)\s*(?:size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl)\b/)?.toUpperCase(),
+        top:
+          said(/\b(?:top|tops|shirt|oberteil|size|größe)\s*(?:size\s*)?(xxs|xs|s|m|l|xl|xxl|xxxl)\b/)?.toUpperCase() ??
+          bareTopSize(),
         waist: said(/\b(?:waist|taille|bundweite|w)\s*(\d{2})\b/),
         shoe_eu: said(/\b(?:feet|foot|shoes?|schuhe?|schuhgröße|eu)\s*(?:size\s*|eu\s*)?(\d{2}(?:[.,]5)?)\b/)?.replace(",", "."),
       }).filter(([, v]) => v),
@@ -400,6 +415,8 @@ export function unifySizes(sizes, envelope) {
   const items = envelope.items ?? [];
   const chosen = { ...sizes };
   const assumed = [];
+  // The top size the customer did stand behind, if any.
+  const statedTop = sizes.base ?? sizes.mid ?? sizes.outer;
   for (const [layer, category] of Object.entries(LAYER_CATEGORY)) {
     if (chosen[layer]) continue;
     const counts = new Map();
@@ -408,12 +425,20 @@ export function unifySizes(sizes, envelope) {
         if (size.in_stock !== false && size.label)
           counts.set(String(size.label), (counts.get(String(size.label)) ?? 0) + 1);
     if (!counts.size) continue;
+    // A bottom has a known relationship to a stated top size - WAIST_TO_LETTER
+    // maps the two - so it is chosen from the labels that agree with it.
+    // Picking on stock alone gave a customer who asked for Small a pair of XL
+    // trousers, and Person 3 refused to build that outfit at all. Shoes have
+    // no such relationship to a shirt size and are left on stock.
+    const agrees = layer === "bottom" && statedTop ? new Set(equivalentSizes(statedTop)) : null;
+    const narrowed = agrees ? [...counts].filter(([label]) => agrees.has(label)) : [...counts];
     // Most stocked first; the label itself breaks a tie so a rerun agrees.
-    const [best, stocked] = [...counts].sort(
+    const [best, stocked] = (narrowed.length ? narrowed : [...counts]).sort(
       (a, b) => b[1] - a[1] || a[0].localeCompare(b[0]),
     )[0];
     chosen[layer] = best;
-    assumed.push(`${layer} was not stated, using ${best} (${stocked} items in stock)`);
+    const why = agrees && narrowed.length ? `, to match ${statedTop}` : "";
+    assumed.push(`${layer} was not stated, using ${best} (${stocked} items in stock${why})`);
   }
   return { sizes: chosen, assumed };
 }
@@ -460,12 +485,16 @@ async function main() {
   await mkdir(path.resolve(ROOT, outDir), { recursive: true });
 
   // Step 1: refuse a bad order here, before the filter spends model calls on it.
-  const intake = readOrder(await readFile(path.resolve(ROOT, orderPath), "utf8"));
-  if (!intake.ok) {
-    console.log(refusal(intake));
+  // The worker asks the same question before the escrow is requested; this is
+  // the same gate for a run started by hand, so "shopping" cannot reach the
+  // filter and spend model calls on an order nobody can fill.
+  const review = reviewOrder(await readFile(path.resolve(ROOT, orderPath), "utf8"));
+  if (review.action !== "proceed") {
+    console.log(review.message);
     process.exitCode = 1;
     return;
   }
+  const intake = review.intake;
   for (const w of intake.warnings) console.log(`warning: ${w}`);
   const order = intake.order;
   const prepared = flag("--shortlist", null);
