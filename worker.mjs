@@ -3,7 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
-import { createPaidAdapter, isPaidReady } from "./paid-task.mjs";
+import { createPaidAdapter, isPaidReady, unpaidFailure } from "./paid-task.mjs";
 import {
   taskTarget,
   isTaskForTarget,
@@ -72,6 +72,16 @@ const once = (taskId, level, message, data) => {
   lastNote.set(taskId, key);
   log[level](message, { task: taskId, ...data });
 };
+/** Phases where work stopped for good: nothing more is done on every poll. */
+const TERMINAL_PHASES = new Set(["refunded", "stalled"]);
+/** The journal as it stands, or {} when it is missing or unreadable. */
+const readJournal = (file) => {
+  try {
+    return existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : {};
+  } catch {
+    return {};
+  }
+};
 while (true) {
   try {
     // Listed with the Coworker's own key: `sokosumi tasks list` uses the
@@ -103,6 +113,9 @@ while (true) {
         let state = existsSync(journal)
           ? JSON.parse(readFileSync(journal, "utf8"))
           : {};
+        // A run that already ended without a result is finished. Polled again it
+        // would only be re-closed, so it is left alone.
+        if (TERMINAL_PHASES.has(state.phase)) continue;
         if (t.status === "RUNNING" && !state.phase)
           once(t.id, "warn", "running in Sokosumi but no local journal; not resumed", {
             hint: "the .local folder was cleared or another machine started it",
@@ -243,10 +256,36 @@ while (true) {
           });
         }
         // A refund is a decision the agent made, not a failure to work: say so,
-        // or it disappears into the same line as a crash.
-        else if (e?.refund)
-          once(t.id, "warn", "refund due, no result submitted", { failed: e.failed ?? e.message });
-        else once(t.id, "error", "task blocked", { error: e.message });
+        // or it disappears into the same line as a crash. Either way the Task
+        // is closed as FAILED, because a run that will submit nothing must not
+        // sit in RUNNING for ever. Closing never submits a result, so nothing
+        // is charged.
+        else {
+          const recorded = readJournal(journal);
+          const outcome = unpaidFailure(recorded, e);
+          if (!outcome) once(t.id, "error", "task blocked", { error: e.message });
+          else {
+            const reported = await closeTaskWithoutResult(runtime, t.id, outcome.text, { log });
+            writeFileSync(
+              journal,
+              JSON.stringify({
+                ...recorded,
+                phase: outcome.phase,
+                failed: e.failed ?? recorded.reasons,
+                reported,
+              }),
+              { mode: 0o600 },
+            );
+            const note = {
+              task: t.id,
+              closed: reported,
+              failed: e.failed ?? e.message,
+            };
+            if (outcome.phase === "refunded")
+              log.warn("refund due, no result submitted", note);
+            else log.error("stopped mid-run, no result submitted", note);
+          }
+        }
       }
     }
   } catch (e) {

@@ -61,6 +61,21 @@ export function stalledNotice(stage) {
     "Starting the order again is safe.",
   ].join("\n");
 }
+/**
+ * How an unpaid run that ends with no result is closed. The paid flow records
+ * this itself; the unpaid path used to only write a log line, so the Task sat
+ * in RUNNING for ever and the local journal stayed at "model-pending".
+ * Returns the terminal phase and what the customer reads, or null when the
+ * phase is one where an operation may already have landed.
+ */
+export function unpaidFailure(state, error) {
+  if (error?.refund)
+    return { phase: "refunded", text: refundNotice(error.failed) };
+  if (RECOVERABLE_PENDING.has(state?.phase))
+    return { phase: "stalled", text: stalledNotice(state.phase) };
+  return null;
+}
+
 export function confirmedState(payment, expected) {
   return (
     (payment.CurrentTransaction?.status === "Confirmed" &&

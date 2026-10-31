@@ -5,6 +5,7 @@ import {
   purchasePayload,
   createPaidAdapter,
   confirmedState,
+  unpaidFailure,
   USDM,
 } from "./paid-task.mjs";
 const registration = {
@@ -359,6 +360,26 @@ test("a Task canceled before the result is submitted is not submitted", async ()
     /CANCELED/,
   );
   assert.equal(submits, 0, "the escrow must not be told a result exists for a canceled Task");
+});
+
+test("an unpaid run that ends with no result is closed, not left RUNNING", async () => {
+  // Seen on a live unpaid Task: the guarantees failed, the worker logged the
+  // refund and wrote nothing else, so the journal stayed at "model-pending" and
+  // the Task sat in RUNNING while every poll only warned "stopped mid-step".
+  const refund = new Error("Guarantees failed");
+  refund.refund = true;
+  refund.failed = ["budget: no outfit passed", "fit: no outfit passed"];
+  const closed = unpaidFailure({ phase: "model-pending" }, refund);
+  assert.equal(closed.phase, "refunded");
+  assert.match(closed.text, /budget: no outfit passed/);
+  assert.match(closed.text, /returns your money/);
+
+  const crash = unpaidFailure({ phase: "model-pending" }, new Error("Pipeline failed or overran"));
+  assert.equal(crash.phase, "stalled", "a pipeline crash is terminal too, so it cannot hang");
+  assert.match(crash.text, /starting the order again is safe/i);
+
+  // Where an operation may already have landed, only a person decides.
+  assert.equal(unpaidFailure({ phase: "complete-pending" }, new Error("x")), null);
 });
 
 test("a Task canceled before completion is not completed", async () => {

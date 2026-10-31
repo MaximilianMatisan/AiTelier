@@ -9,7 +9,7 @@ import {
 } from "node:fs";
 import { answer, client } from "./client.mjs";
 import { inputHash, resultHash, sha256 } from "./standard-hash.mjs";
-import { confirmedState } from "./paid-task.mjs";
+import { confirmedState, unpaidFailure } from "./paid-task.mjs";
 import { HOW_TO_ORDER } from "./logic/intake.mjs";
 import { logger } from "./log.mjs";
 const log = logger("api");
@@ -254,7 +254,26 @@ setInterval(async () => {
         job.phase = "awaiting-result";
         save(job);
       } catch (e) {
-        log.error("standard job needs inspection", { job: job.id, phase: job.phase, error: e.message });
+        // The run stopped before there was a result. Only "model-pending" is
+        // safe to close: nothing was submitted there, and the buyer's escrow
+        // returns the funds if no result hash arrives. Left alone, the job
+        // reported "running" for ever and the buyer never learned why.
+        const outcome =
+          job.phase === "model-pending"
+            ? unpaidFailure({ phase: job.phase }, e)
+            : null;
+        if (outcome) {
+          job.phase = outcome.phase;
+          job.status = "failed";
+          job.error = outcome.text;
+          save(job);
+          log.warn("job closed without a result", {
+            job: job.id,
+            phase: outcome.phase,
+            error: e.message,
+          });
+        } else
+          log.error("standard job needs inspection", { job: job.id, phase: job.phase, error: e.message });
       }
     }
   } finally {
