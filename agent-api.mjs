@@ -10,6 +10,7 @@ import {
 import { answer, client } from "./client.mjs";
 import { inputHash, resultHash, sha256 } from "./standard-hash.mjs";
 import { confirmedState } from "./paid-task.mjs";
+import { HOW_TO_ORDER } from "./logic/intake.mjs";
 import { logger } from "./log.mjs";
 const log = logger("api");
 const jobsDir = ".local/standard-jobs";
@@ -39,10 +40,9 @@ const schema = {
       id: "prompt",
       type: "string",
       name: "Your outfit order",
-      data: {
-        description:
-          "Describe the outfits you want in plain words: your sizes (top, waist in inches, shoes in EU), budget in EUR, number of outfits, style and season.",
-      },
+      // This is the only thing the customer reads before they type, so the
+      // wording lives with the order rules it describes rather than here.
+      data: { description: HOW_TO_ORDER },
       validations: [
         { validation: "min", value: "1" },
         { validation: "max", value: "16000" },

@@ -1,7 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { readOrder, refusal, reviewOrder, TEMPLATE } from "./logic/intake.mjs";
+import {
+  readOrder,
+  refusal,
+  reviewOrder,
+  welcome,
+  HOW_TO_ORDER,
+  ORDER_EXAMPLE,
+  TEMPLATE,
+} from "./logic/intake.mjs";
 import { briefToCustomer, sizesFromLabels } from "./logic/run-pipeline.mjs";
 
 const today = new Date("2026-10-30T12:00:00Z");
@@ -135,4 +143,27 @@ test("a malformed JSON order is refused, not answered at the customer's expense"
   const review = reviewOrder(JSON.stringify({ ...TEMPLATE, sizes: undefined }), { today });
   assert.equal(review.action, "refuse");
   assert.match(review.message, /sizes is required/);
+});
+
+// The greeting is the first thing the customer reads, before the payment
+// request and before any refusal.
+test("the greeting states the bargain and shows an order to copy", () => {
+  const text = welcome();
+  assert.match(text, /pay only if all five guarantees hold/);
+  assert.match(text, /returns your money/);
+  assert.match(text, /will not guess/);
+  assert.ok(text.includes(ORDER_EXAMPLE), "it shows the example order verbatim");
+});
+
+test("the form, the greeting and the refusal cannot drift apart", () => {
+  // One copy of how to order, read by the form the customer fills in, the
+  // greeting posted when the Task is picked up, and every refusal.
+  assert.ok(welcome().includes(HOW_TO_ORDER));
+  assert.ok(refusal({ errors: ["x"] }).includes(ORDER_EXAMPLE));
+  assert.ok(reviewOrder("Organize black clothing collection", { today }).message.includes(ORDER_EXAMPLE));
+});
+
+test("how to order names every size the pipeline needs", () => {
+  for (const needed of [/top/i, /waist/i, /shoes/i, /EUR/])
+    assert.match(HOW_TO_ORDER, needed);
 });

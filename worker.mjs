@@ -4,9 +4,14 @@ import { acquireWorkerLock } from "./worker-lock.mjs";
 import { answer, client } from "./client.mjs";
 import { reply } from "./comments.mjs";
 import { createPaidAdapter, isPaidReady } from "./paid-task.mjs";
-import { taskTarget, isTaskForTarget, closeTaskWithoutResult } from "./task-target.mjs";
+import {
+  taskTarget,
+  isTaskForTarget,
+  closeTaskWithoutResult,
+  postTaskComment,
+} from "./task-target.mjs";
 import { pipelineAnswer } from "./logic/lead-agent.mjs";
-import { reviewOrder } from "./logic/intake.mjs";
+import { reviewOrder, welcome } from "./logic/intake.mjs";
 import { logger } from "./log.mjs";
 const log = logger("worker");
 import { loadSokosumiRuntime } from "./sokosumi-runtime.mjs";
@@ -122,6 +127,16 @@ while (true) {
           state = { phase: "started", input: started.description };
           writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
           log.info("started", { task: t.id, inputChars: state.input?.length ?? 0 });
+        }
+        // Say hello before anything else: the payment request, a refusal and a
+        // request for sizes all read better after the customer knows what they
+        // are buying, what they are not charged for, and what an order looks
+        // like. Posted once per Task, and before any money is asked for.
+        if (state.phase === "started" && !state.greeted) {
+          await postTaskComment(runtime, t.id, welcome());
+          state = { ...state, greeted: true };
+          writeFileSync(journal, JSON.stringify(state), { mode: 0o600 });
+          log.info("greeted", { task: t.id });
         }
         // Read the order before any money is asked for. A description of
         // "shopping" used to reach APPROVED on a guessed budget and a guessed

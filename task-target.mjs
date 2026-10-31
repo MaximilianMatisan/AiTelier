@@ -33,6 +33,11 @@ export function assertTaskTarget(task, target) {
   if (!isTaskForTarget(task, target))
     throw new Error("Task must match the configured Coworker and Workspace");
 }
+/** Says something on the Task without changing its status. */
+export async function postTaskComment(client, taskId, text) {
+  await client.post(`/v1/tasks/${encodeURIComponent(taskId)}/events`, { comment: text });
+}
+
 /**
  * Closes a Task that is going to get no result and tells the customer why, so
  * it does not sit in RUNNING waiting for something that will never arrive.

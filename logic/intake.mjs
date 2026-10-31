@@ -206,6 +206,55 @@ export function readOrder(description, { today = new Date() } = {}) {
   return errors.length ? { ok: false, errors, warnings } : { ok: true, order, warnings };
 }
 
+/**
+ * How to write an order, in the customer's own words. One copy, read by the
+ * form they fill in before submitting (agent-api.mjs), by the greeting the
+ * worker posts when it picks a Task up, and by the refusal when an order
+ * cannot be filled, so the three can never drift apart.
+ */
+export const ORDER_EXAMPLE = [
+  "Two autumn outfits, old money style.",
+  "Budget 400 EUR in total.",
+  "Top M, waist 32, shoes EU 43.",
+  "I already own black slim jeans. Avoid neon.",
+].join("\n");
+
+/** One paragraph, for a form field where newlines may be collapsed. */
+export const HOW_TO_ORDER =
+  "Describe the outfits you want in plain words, and include your sizes: top (S, M, L), " +
+  "waist in inches, shoes in EU. Add your budget in EUR, how many outfits, the style and " +
+  "the season. Sizes are the one thing AiTelier will not guess.";
+
+/**
+ * The first thing the customer reads, posted before any payment is requested.
+ * It says what they are about to buy, what they are not charged for, and shows
+ * the shape of an order they can copy.
+ */
+export function welcome() {
+  return [
+    "## AiTelier",
+    "",
+    "I build complete outfits out of garments that are really in stock in European shops,",
+    "and I check every one of them before you are asked for anything.",
+    "",
+    "**You pay only if all five guarantees hold:** it fits your budget, it comes in your",
+    "size, the shop still has it, the price matches the quote, and it arrives in time.",
+    "If any one of them fails I submit no result at all, and the escrow returns your money.",
+    "",
+    "### How to write your order",
+    "",
+    HOW_TO_ORDER,
+    "",
+    "Copy this and change the values:",
+    "",
+    "```",
+    ORDER_EXAMPLE,
+    "```",
+    "",
+    "A structured JSON order works too: send the same facts as an object.",
+  ].join("\n");
+}
+
 // A free-text brief is accepted as an order, but the pipeline still has to know
 // what to buy and in which size. Without a size Person 2's filter invents one
 // and the customer pays for clothes that do not fit; with no garment or style
@@ -272,7 +321,13 @@ export function reviewOrder(description, options = {}) {
         "- waist in inches, for example 32",
         "- shoe size in EU, for example 43",
         "",
-        "Start the order again with those included and it will run straight through.",
+        "So the whole order reads like this:",
+        "",
+        "```",
+        ORDER_EXAMPLE,
+        "```",
+        "",
+        "Start the order again with your sizes included and it will run straight through.",
       ].join("\n"),
       intake,
     };
@@ -287,8 +342,13 @@ export function refusal({ errors, warnings = [] }) {
     ...errors.map((e) => `- ${e}`),
     ...warnings.map((w) => `- Note: ${w}`),
     "",
-    "Describe your order in plain words, for example: \"Two autumn outfits, old money style,",
-    "budget 400 EUR, top M, waist 32, shoes EU 43.\" Or send it as JSON:",
+    "Describe your order in plain words, for example:",
+    "",
+    "```",
+    ORDER_EXAMPLE,
+    "```",
+    "",
+    "Or send it as JSON:",
     "",
     "```json",
     JSON.stringify(TEMPLATE, null, 2),
